@@ -10,6 +10,15 @@ const experiments = [
   },
 ]
 
+const sections = [
+  {
+    path: '/components',
+    title: 'Components',
+    description:
+      'Every component from the main site (Nav, Footer, Hero, GameCard, forms, etc.), rendered in isolation for review.',
+  },
+]
+
 export default function HomePage() {
   return (
     <main className="sandbox-home">
@@ -20,6 +29,20 @@ export default function HomePage() {
             Design experiments, component previews, prototypes.
           </p>
         </header>
+
+        <section className="sandbox-home_section">
+          <h2 className="sandbox-home_section-title">Browse</h2>
+          <ul className="sandbox-home_list">
+            {sections.map((section) => (
+              <li key={section.path} className="sandbox-home_item">
+                <Link to={section.path} className="sandbox-home_item-link">
+                  {section.title}
+                </Link>
+                <p className="sandbox-home_item-desc">{section.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
 
         <section className="sandbox-home_section">
           <h2 className="sandbox-home_section-title">Experiments</h2>
