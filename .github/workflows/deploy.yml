@@ -1,0 +1,72 @@
+name: Deploy sandbox to GitHub Pages
+
+# Builds with VITE_DEPLOY_TARGET=pages and deploys via the Pages action.
+#
+# The sandbox depends on external-site as a file: sibling via package.json.
+# The workflow checks BOTH repos out side by side so `npm ci` can resolve
+# the `kato8studios-site` symlink to the external-site checkout.
+#
+# Requires Pages source to be set to "GitHub Actions" in repo Settings -> Pages.
+# After that switch, this workflow is the only thing that publishes to
+# https://aeiti.github.io/kato8-sandbox/.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out kato8-sandbox
+        uses: actions/checkout@v4
+        with:
+          path: kato8-sandbox
+
+      - name: Check out external-site (sibling for file: dep)
+        uses: actions/checkout@v4
+        with:
+          repository: terrytkato8/external-site
+          path: external-site
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: kato8-sandbox/package-lock.json
+
+      - name: Install
+        working-directory: kato8-sandbox
+        run: npm ci
+
+      - name: Build
+        working-directory: kato8-sandbox
+        env:
+          VITE_DEPLOY_TARGET: pages
+        run: npm run build
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: kato8-sandbox/docs
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

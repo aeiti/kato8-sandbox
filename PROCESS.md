@@ -73,12 +73,15 @@ Every experiment must be verified in a browser before you call it done — a cod
 
 ## 4. Share with team
 
-The sandbox is not deployed yet. Interim options:
-- Screenshot the page in both states you want to compare (rest / hover / mobile / dark).
-- Record a short screen capture if you're showing motion or transitions.
-- Push your branch and pair-open on a call.
+The sandbox auto-deploys to GitHub Pages on every push to `main`:
 
-When we set up a deploy target (Cloudflare Pages / Vercel / GitHub Pages), document the URL pattern here.
+**https://aeiti.github.io/kato8-sandbox/**
+
+Share the deep link — e.g. `https://aeiti.github.io/kato8-sandbox/kickstarter-buttons` — and the SPA fallback (public/404.html + decode snippet in index.html) restores the client-side route. Direct visits and refreshes both work.
+
+The deploy is driven by `.github/workflows/deploy.yml`, which checks out both this repo and `terrytkato8/external-site` side by side so the `file:` dep resolves in CI. If your experiment adds a new npm dep from external-site or needs an env var, update the workflow.
+
+For work-in-progress that isn't ready to share yet, push to a branch instead of `main` — the workflow only fires on `main`. Screenshot or screen-record if you need to share before merging.
 
 ## 5. Graduating an experiment to production
 

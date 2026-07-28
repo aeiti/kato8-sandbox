@@ -1,3 +1,5 @@
+import { asset } from '../utils/asset'
+
 /**
  * Kickstarter CTA button. Round-2 variants under evaluation.
  *
@@ -22,7 +24,7 @@ export default function KickstarterButton({
       className={`kickstarter-button kickstarter-button--${variant}`}
     >
       <img
-        src="/assets/img/kickstarter-logo-k-white.svg"
+        src={asset('/assets/img/kickstarter-logo-k-white.svg')}
         alt=""
         className="kickstarter-button_logo"
       />
