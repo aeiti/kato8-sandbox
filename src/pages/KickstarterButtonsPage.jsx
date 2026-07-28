@@ -1,4 +1,6 @@
 import KickstarterButton from '../components/KickstarterButton'
+import Seo from '../components/Seo'
+import { staticRoutes } from '../data/seo-config'
 import '../styles/kickstarter-button.css'
 import '../styles/kickstarter-buttons-page.css'
 
@@ -83,6 +85,7 @@ const CATEGORIES = [
 export default function KickstarterButtonsPage() {
   return (
     <main className="kickstarter-buttons-page">
+      <Seo path="/kickstarter-buttons" {...staticRoutes['/kickstarter-buttons']} />
       <header className="kickstarter-buttons-page_header">
         <h1 className="kickstarter-buttons-page_title">Kickstarter button — round 2</h1>
         <p className="kickstarter-buttons-page_subtitle">

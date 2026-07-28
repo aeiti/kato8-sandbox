@@ -87,6 +87,6 @@ export default defineConfig({
     // this, Vite/Rollup would walk up from external-site/src/... looking
     // for node_modules; local dev works because external-site has its
     // own populated node_modules, but CI only installs in the sandbox.
-    dedupe: ['react', 'react-dom', 'react-router-dom'],
+    dedupe: ['react', 'react-dom', 'react-router-dom', 'react-helmet-async'],
   },
 })

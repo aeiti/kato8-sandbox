@@ -3,7 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kato.8 Sandbox</title>
+    <!-- seo:start -->
+    <title data-prerender>Kato.8 Sandbox</title>
+    <meta data-prerender name="description" content="Design experiments, component previews, and prototypes for the Kato.8 Studios main site." />
+    <link data-prerender rel="canonical" href="https://aeiti.github.io/kato8-sandbox/" />
+    <meta data-prerender property="og:site_name" content="Kato.8 Sandbox" />
+    <meta data-prerender property="og:type" content="website" />
+    <meta data-prerender property="og:url" content="https://aeiti.github.io/kato8-sandbox/" />
+    <meta data-prerender property="og:title" content="Kato.8 Sandbox" />
+    <meta data-prerender property="og:description" content="Design experiments, component previews, and prototypes for the Kato.8 Studios main site." />
+    <meta data-prerender property="og:image" content="https://aeiti.github.io/kato8-sandbox/assets/img/kato-webclip.png" />
+    <meta data-prerender name="twitter:card" content="summary_large_image" />
+    <meta data-prerender name="twitter:title" content="Kato.8 Sandbox" />
+    <meta data-prerender name="twitter:description" content="Design experiments, component previews, and prototypes for the Kato.8 Studios main site." />
+    <meta data-prerender name="twitter:image" content="https://aeiti.github.io/kato8-sandbox/assets/img/kato-webclip.png" />
+    <!-- seo:end -->
+
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin="anonymous" />
     <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
@@ -43,6 +58,11 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Strip prerendered SEO tags so react-helmet-async owns them after hydration.
+      // Crawlers (no JS) keep the route-specific tags from the prerendered HTML.
+      document.querySelectorAll('[data-prerender]').forEach(function (el) { el.remove() })
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
