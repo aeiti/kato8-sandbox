@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import '../styles/home.css'
 
 const experiments = [
   {
@@ -11,29 +12,29 @@ const experiments = [
 
 export default function HomePage() {
   return (
-    <main
-      style={{
-        padding: '2rem',
-        maxWidth: 720,
-        margin: '0 auto',
-        fontFamily: 'system-ui, sans-serif',
-      }}
-    >
-      <h1>Kato.8 Sandbox</h1>
-      <p style={{ color: '#666' }}>
-        Design experiments, component previews, prototypes.
-      </p>
-      <section style={{ marginTop: '2rem' }}>
-        <h2>Experiments</h2>
-        <ul>
-          {experiments.map((exp) => (
-            <li key={exp.path} style={{ marginBottom: '.5rem' }}>
-              <Link to={exp.path}>{exp.title}</Link>
-              <div style={{ color: '#666', fontSize: '.9rem' }}>{exp.description}</div>
-            </li>
-          ))}
-        </ul>
-      </section>
+    <main className="sandbox-home">
+      <div className="container">
+        <header className="sandbox-home_header">
+          <h1 className="sandbox-home_title">Kato.8 Sandbox</h1>
+          <p className="sandbox-home_subtitle">
+            Design experiments, component previews, prototypes.
+          </p>
+        </header>
+
+        <section className="sandbox-home_section">
+          <h2 className="sandbox-home_section-title">Experiments</h2>
+          <ul className="sandbox-home_list">
+            {experiments.map((exp) => (
+              <li key={exp.path} className="sandbox-home_item">
+                <Link to={exp.path} className="sandbox-home_item-link">
+                  {exp.title}
+                </Link>
+                <p className="sandbox-home_item-desc">{exp.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
     </main>
   )
 }
