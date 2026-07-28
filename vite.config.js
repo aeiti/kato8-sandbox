@@ -81,4 +81,12 @@ export default defineConfig({
   build: {
     outDir: 'docs',
   },
+  resolve: {
+    // Force imports coming from the linked external-site checkout to
+    // resolve against the sandbox's own copies of these packages. Without
+    // this, Vite/Rollup would walk up from external-site/src/... looking
+    // for node_modules; local dev works because external-site has its
+    // own populated node_modules, but CI only installs in the sandbox.
+    dedupe: ['react', 'react-dom', 'react-router-dom'],
+  },
 })
