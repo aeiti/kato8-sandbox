@@ -43,10 +43,10 @@ export const staticRoutes = {
       'Team-review gallery: every main-site component in isolation, live from the source.',
   },
   '/kickstarter-buttons': {
-    title: 'Kickstarter Button — Round 2 | Kato.8 Sandbox',
+    title: 'Kickstarter Button | Kato.8 Sandbox',
     description:
       'Nine hover variants across three axes (shadow, motion, color) for the Kickstarter CTA. For team review.',
-    ogTitle: 'Kickstarter Button — Round 2',
+    ogTitle: 'Kickstarter Button',
     ogDescription:
       'Nine hover variants for the Kickstarter CTA, side-by-side for team review.',
   },

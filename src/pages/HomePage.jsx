@@ -6,7 +6,7 @@ import '../styles/home.css'
 const experiments = [
   {
     path: '/kickstarter-buttons',
-    title: 'Kickstarter button — round 2',
+    title: 'Kickstarter Button',
     description:
       'Nine hover variants across three axes (shadow, motion, color) for the Kickstarter CTA. For team review.',
   },

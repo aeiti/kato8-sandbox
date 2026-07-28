@@ -16,6 +16,23 @@
   margin: 0 auto var(--space-3);
 }
 
+.kickstarter-buttons-page_kicker {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-body);
+  font-size: var(--text-sm-size);
+}
+
+.kickstarter-buttons-page_back {
+  color: var(--squid-pink);
+  font-family: var(--font-body);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.kickstarter-buttons-page_back:hover {
+  text-decoration: underline;
+}
+
 .kickstarter-buttons-page_title {
   margin: 0 0 0.35rem;
   font-family: 'RocknRoll One', sans-serif;
