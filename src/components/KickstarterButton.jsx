@@ -24,7 +24,7 @@ export default function KickstarterButton({
       className={`kickstarter-button kickstarter-button--${variant}`}
     >
       <img
-        src={asset('/assets/img/kickstarter-logo-k-white.svg')}
+        src={asset('/assets/sandbox/kickstarter-logo-k-white.svg')}
         alt=""
         className="kickstarter-button_logo"
       />
