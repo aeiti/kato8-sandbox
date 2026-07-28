@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import Seo from '../components/Seo'
+import { staticRoutes } from '../data/seo-config'
 import '../styles/home.css'
 
 const experiments = [
@@ -22,6 +24,7 @@ const sections = [
 export default function HomePage() {
   return (
     <main className="sandbox-home">
+      <Seo path="/" {...staticRoutes['/']} />
       <div className="container">
         <header className="sandbox-home_header">
           <h1 className="sandbox-home_title">Kato.8 Sandbox</h1>
