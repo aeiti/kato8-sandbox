@@ -102,6 +102,28 @@ export default function KickstarterButtonsPage() {
         </p>
       </header>
 
+      <section className="kickstarter-buttons-page_baseline">
+        <div className="kickstarter-buttons-page_cat-header">
+          <span className="kickstarter-buttons-page_cat-tag kickstarter-buttons-page_cat-tag--baseline">
+            Top pick
+          </span>
+          <h2 className="kickstarter-buttons-page_cat-heading">
+            The baseline every variant derives from
+          </h2>
+          <span className="kickstarter-buttons-page_cat-what">reference</span>
+        </div>
+        <div className="kickstarter-buttons-page_baseline-swatch">
+          <div className="kickstarter-buttons-page_swatch-btn">
+            <KickstarterButton variant="top" href="#" />
+          </div>
+          <p className="kickstarter-buttons-page_baseline-why">
+            Dark-cobalt inset stroke, hard-offset shadow at rest, shadow lifts on
+            hover, KS green base, Reem Kufi 400, arrow slide. Hover each variant
+            below to see how one axis of this changes.
+          </p>
+        </div>
+      </section>
+
       {CATEGORIES.map((category) => (
         <section key={category.tag} className="kickstarter-buttons-page_category">
           <div className="kickstarter-buttons-page_cat-header">

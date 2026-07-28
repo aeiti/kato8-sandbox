@@ -56,6 +56,30 @@
   transition: transform 0.2s ease;
 }
 
+/* ── Baseline (top pick) ──────────────────────────────────────────── */
+
+/*
+ * The reference design all round-2 variants derive from. Dark-cobalt
+ * inset stroke + hard-offset shadow at rest, shadow lifts on hover,
+ * arrow slides. Each --sN / --mN / --cN modifier tweaks ONE axis of
+ * this baseline.
+ */
+.kickstarter-button--top {
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--top:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+  color: #fff;
+}
+.kickstarter-button--top:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
 /* ── Shadow ───────────────────────────────────────────────────────── */
 
 .kickstarter-button--s1 {
