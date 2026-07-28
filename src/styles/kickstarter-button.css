@@ -1,0 +1,235 @@
+/*
+ * Kickstarter button — 9 variants under review.
+ *
+ * Base (.kickstarter-button) is the same across all: KS green background,
+ * white text, Reem Kufi 400, dark-cobalt hard-offset shadow at rest.
+ *
+ * Modifier classes vary ONE axis:
+ *   --s1 / --s2 / --s3   Shadow color/material
+ *   --m1 / --m2 / --m3   Motion on hover (beyond arrow slide)
+ *   --c1 / --c2 / --c3   Background color transition on hover
+ *
+ * Assumes external-site's tokens.css is already loaded (for --dark-cobalt,
+ * --squid-pink, --light-pearl, --font-body).
+ */
+
+:root {
+  --ks-green: #05ce78;
+  --ks-green-hover: #009b62;
+}
+
+.kickstarter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.1rem;
+  background-color: var(--ks-green);
+  color: #fff;
+  border-radius: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.2;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s cubic-bezier(0.165, 0.84, 0.44, 1),
+    transform 0.2s ease;
+}
+
+.kickstarter-button_logo {
+  width: 1.4em;
+  height: 1.4em;
+  flex-shrink: 0;
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.kickstarter-button_arrow {
+  opacity: 0.85;
+  font-size: 1.05em;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+
+/* ── Shadow ───────────────────────────────────────────────────────── */
+
+.kickstarter-button--s1 {
+  box-shadow:
+    0 0 0 2px var(--ks-green-hover) inset,
+    4px 4px 0 var(--ks-green-hover);
+}
+.kickstarter-button--s1:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px #037a48 inset,
+    7px 7px 0 #037a48;
+  color: #fff;
+}
+.kickstarter-button--s1:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+.kickstarter-button--s2 {
+  box-shadow:
+    0 0 0 2px var(--squid-pink) inset,
+    4px 4px 0 var(--squid-pink);
+}
+.kickstarter-button--s2:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--squid-pink) inset,
+    7px 7px 0 var(--squid-pink);
+  color: #fff;
+}
+.kickstarter-button--s2:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+.kickstarter-button--s3 {
+  border: 2px solid var(--dark-cobalt);
+  box-shadow:
+    0 4px 0 var(--dark-cobalt),
+    0 6px 14px rgba(0, 0, 0, 0.25);
+}
+.kickstarter-button--s3:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 7px 0 var(--dark-cobalt),
+    0 10px 20px rgba(0, 0, 0, 0.35);
+  transform: translateY(-2px);
+  color: #fff;
+}
+.kickstarter-button--s3:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+/* ── Motion ───────────────────────────────────────────────────────── */
+
+.kickstarter-button--m1 {
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--m1:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+  color: #fff;
+}
+.kickstarter-button--m1:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+.kickstarter-button--m1:hover .kickstarter-button_logo {
+  transform: scale(1.15) rotate(-8deg);
+}
+
+.kickstarter-button--m2 {
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--m2:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 7px 0 var(--dark-cobalt);
+  transform: translateY(-3px);
+  color: #fff;
+}
+
+.kickstarter-button--m3 {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--m3::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+.kickstarter-button--m3:hover {
+  background-color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+  color: #fff;
+}
+.kickstarter-button--m3:hover::before {
+  left: 130%;
+}
+.kickstarter-button--m3:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+/* ── Color ────────────────────────────────────────────────────────── */
+
+.kickstarter-button--c1 {
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--c1:hover {
+  background-color: var(--dark-cobalt);
+  color: var(--ks-green);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+}
+.kickstarter-button--c1:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+.kickstarter-button--c2 {
+  background-image: linear-gradient(135deg, #10dd85 0%, var(--ks-green) 100%);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--c2:hover {
+  background-image: linear-gradient(135deg, var(--ks-green) 0%, #007a4d 100%);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+  color: #fff;
+}
+.kickstarter-button--c2:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
+
+.kickstarter-button--c3 {
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    4px 4px 0 var(--dark-cobalt);
+}
+.kickstarter-button--c3:hover {
+  background-color: var(--light-pearl);
+  color: var(--ks-green-hover);
+  box-shadow:
+    0 0 0 2px var(--dark-cobalt) inset,
+    7px 7px 0 var(--dark-cobalt);
+}
+.kickstarter-button--c3:hover .kickstarter-button_logo {
+  filter: brightness(0.2);
+}
+.kickstarter-button--c3:hover .kickstarter-button_arrow {
+  transform: translateX(4px);
+}
