@@ -33,7 +33,7 @@ jobs:
         with:
           path: kato8-sandbox
 
-      - name: Check out external-site (sibling for file: dep)
+      - name: 'Check out external-site (sibling for file: dep)'
         uses: actions/checkout@v4
         with:
           repository: terrytkato8/external-site
