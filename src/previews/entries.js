@@ -18,6 +18,7 @@ export const previewEntries = [
   { name: 'newsletter-signup',    label: 'NewsletterSignup',     description: 'Email signup form. No network call when VITE_NEWSLETTER_ENDPOINT is unset (dev / preview default).' },
   { name: 'discord-signup-form',  label: 'DiscordSignupForm',    description: 'Per-game Discord community signup form. No network call without an endpoint prop.' },
   { name: 'playtest-signup-form', label: 'PlaytestSignupForm',   description: 'Per-game playtest signup form. No network call without an endpoint prop.' },
+  { name: 'kickstarter-button',   label: 'KickstarterButton',    description: 'Green CTA linking to a Kickstarter campaign. Rendered on game pages whose data entry defines a kickstarterUrl. Dark-cobalt inset stroke + hard-offset shadow that lifts on hover; arrow slides right.' },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))
