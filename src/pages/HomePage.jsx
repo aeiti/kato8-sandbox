@@ -7,8 +7,9 @@ const experiments = [
   {
     path: '/kickstarter-buttons',
     title: 'Kickstarter Button',
+    active: false,
     description:
-      'Nine hover variants across three axes (shadow, motion, color) for the Kickstarter CTA. For team review.',
+      'Nine hover variants across three axes (shadow, motion, color) for the Kickstarter CTA. Top pick shipped to prod 2026-07-29; page kept as the historical record.',
   },
 ]
 
@@ -52,9 +53,16 @@ export default function HomePage() {
           <ul className="sandbox-home_list">
             {experiments.map((exp) => (
               <li key={exp.path} className="sandbox-home_item">
-                <Link to={exp.path} className="sandbox-home_item-link">
-                  {exp.title}
-                </Link>
+                <div className="sandbox-home_item-heading">
+                  <Link to={exp.path} className="sandbox-home_item-link">
+                    {exp.title}
+                  </Link>
+                  <span
+                    className={`sandbox-home_status sandbox-home_status--${exp.active ? 'active' : 'concluded'}`}
+                  >
+                    {exp.active ? 'Active' : 'Concluded'}
+                  </span>
+                </div>
                 <p className="sandbox-home_item-desc">{exp.description}</p>
               </li>
             ))}

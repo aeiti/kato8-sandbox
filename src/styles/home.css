@@ -55,6 +55,36 @@
   border-radius: var(--card-radius);
 }
 
+.sandbox-home_item-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.sandbox-home_status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.sandbox-home_status--active {
+  background-color: color-mix(in srgb, #05ce78 18%, transparent);
+  color: #037a48;
+}
+
+.sandbox-home_status--concluded {
+  background-color: color-mix(in srgb, var(--dark-cobalt) 8%, transparent);
+  color: color-mix(in srgb, var(--dark-cobalt) 65%, transparent);
+}
+
 .sandbox-home_item-link {
   font-family: var(--font-body);
   font-size: 1.13rem;
