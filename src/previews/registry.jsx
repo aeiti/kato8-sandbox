@@ -10,6 +10,7 @@ import { socialLinks, SocialIcon } from 'kato8studios-site/src/components/Social
 import NewsletterSignup from 'kato8studios-site/src/components/NewsletterSignup'
 import DiscordSignupForm from 'kato8studios-site/src/components/DiscordSignupForm'
 import PlaytestSignupForm from 'kato8studios-site/src/components/PlaytestSignupForm'
+import ProdKickstarterButton from 'kato8studios-site/src/components/KickstarterButton'
 import { games } from 'kato8studios-site/src/data/games'
 import { previewEntries, entryByName } from './entries.js'
 
@@ -46,6 +47,11 @@ const renderers = {
   ),
   'playtest-signup-form': () => (
     <PlaytestSignupForm source="sandbox" gameTitle="Universal Serial Blade" />
+  ),
+  'kickstarter-button':   () => (
+    <div style={{ display: 'flex', justifyContent: 'center' }}>
+      <ProdKickstarterButton href="https://www.kickstarter.com/projects/kato8-lastlight/universal-serial-blade-usb" />
+    </div>
   ),
 }
 
