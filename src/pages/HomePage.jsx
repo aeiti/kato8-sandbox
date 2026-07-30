@@ -5,6 +5,13 @@ import '../styles/home.css'
 
 const experiments = [
   {
+    path: '/kickstarter-button-v2',
+    title: 'Kickstarter Button v2',
+    active: true,
+    description:
+      'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
+  },
+  {
     path: '/kickstarter-buttons',
     title: 'Kickstarter Button',
     active: false,

@@ -1,0 +1,21 @@
+/*
+ * Kickstarter button — v2 (flat).
+ *
+ * A response to "the v1 top pick looks a bit AI-generated" — v1 stacked
+ * four tropes on one button (inset stroke + hard-offset shadow + shadow
+ * lift on hover + arrow slide). v2 strips it back to what an official
+ * partner CTA usually looks like: flat KS green, K mark, text, and a
+ * background darken on hover. Subtle drop shadow only.
+ *
+ * Assumes .kickstarter-button base rules are already loaded (via
+ * kickstarter-button.css) — this file adds the --v2 modifier only.
+ */
+
+.kickstarter-button--v2 {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+.kickstarter-button--v2:hover {
+  background-color: var(--ks-green-hover);
+  color: #fff;
+}
