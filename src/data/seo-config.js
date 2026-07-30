@@ -50,6 +50,14 @@ export const staticRoutes = {
     ogDescription:
       'Nine hover variants for the Kickstarter CTA, side-by-side for team review.',
   },
+  '/kickstarter-button-v2': {
+    title: 'Kickstarter Button v2 | Kato.8 Sandbox',
+    description:
+      'Flatter, "official-partner" take on the Kickstarter CTA — a response to v1 reading as designed-by-AI. Side-by-side with v1 for review.',
+    ogTitle: 'Kickstarter Button v2',
+    ogDescription:
+      'Flatter, official-partner take on the Kickstarter CTA. Compare against v1.',
+  },
 }
 
 // Per-component preview routes, derived from the registry so adding a
