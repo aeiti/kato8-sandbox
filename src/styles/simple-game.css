@@ -1,0 +1,213 @@
+/*
+ * <SimpleGamePage> styles. Spec from Figma (1512px artboard).
+ *
+ * Layout:
+ *   .simple-game-page
+ *   ├─ .simple-game-hero               ← 120px horizontal padding, row layout
+ *   │  ├─ .simple-game-cover           ← 320x480 portrait art
+ *   │  └─ .simple-game-info            ← title, tags, description
+ *   │     ├─ .simple-game-title-block
+ *   │     │  ├─ .simple-game-title     ← "Last Light"
+ *   │     │  └─ .simple-game-tags      ← pill row
+ *   │     └─ .simple-game-description  ← <p> paragraphs
+ *   └─ <ConceptArtGallery>             ← reused; styles live in concept-art-gallery.css
+ *
+ * Tag colors deliberately differ from the existing .title-tag styles so
+ * the Figma's neutral "Coming Soon" + orange "Genre" treatment is
+ * preserved without affecting GamePage's purple/yellow pills.
+ */
+
+.simple-game-page {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  width: 100%;
+  margin-top: 1.5vw;
+  padding-bottom: 64px;
+}
+
+.simple-game-hero {
+  display: flex;
+  align-items: center;
+  gap: 56px;
+  padding-inline: 120px;
+}
+
+.simple-game-cover {
+  flex: 0 0 320px;
+  width: 320px;
+  height: 480px;
+  background-color: #e5e5e5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.simple-game-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.simple-game-cover-placeholder {
+  width: 100%;
+  height: 100%;
+}
+
+.simple-game-info {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.simple-game-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.simple-game-title {
+  margin: 0;
+  color: #000;
+  font-family: RocknRoll One, sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.simple-game-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.simple-game-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-family: Reem Kufi, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Mirror the USB GamePage tag palette so the two pages share a
+ * visual language. Sources: .title-tag.coming-soon / .title-tag.category
+ * in pages/games.css. */
+.simple-game-tag-coming-soon {
+  background-color: rgba(219, 161, 239, 0.18);
+  border-color: rgba(205, 178, 229, 0.18);
+  color: #e2d3e7;
+}
+
+.simple-game-tag-category {
+  background-color: rgba(254, 204, 134, 0.18);
+  border-color: rgba(254, 204, 134, 0.28);
+  color: #fecc86;
+}
+
+.simple-game-description {
+  color: #000;
+  font-family: Reem Kufi, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 24px;
+}
+
+.simple-game-description p {
+  margin: 0 0 12px;
+}
+
+.simple-game-description p:last-child {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 1199px) {
+  .simple-game-hero {
+          padding-inline: 80px;
+          gap: 40px;
+        }
+
+  .simple-game-cover {
+          flex-basis: 280px;
+          width: 280px;
+          height: 420px;
+        }
+
+  .simple-game-info {
+          gap: 36px;
+        }
+}
+
+@media screen and (max-width: 991px) {
+  .simple-game-hero {
+          padding-inline: 48px;
+          gap: 32px;
+        }
+
+  .simple-game-cover {
+          flex-basis: 240px;
+          width: 240px;
+          height: 360px;
+        }
+
+  .simple-game-title {
+          font-size: 30px;
+        }
+
+  .simple-game-info {
+          gap: 28px;
+        }
+}
+
+@media screen and (max-width: 767px) {
+  .simple-game-page {
+          gap: 40px;
+          margin-top: 24px;
+        }
+
+  .simple-game-hero {
+          flex-direction: column;
+          align-items: center;
+          gap: 24px;
+          padding-inline: 24px;
+        }
+
+  .simple-game-cover {
+          flex-basis: auto;
+          width: 220px;
+          height: 330px;
+        }
+
+  .simple-game-info {
+          gap: 24px;
+          align-self: stretch;
+        }
+
+  .simple-game-title {
+          font-size: 28px;
+        }
+
+  .simple-game-description {
+          font-size: 15px;
+          line-height: 22px;
+        }
+}
+
+@media screen and (max-width: 479px) {
+  .simple-game-cover {
+          width: 200px;
+          height: 300px;
+        }
+
+  .simple-game-title {
+          font-size: 24px;
+        }
+}

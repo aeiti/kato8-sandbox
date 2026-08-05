@@ -35,6 +35,39 @@ Naming:
 - File uses PascalCase + `Page` suffix (`KickstarterButtonsPage.jsx`).
 - CSS class prefix matches the concept (`.kickstarter-button` — not `.kbtn`) so grepping in future sessions finds everything.
 
+## 1b. Add a full-page preview ("Pages")
+
+Some sandbox entries are whole pages, not isolated experiments — a preview
+of a real site page (e.g. the crowdfunding games landing + its detail
+pages) for team review. These live under the **Pages** section on the home
+page (`pages` array in `src/pages/HomePage.jsx`), a sibling of Browse and
+Experiments.
+
+Conventions specific to page previews:
+
+- **Wrap the content in the real chrome.** Import `Nav` and `Footer` from
+  `kato8studios-site` and render them around the page body so it reads like
+  the live page, not a bare component.
+- **Match the real route paths** where practical (e.g. `/crowdfunding-games`
+  and `/crowdfunding-games/:slug`) so internal `<Link>`s work unchanged.
+- **Mirror the main site's layout toggles.** The main site swaps `body` ↔
+  `body-2` (full-bleed) per route; replicate that in `src/App.jsx` via
+  `useLocation()` for the routes that need it.
+
+### Vendoring exception — when "never copy" doesn't apply
+
+Section 2's rule is *import from `kato8studios-site`, never copy*. That
+assumes the code exists on external-site `main`. When you're previewing a
+page whose source **isn't upstream yet** (e.g. it lives only on a staging
+branch or an un-merged external-site branch), there's nothing to import —
+so **vendor a copy** of just the not-yet-upstream pieces into the sandbox
+(`src/components`, `src/data`, `src/styles`). Still import everything that
+*is* upstream (Nav, Footer, tokens, Seo).
+
+When the feature graduates to external-site `main`, delete the vendored
+copies and switch those imports to `kato8studios-site/...` (see §5). Until
+then, keep the vendored slug lists / data in sync with staging by hand.
+
 ## 2. Reuse main-site styles and components
 
 The external-site repo is installed as `kato8studios-site` (its own package name). Import deep paths:
@@ -101,6 +134,6 @@ The sandbox is meant to be a graveyard of what didn't ship and a fast path for w
 | Route | kebab-case (`/kickstarter-buttons`) |
 | Page file | PascalCase + `Page.jsx` (`KickstarterButtonsPage.jsx`) |
 | CSS class | Full descriptive names (`.kickstarter-button`) — no cryptic abbreviations |
-| Reuse | Import from `kato8studios-site/…`, never copy files across |
+| Reuse | Import from `kato8studios-site/…`, never copy files across — except vendoring not-yet-upstream page-preview code (§1b) |
 | Testing | Browser verification is required before "done" |
 | Cleanup | Delete on ship |

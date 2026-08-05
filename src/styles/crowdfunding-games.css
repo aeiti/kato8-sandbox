@@ -1,0 +1,179 @@
+/**
+ * Styles for the Crowdfunding Games page (`/crowdfunding-games`).
+ *
+ * Ported from the design template (a fixed-width Figma export) into the
+ * site's responsive layout. All selectors are namespaced with `cf-` so
+ * they don't collide with the home grid's `.game-card` / `.page-heading`
+ * classes.
+ */
+
+.cf-page {
+  color: var(--text-primary);
+  background-color: #fff;
+}
+
+/* ---------- Page heading ---------- */
+
+.cf-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 1512px;
+  margin-inline: auto;
+  padding-top: 48px;
+  padding-inline: 120px;
+}
+
+.cf-heading__title {
+  margin-block: 0;
+  color: #000;
+  font-family: "RocknRoll One", sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.cf-heading__description {
+  margin-block: 0;
+  max-width: 631px;
+  color: #000;
+  font-family: "Reem Kufi", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ---------- Games grid ---------- */
+
+.cf-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  width: 100%;
+  max-width: 1512px;
+  margin-inline: auto;
+  padding-top: 48px;
+  padding-bottom: 64px;
+  padding-inline: 120px;
+}
+
+/* ---------- Card ---------- */
+
+.cf-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(27, 27, 38, 0.12);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cf-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(27, 27, 38, 0.18);
+}
+
+.cf-card__image {
+  height: 190px;
+  background: #d9d9d9;
+  background-position: 50%;
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 4px;
+}
+
+.cf-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cf-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cf-card__categories {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cf-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: rgba(254, 204, 134, 0.18);
+  outline: 1px solid #fecc86;
+  outline-offset: -1px;
+  border-radius: 99999px;
+}
+
+.cf-chip__label {
+  color: #feae84;
+  font-family: "Reem Kufi", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.cf-card__title {
+  margin-block: 0;
+  color: #000;
+  font-family: "RocknRoll One", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.cf-card__description {
+  margin-block: 0;
+  color: #000;
+  font-family: "Reem Kufi", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+/* ---------- Responsive ---------- */
+
+@media screen and (max-width: 991px) {
+  .cf-heading,
+  .cf-grid {
+    padding-inline: 80px;
+  }
+
+  .cf-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .cf-heading,
+  .cf-grid {
+    padding-inline: 48px;
+  }
+}
+
+@media screen and (max-width: 479px) {
+  .cf-heading,
+  .cf-grid {
+    padding-inline: 24px;
+  }
+
+  .cf-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-heading__title {
+    font-size: 28px;
+  }
+}

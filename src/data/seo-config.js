@@ -58,6 +58,14 @@ export const staticRoutes = {
     ogDescription:
       'Flatter, official-partner take on the Kickstarter CTA. Compare against v1.',
   },
+  '/crowdfunding-games': {
+    title: 'Crowdfunding Games | Kato.8 Sandbox',
+    description:
+      'Full-page preview of the crowdfunding games landing page — heading + a grid of demo game cards, each linking to its detail page.',
+    ogTitle: 'Crowdfunding Games — page preview',
+    ogDescription:
+      'Preview of the crowdfunding games landing page and its per-game detail pages.',
+  },
 }
 
 // Per-component preview routes, derived from the registry so adding a
@@ -74,6 +82,33 @@ export const componentRoutes = Object.fromEntries(
   ]),
 )
 
+// Per-game meta for the crowdfunding demo detail pages
+// (`/crowdfunding-games/:slug`). Slugs mirror the vendored
+// `src/data/crowdfundingGames.js`; kept in sync by hand so this file stays
+// import-light and Node-loadable by the prerender script.
+const CROWDFUNDING_SLUGS = [
+  'game-one',
+  'game-two',
+  'game-three',
+  'game-four',
+  'game-five',
+  'game-six',
+]
+
+export const crowdfundingGameRoutes = Object.fromEntries(
+  CROWDFUNDING_SLUGS.map((slug) => [
+    slug,
+    {
+      title: 'Crowdfunding Game | Kato.8 Sandbox',
+      description:
+        'Preview of a crowdfunding demo game detail page — cover, title, tags, and description. Placeholder content.',
+      ogTitle: 'Crowdfunding Game — page preview',
+      ogDescription:
+        'Preview of a crowdfunding demo game detail page. Placeholder content.',
+    },
+  ]),
+)
+
 export const NOT_FOUND_META = {
   title: 'Not found | Kato.8 Sandbox',
   description: "The page you're looking for doesn't exist.",
@@ -84,6 +119,8 @@ export function getRouteMeta(pathname) {
   if (staticRoutes[pathname]) return staticRoutes[pathname]
   const m = pathname.match(/^\/components\/([^/]+)\/?$/)
   if (m && componentRoutes[m[1]]) return componentRoutes[m[1]]
+  const cf = pathname.match(/^\/crowdfunding-games\/([^/]+)\/?$/)
+  if (cf && crowdfundingGameRoutes[cf[1]]) return crowdfundingGameRoutes[cf[1]]
   return null
 }
 
@@ -92,5 +129,6 @@ export function listPrerenderRoutes() {
   return [
     ...Object.keys(staticRoutes),
     ...Object.keys(componentRoutes).map((name) => `/components/${name}`),
+    ...Object.keys(crowdfundingGameRoutes).map((slug) => `/crowdfunding-games/${slug}`),
   ]
 }

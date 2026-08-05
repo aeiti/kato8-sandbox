@@ -29,6 +29,15 @@ const sections = [
   },
 ]
 
+const pages = [
+  {
+    path: '/crowdfunding-games',
+    title: 'Crowdfunding Games',
+    description:
+      'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
+  },
+]
+
 export default function HomePage() {
   return (
     <main className="sandbox-home">
@@ -50,6 +59,20 @@ export default function HomePage() {
                   {section.title}
                 </Link>
                 <p className="sandbox-home_item-desc">{section.description}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="sandbox-home_section">
+          <h2 className="sandbox-home_section-title">Pages</h2>
+          <ul className="sandbox-home_list">
+            {pages.map((page) => (
+              <li key={page.path} className="sandbox-home_item">
+                <Link to={page.path} className="sandbox-home_item-link">
+                  {page.title}
+                </Link>
+                <p className="sandbox-home_item-desc">{page.description}</p>
               </li>
             ))}
           </ul>
