@@ -18,9 +18,6 @@ function Gallery() {
       <Seo path="/components" {...staticRoutes['/components']} />
       <div className="container">
         <header className="previews-gallery_header">
-          <p className="previews-gallery_kicker">
-            <Link to="/" className="previews-gallery_back">← Sandbox</Link>
-          </p>
           <h1 className="previews-gallery_title">Components</h1>
           <p className="previews-gallery_subtitle">
             Every component from the main site, rendered in isolation. Click a card to view it on its own page.

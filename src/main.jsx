@@ -22,6 +22,7 @@ import 'kato8studios-site/src/styles/main/concept-art-gallery.css'
 import 'kato8studios-site/src/styles/main/signup-form.css'
 import 'kato8studios-site/src/styles/main/kickstarter-button.css'
 import 'kato8studios-site/src/styles/mobile-menu.css'
+import './styles/sandbox-chrome.css'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

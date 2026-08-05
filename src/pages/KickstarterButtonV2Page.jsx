@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import KickstarterButton from '../components/KickstarterButton'
 import Seo from '../components/Seo'
 import { staticRoutes } from '../data/seo-config'
@@ -34,9 +33,6 @@ export default function KickstarterButtonV2Page() {
     <main className="kickstarter-buttons-page">
       <Seo path="/kickstarter-button-v2" {...staticRoutes['/kickstarter-button-v2']} />
       <header className="kickstarter-buttons-page_header">
-        <p className="kickstarter-buttons-page_kicker">
-          <Link to="/" className="kickstarter-buttons-page_back">← Sandbox</Link>
-        </p>
         <h1 className="kickstarter-buttons-page_title">Kickstarter Button v2</h1>
         <p className="kickstarter-buttons-page_subtitle">
           v1 (currently shipped) stacked four "designed-by-AI" tropes on one

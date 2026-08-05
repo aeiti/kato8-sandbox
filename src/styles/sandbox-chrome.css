@@ -1,0 +1,24 @@
+/*
+ * Standard sandbox chrome shared across every page (rendered by App.jsx):
+ * a thin "← Sandbox" back bar that sits above the main-site Nav on every
+ * page except the home index. Matches the pink Reem Kufi back-link look
+ * the individual experiment pages used before it was centralized here.
+ */
+
+.sandbox-backbar {
+  background: var(--light-pearl);
+  border-bottom: 1px solid rgba(27, 27, 38, 0.1);
+  padding: 10px 24px;
+}
+
+.sandbox-backbar_link {
+  color: var(--squid-pink);
+  font-family: var(--font-body);
+  font-size: var(--text-sm-size);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.sandbox-backbar_link:hover {
+  text-decoration: underline;
+}

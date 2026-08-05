@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import KickstarterButton from '../components/KickstarterButton'
 import Seo from '../components/Seo'
 import { staticRoutes } from '../data/seo-config'
@@ -88,9 +87,6 @@ export default function KickstarterButtonsPage() {
     <main className="kickstarter-buttons-page">
       <Seo path="/kickstarter-buttons" {...staticRoutes['/kickstarter-buttons']} />
       <header className="kickstarter-buttons-page_header">
-        <p className="kickstarter-buttons-page_kicker">
-          <Link to="/" className="kickstarter-buttons-page_back">← Sandbox</Link>
-        </p>
         <h1 className="kickstarter-buttons-page_title">Kickstarter Button</h1>
         <p className="kickstarter-buttons-page_subtitle">
           All keep the top pick's DNA:{' '}
