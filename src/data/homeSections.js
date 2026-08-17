@@ -35,6 +35,12 @@ export const pages = [
 
 export const experiments = [
   {
+    path: '/kickstarter-button-v2',
+    title: 'Kickstarter Button v2',
+    active: true,
+    description: 'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
+  },
+  {
     path: '/our-story-timeline',
     title: 'Our Story timeline',
     active: true,
@@ -45,12 +51,6 @@ export const experiments = [
     title: 'Newsletter on About',
     active: true,
     description: 'NewsletterSignup mounted below the Support Kato.8 section on the About page, with the top spacing tightened so the form hugs the section above. WIP from external-site branch mount-newsletter-on-about.',
-  },
-  {
-    path: '/kickstarter-button-v2',
-    title: 'Kickstarter Button v2',
-    active: true,
-    description: 'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
   },
   {
     path: '/kickstarter-buttons',
