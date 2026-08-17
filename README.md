@@ -29,6 +29,8 @@ npm run dev
 
 - `src/App.jsx` — route table.
 - `src/pages/` — one file per experiment; add a matching `<Route>` in `App.jsx`.
+- `src/data/homeSections.js` — the Browse / Pages / Experiments lists shown on the home index.
+- `scripts/dev-admin/` — a dev-only manager at [http://localhost:5173/__manage](http://localhost:5173/__manage) for editing those lists (toggle experiments active/concluded, add/edit/reorder) and one-click publishing. Dev server only; never in a build. See [PROCESS.md](./PROCESS.md) §1c.
 
 ## Process
 

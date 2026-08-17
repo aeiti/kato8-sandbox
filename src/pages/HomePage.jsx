@@ -1,56 +1,8 @@
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
 import { staticRoutes } from '../data/seo-config'
+import { sections, pages, experiments } from '../data/homeSections'
 import '../styles/home.css'
-
-const experiments = [
-  {
-    path: '/our-story-timeline',
-    title: 'Our Story timeline',
-    active: true,
-    description:
-      'Milestone timeline proposed for the bottom of the About page — alternating cards zigzag around a centered line, collapsing to a left rail on mobile. WIP from external-site branch about-timeline-section; vendored here (not yet on main).',
-  },
-  {
-    path: '/newsletter-on-about',
-    title: 'Newsletter on About',
-    active: true,
-    description:
-      'NewsletterSignup mounted below the Support Kato.8 section on the About page, with the top spacing tightened so the form hugs the section above. WIP from external-site branch mount-newsletter-on-about.',
-  },
-  {
-    path: '/kickstarter-button-v2',
-    title: 'Kickstarter Button v2',
-    active: true,
-    description:
-      'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
-  },
-  {
-    path: '/kickstarter-buttons',
-    title: 'Kickstarter Button',
-    active: false,
-    description:
-      'Nine hover variants across three axes (shadow, motion, color) for the Kickstarter CTA. Top pick shipped to prod 2026-07-29; page kept as the historical record.',
-  },
-]
-
-const sections = [
-  {
-    path: '/components',
-    title: 'Components',
-    description:
-      'Every component from the main site (Nav, Footer, Hero, GameCard, forms, etc.), rendered in isolation for review.',
-  },
-]
-
-const pages = [
-  {
-    path: '/crowdfunding-games',
-    title: 'Crowdfunding Games',
-    description:
-      'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
-  },
-]
 
 export default function HomePage() {
   return (

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { devAdmin } from './scripts/dev-admin/plugin.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -76,7 +77,8 @@ function copyRecursive(src, dest) {
 }
 
 export default defineConfig({
-  plugins: [react(), externalSiteAssets()],
+  // devAdmin() is `apply: 'serve'` — dev server only, never in a build.
+  plugins: [react(), externalSiteAssets(), devAdmin()],
   base,
   build: {
     outDir: 'docs',
