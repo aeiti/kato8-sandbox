@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Sandbox Home Manager</title>
+  <style>
+    :root {
+      --cobalt: #1b1b26;
+      --cobalt-2: #24243a;
+      --panel: #ffffff;
+      --ink: #1b1b26;
+      --muted: #6b6b7b;
+      --line: #e3e3ec;
+      --pink: #e6738a;
+      --pink-ink: #b23c56;
+      --green: #2f9e6f;
+      --amber: #c98a1a;
+      --radius: 12px;
+      --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f4f4f8;
+      color: var(--ink);
+      font-family: var(--font);
+      line-height: 1.5;
+    }
+    a { color: var(--pink-ink); }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--cobalt);
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 600;
+    }
+    .topbar .sub { color: #b9b9cc; font-size: 0.85rem; margin: 0; }
+    .topbar .spacer { flex: 1; }
+    .topbar .env {
+      font-size: 0.75rem;
+      color: #b9b9cc;
+      border: 1px solid #3a3a52;
+      border-radius: 999px;
+      padding: 3px 10px;
+    }
+
+    main { max-width: 900px; margin: 0 auto; padding: 24px; }
+
+    .block {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .block__head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfbfd;
+    }
+    .block__head h2 { margin: 0; font-size: 1.05rem; }
+    .block__head .count { color: var(--muted); font-size: 0.85rem; }
+    .block__head .spacer { flex: 1; }
+    .dirty-dot {
+      display: none;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--amber);
+    }
+    .block.is-dirty .dirty-dot { display: inline-block; }
+
+    .entries { padding: 8px 18px 18px; }
+    .entry {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px 14px;
+    }
+    .entry__fields { display: grid; gap: 8px; }
+    .entry__side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+      justify-content: flex-start;
+    }
+    .field { display: grid; gap: 3px; }
+    .field label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    input[type="text"], textarea {
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      width: 100%;
+      resize: vertical;
+    }
+    input:focus, textarea:focus { outline: 2px solid var(--pink); border-color: var(--pink); }
+    textarea { min-height: 58px; }
+
+    .btn {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--muted); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary { background: var(--pink); border-color: var(--pink); color: #fff; }
+    .btn--primary:hover { background: var(--pink-ink); border-color: var(--pink-ink); }
+    .btn--publish { background: #fff; color: var(--cobalt); border: none; font-weight: 600; }
+    .btn--ghost { border: none; background: transparent; color: var(--muted); padding: 4px 8px; }
+    .btn--ghost:hover { color: var(--pink-ink); }
+    .btn--danger:hover { color: #c0392b; }
+    .icon-row { display: flex; gap: 2px; }
+
+    /* Active/Concluded toggle */
+    .toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; user-select: none; }
+    .toggle input { position: absolute; opacity: 0; pointer-events: none; }
+    .toggle .track {
+      width: 40px; height: 22px; border-radius: 999px;
+      background: #cdcdd8; position: relative; transition: background 0.15s;
+    }
+    .toggle .track::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 18px; height: 18px; border-radius: 50%; background: #fff;
+      transition: transform 0.15s;
+    }
+    .toggle input:checked + .track { background: var(--green); }
+    .toggle input:checked + .track::after { transform: translateX(18px); }
+    .toggle .state-label { min-width: 66px; color: var(--muted); }
+
+    .block__foot {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 18px;
+      border-top: 1px solid var(--line);
+      background: #fbfbfd;
+    }
+    .block__foot .spacer { flex: 1; }
+    .save-note { font-size: 0.8rem; color: var(--muted); }
+
+    /* Toast / publish feedback */
+    #toast {
+      position: fixed;
+      right: 20px; bottom: 20px;
+      max-width: 380px;
+      background: var(--cobalt);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+      font-size: 0.88rem;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok { background: #1e6f4e; }
+    #toast.err { background: #8a2733; }
+
+    .empty { color: var(--muted); font-size: 0.88rem; padding: 12px 0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>Sandbox Home Manager</h1>
+      <p class="sub">Edit the home-page listings, then Publish to deploy.</p>
+    </div>
+    <div class="spacer"></div>
+    <span class="env" id="branch">branch …</span>
+    <button class="btn btn--publish" id="publish">Publish → deploy</button>
+  </div>
+
+  <main id="app">
+    <p class="empty">Loading…</p>
+  </main>
+
+  <div id="toast"></div>
+
+  <script type="module">
+    const SECTIONS = [
+      { key: 'sections', title: 'Browse', hasActive: false, noun: 'entry' },
+      { key: 'pages', title: 'Pages', hasActive: false, noun: 'page' },
+      { key: 'experiments', title: 'Experiments', hasActive: true, noun: 'experiment' },
+    ]
+
+    // state[key] = current (possibly edited) array; saved[key] = last-saved baseline
+    let state = {}
+    let saved = {}
+
+    const app = document.getElementById('app')
+    const toastEl = document.getElementById('toast')
+    let toastTimer
+
+    function toast(msg, kind) {
+      clearTimeout(toastTimer)
+      toastEl.textContent = msg
+      toastEl.className = 'show' + (kind ? ' ' + kind : '')
+      toastTimer = setTimeout(() => { toastEl.className = '' }, 5000)
+    }
+
+    function isDirty(key) {
+      return JSON.stringify(state[key]) !== JSON.stringify(saved[key])
+    }
+
+    function clone(v) { return JSON.parse(JSON.stringify(v)) }
+
+    async function load() {
+      const res = await fetch('/__manage/api/data')
+      if (!res.ok) { app.innerHTML = '<p class="empty">Failed to load data.</p>'; return }
+      const data = await res.json()
+      state = clone(data)
+      saved = clone(data)
+      render()
+    }
+
+    function makeEntry(hasActive) {
+      const e = { path: '/', title: '', description: '' }
+      if (hasActive) e.active = true
+      return e
+    }
+
+    function render() {
+      app.innerHTML = ''
+      for (const def of SECTIONS) {
+        app.appendChild(renderBlock(def))
+      }
+    }
+
+    function renderBlock(def) {
+      const items = state[def.key] || []
+      const wrap = document.createElement('section')
+      wrap.className = 'block' + (isDirty(def.key) ? ' is-dirty' : '')
+
+      const head = document.createElement('div')
+      head.className = 'block__head'
+      head.innerHTML =
+        `<h2>${def.title}</h2>` +
+        `<span class="count">${items.length} ${def.noun}${items.length === 1 ? '' : 's'}</span>` +
+        `<span class="dirty-dot" title="Unsaved changes"></span>` +
+        `<span class="spacer"></span>`
+      const addBtn = document.createElement('button')
+      addBtn.className = 'btn'
+      addBtn.textContent = '+ Add ' + def.noun
+      addBtn.onclick = () => {
+        state[def.key] = [...items, makeEntry(def.hasActive)]
+        render()
+      }
+      head.appendChild(addBtn)
+      wrap.appendChild(head)
+
+      const list = document.createElement('div')
+      list.className = 'entries'
+      if (items.length === 0) {
+        const p = document.createElement('p')
+        p.className = 'empty'
+        p.textContent = 'No ' + def.noun + 's yet.'
+        list.appendChild(p)
+      }
+      items.forEach((item, i) => list.appendChild(renderEntry(def, item, i)))
+      wrap.appendChild(list)
+
+      const foot = document.createElement('div')
+      foot.className = 'block__foot'
+      const note = document.createElement('span')
+      note.className = 'save-note'
+      note.textContent = isDirty(def.key) ? 'Unsaved changes' : 'Saved'
+      const saveBtn = document.createElement('button')
+      saveBtn.className = 'btn btn--primary'
+      saveBtn.textContent = 'Save ' + def.title
+      saveBtn.disabled = !isDirty(def.key)
+      saveBtn.onclick = () => saveBlock(def.key)
+      foot.appendChild(note)
+      foot.appendChild(document.createElement('span')).className = 'spacer'
+      foot.appendChild(saveBtn)
+      wrap.appendChild(foot)
+
+      return wrap
+    }
+
+    function renderEntry(def, item, index) {
+      const items = state[def.key]
+      const el = document.createElement('div')
+      el.className = 'entry'
+
+      const fields = document.createElement('div')
+      fields.className = 'entry__fields'
+      fields.appendChild(textField('Path', item.path, (v) => { item.path = v; markDirty(def.key) }))
+      fields.appendChild(textField('Title', item.title, (v) => { item.title = v; markDirty(def.key) }))
+      fields.appendChild(textArea('Description', item.description, (v) => { item.description = v; markDirty(def.key) }))
+      el.appendChild(fields)
+
+      const side = document.createElement('div')
+      side.className = 'entry__side'
+
+      if (def.hasActive) {
+        side.appendChild(activeToggle(item, () => { markDirty(def.key); render() }))
+      }
+
+      const icons = document.createElement('div')
+      icons.className = 'icon-row'
+      icons.appendChild(iconBtn('↑', 'Move up', index === 0, () => { move(def.key, index, -1) }))
+      icons.appendChild(iconBtn('↓', 'Move down', index === items.length - 1, () => { move(def.key, index, 1) }))
+      const rm = iconBtn('✕', 'Remove', false, () => {
+        state[def.key] = items.filter((_, j) => j !== index)
+        render()
+      })
+      rm.classList.add('btn--danger')
+      icons.appendChild(rm)
+      side.appendChild(icons)
+
+      el.appendChild(side)
+      return el
+    }
+
+    function textField(label, value, onInput) {
+      const f = document.createElement('div')
+      f.className = 'field'
+      const l = document.createElement('label')
+      l.textContent = label
+      const input = document.createElement('input')
+      input.type = 'text'
+      input.value = value || ''
+      input.oninput = () => onInput(input.value)
+      f.appendChild(l)
+      f.appendChild(input)
+      return f
+    }
+
+    function textArea(label, value, onInput) {
+      const f = document.createElement('div')
+      f.className = 'field'
+      const l = document.createElement('label')
+      l.textContent = label
+      const ta = document.createElement('textarea')
+      ta.value = value || ''
+      ta.oninput = () => onInput(ta.value)
+      f.appendChild(l)
+      f.appendChild(ta)
+      return f
+    }
+
+    function activeToggle(item, onChange) {
+      const wrap = document.createElement('label')
+      wrap.className = 'toggle'
+      const cb = document.createElement('input')
+      cb.type = 'checkbox'
+      cb.checked = !!item.active
+      const track = document.createElement('span')
+      track.className = 'track'
+      const lbl = document.createElement('span')
+      lbl.className = 'state-label'
+      lbl.textContent = item.active ? 'Active' : 'Concluded'
+      cb.onchange = () => { item.active = cb.checked; onChange() }
+      wrap.appendChild(cb)
+      wrap.appendChild(track)
+      wrap.appendChild(lbl)
+      return wrap
+    }
+
+    function iconBtn(glyph, title, disabled, onClick) {
+      const b = document.createElement('button')
+      b.className = 'btn btn--ghost'
+      b.textContent = glyph
+      b.title = title
+      b.disabled = disabled
+      b.onclick = onClick
+      return b
+    }
+
+    function move(key, index, delta) {
+      const arr = state[key]
+      const j = index + delta
+      if (j < 0 || j >= arr.length) return
+      const copy = [...arr]
+      ;[copy[index], copy[j]] = [copy[j], copy[index]]
+      state[key] = copy
+      render()
+    }
+
+    // Re-render just enough to reflect dirty state without losing focus:
+    // update the block's dirty class + save button. Full re-render on
+    // structural changes (add/remove/move/toggle) happens via render().
+    function markDirty(key) {
+      const blocks = app.querySelectorAll('.block')
+      const idx = SECTIONS.findIndex((s) => s.key === key)
+      const block = blocks[idx]
+      if (!block) return render()
+      const dirty = isDirty(key)
+      block.classList.toggle('is-dirty', dirty)
+      const saveBtn = block.querySelector('.btn--primary')
+      if (saveBtn) saveBtn.disabled = !dirty
+      const note = block.querySelector('.save-note')
+      if (note) note.textContent = dirty ? 'Unsaved changes' : 'Saved'
+    }
+
+    async function saveBlock(key) {
+      try {
+        const res = await fetch('/__manage/api/block/' + key, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state[key]),
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error || 'save failed')
+        saved[key] = clone(state[key])
+        render()
+        toast('Saved ' + key + ' (' + body.count + ' items) to homeSections.js.', 'ok')
+      } catch (err) {
+        toast('Save failed: ' + err.message, 'err')
+      }
+    }
+
+    async function publish() {
+      const dirtyKeys = SECTIONS.map((s) => s.key).filter(isDirty)
+      if (dirtyKeys.length) {
+        const ok = confirm(
+          'You have unsaved changes in: ' + dirtyKeys.join(', ') +
+          '.\nOnly saved changes are published. Save them first?\n\n' +
+          'OK = save all, then publish. Cancel = publish only saved changes.'
+        )
+        if (ok) {
+          for (const k of dirtyKeys) await saveBlock(k)
+        }
+      }
+      try {
+        const res = await fetch('/__manage/api/publish', { method: 'POST' })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error || 'publish failed')
+        if (body.published === false) { toast(body.reason, 'ok'); return }
+        toast(body.message, body.deploy ? 'ok' : '')
+      } catch (err) {
+        toast('Publish failed: ' + err.message, 'err')
+      }
+    }
+
+    document.getElementById('publish').onclick = publish
+
+    // Show the current branch so it's obvious where Publish will push.
+    fetch('/__manage/api/info')
+      .then((r) => r.json())
+      .then((info) => {
+        const el = document.getElementById('branch')
+        if (!info.branch) { el.textContent = 'not a git repo'; return }
+        el.textContent = 'branch: ' + info.branch + (info.isMain ? ' → deploys' : '')
+      })
+      .catch(() => {})
+    load()
+  </script>
+</body>
+</html>

@@ -68,6 +68,39 @@ When the feature graduates to external-site `main`, delete the vendored
 copies and switch those imports to `kato8studios-site/...` (see §5). Until
 then, keep the vendored slug lists / data in sync with staging by hand.
 
+## 1c. Manage the home page (dev-only manager)
+
+The three home-page lists — **Browse** (`sections`), **Pages** (`pages`),
+and **Experiments** (`experiments`) — live as plain-data arrays in
+`src/data/homeSections.js`, split out of `HomePage.jsx` so they can be
+edited without touching JSX.
+
+During `npm run dev` there's a small manager at
+**http://localhost:5173/__manage** for editing those lists from a
+browser instead of hand-editing the file:
+
+- Toggle each experiment **Active / Concluded**, edit path/title/
+  description, and add / remove / reorder entries in any of the three
+  lists.
+- **Save** rewrites the matching array in `homeSections.js` in place
+  (Vite hot-reloads the running site). Only that one array is touched;
+  everything else in the file is preserved. Comments *inside* the arrays
+  are dropped on save, so keep prose in the file's top doc comment.
+- **Publish → deploy** commits `homeSections.js` and pushes the current
+  branch. Run it on `main` (the normal case) and that push triggers the
+  Pages deploy; on any other branch it just tells you to merge to main.
+  It only ever commits that one file and never force-pushes.
+
+How it stays out of production: the manager is a Vite middleware plugin
+(`scripts/dev-admin/`) registered with `apply: 'serve'`, so it exists
+only under the dev server — it's never in a `vite build`, lives outside
+`src/`, and has no React route. Editing `src/pages/*` still means writing
+code; the manager only curates what shows up on the home index.
+
+Adding a brand-new experiment is still a code task (page + route + SEO
+per §1); use the manager's **Add** to create the home-page listing row
+once the page exists (or to point at an external path).
+
 ## 2. Reuse main-site styles and components
 
 The external-site repo is installed as `kato8studios-site` (its own package name). Import deep paths:
