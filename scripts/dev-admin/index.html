@@ -378,7 +378,7 @@
 
     function makeEntry(def) {
       if (def.kind === 'component') {
-        return { name: '', label: '', status: 'stable', source: '', description: '' }
+        return { name: '', label: '', status: 'stable', source: '', styles: '', description: '' }
       }
       const e = { path: '/', title: '', description: '' }
       if (def.hasActive) e.active = true
