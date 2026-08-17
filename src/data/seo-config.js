@@ -58,6 +58,22 @@ export const staticRoutes = {
     ogDescription:
       'Flatter, official-partner take on the Kickstarter CTA. Compare against v1.',
   },
+  '/our-story-timeline': {
+    title: 'Our Story timeline | Kato.8 Sandbox',
+    description:
+      'Milestone timeline proposed for the About page — alternating cards around a centered line, collapsing to a left rail on mobile. WIP preview.',
+    ogTitle: 'Our Story timeline',
+    ogDescription:
+      'About-page milestone timeline preview — alternating cards, mobile left-rail collapse.',
+  },
+  '/newsletter-on-about': {
+    title: 'Newsletter on About | Kato.8 Sandbox',
+    description:
+      'NewsletterSignup mounted below the Support Kato.8 section on the About page, with tightened top spacing. WIP preview.',
+    ogTitle: 'Newsletter on About',
+    ogDescription:
+      'Preview of NewsletterSignup mounted on the About page with tightened spacing.',
+  },
   '/crowdfunding-games': {
     title: 'Crowdfunding Games | Kato.8 Sandbox',
     description:
