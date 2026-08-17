@@ -3,23 +3,122 @@
  * so Node scripts (e.g. scripts/prerender.mjs) can consume it without
  * a JSX transform. registry.jsx builds on this list to attach render
  * thunks, and seo-config.js uses it to derive per-preview OG meta.
+ *
+ * Entry shape: { name, label, status, source, description }
+ *   name        route slug + registry render key (`/components/<name>`).
+ *   label       display name shown in the gallery and preview bar.
+ *   status      lifecycle badge: 'stable' | 'wip' | 'vendored' | 'deprecated'.
+ *   source      where the rendered component lives, as an import-style path.
+ *               `src/...` paths are vendored in this repo (editable from the
+ *               admin panel); `kato8studios-site/...` paths live in the
+ *               sibling external-site checkout (read-only here).
+ *   description one-line summary for the gallery card + OG meta.
+ *
+ * This whole array is a plain-data literal: keep it that way (no imports,
+ * no expressions) so the dev-only admin panel (scripts/dev-admin/,
+ * reachable at http://localhost:5173/__admin during `npm run dev`) can
+ * parse and re-emit it. Comments inside the array are dropped on save.
  */
 
 export const previewEntries = [
-  { name: 'nav',                  label: 'Nav',                  description: 'Top navigation bar with games dropdown, About link, and social icons. Mobile viewports collapse to a hamburger + MobileMenu.' },
-  { name: 'footer',               label: 'Footer',               description: 'Site-wide footer: studio blurb, per-game links, community links, and the bottom legal bar.' },
-  { name: 'hero',                 label: 'Hero',                 description: 'Home-page hero: studio logo + mission tagline. Uses responsive srcSet for the logo image.' },
-  { name: 'game-grid',            label: 'GameGrid',             description: 'Home-page grid of GameCards, driven by the games data. Renders one card per entry in games.js.' },
-  { name: 'game-card',            label: 'GameCard',             description: 'A single game tile. Rendered here with the first entry from games.js.' },
-  { name: 'mobile-menu',          label: 'MobileMenu',           description: 'Slide-in menu used on narrow viewports. Rendered here in the always-open state; the close button is a no-op in preview.' },
-  { name: 'gofundme-widget',      label: 'GoFundMeWidget',       description: 'Embedded GoFundMe campaign iframe. Loads from gofundme.com.' },
-  { name: 'support-section',      label: 'SupportSection',       description: 'Home-page "Help Us Build Something Special" block: heading + pitch + GoFundMe widget.' },
-  { name: 'social-icons',         label: 'SocialIcons',          description: 'Row of social-media icon links used by Nav and MobileMenu. Icons come from public/assets/img/social/.' },
-  { name: 'newsletter-signup',    label: 'NewsletterSignup',     description: 'Email signup form. No network call when VITE_NEWSLETTER_ENDPOINT is unset (dev / preview default).' },
-  { name: 'discord-signup-form',  label: 'DiscordSignupForm',    description: 'Per-game Discord community signup form. No network call without an endpoint prop.' },
-  { name: 'playtest-signup-form', label: 'PlaytestSignupForm',   description: 'Per-game playtest signup form. No network call without an endpoint prop.' },
-  { name: 'kickstarter-button',   label: 'KickstarterButton',    description: 'Green CTA linking to a Kickstarter campaign. Rendered on game pages whose data entry defines a kickstarterUrl. Dark-cobalt inset stroke + hard-offset shadow that lifts on hover; arrow slides right.' },
-  { name: 'our-story-timeline',   label: 'OurStoryTimeline',     description: 'About-page "Our Story" milestone timeline: alternating cards zigzag around a centered line, collapsing to a left rail under 767px. WIP from external-site branch about-timeline-section — not yet on main, vendored here.' },
+  {
+    name: 'nav',
+    label: 'Nav',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/Nav.jsx',
+    description: 'Top navigation bar with games dropdown, About link, and social icons. Mobile viewports collapse to a hamburger + MobileMenu.',
+  },
+  {
+    name: 'footer',
+    label: 'Footer',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/Footer.jsx',
+    description: 'Site-wide footer: studio blurb, per-game links, community links, and the bottom legal bar.',
+  },
+  {
+    name: 'hero',
+    label: 'Hero',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/Hero.jsx',
+    description: 'Home-page hero: studio logo + mission tagline. Uses responsive srcSet for the logo image.',
+  },
+  {
+    name: 'game-grid',
+    label: 'GameGrid',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/GameGrid.jsx',
+    description: 'Home-page grid of GameCards, driven by the games data. Renders one card per entry in games.js.',
+  },
+  {
+    name: 'game-card',
+    label: 'GameCard',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/GameCard.jsx',
+    description: 'A single game tile. Rendered here with the first entry from games.js.',
+  },
+  {
+    name: 'mobile-menu',
+    label: 'MobileMenu',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/MobileMenu.jsx',
+    description: 'Slide-in menu used on narrow viewports. Rendered here in the always-open state; the close button is a no-op in preview.',
+  },
+  {
+    name: 'gofundme-widget',
+    label: 'GoFundMeWidget',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/GoFundMeWidget.jsx',
+    description: 'Embedded GoFundMe campaign iframe. Loads from gofundme.com.',
+  },
+  {
+    name: 'support-section',
+    label: 'SupportSection',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/SupportSection.jsx',
+    description: 'Home-page "Help Us Build Something Special" block: heading + pitch + GoFundMe widget.',
+  },
+  {
+    name: 'social-icons',
+    label: 'SocialIcons',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/SocialIcons.jsx',
+    description: 'Row of social-media icon links used by Nav and MobileMenu. Icons come from public/assets/img/social/.',
+  },
+  {
+    name: 'newsletter-signup',
+    label: 'NewsletterSignup',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/NewsletterSignup.jsx',
+    description: 'Email signup form. No network call when VITE_NEWSLETTER_ENDPOINT is unset (dev / preview default).',
+  },
+  {
+    name: 'discord-signup-form',
+    label: 'DiscordSignupForm',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/DiscordSignupForm.jsx',
+    description: 'Per-game Discord community signup form. No network call without an endpoint prop.',
+  },
+  {
+    name: 'playtest-signup-form',
+    label: 'PlaytestSignupForm',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/PlaytestSignupForm.jsx',
+    description: 'Per-game playtest signup form. No network call without an endpoint prop.',
+  },
+  {
+    name: 'kickstarter-button',
+    label: 'KickstarterButton',
+    status: 'stable',
+    source: 'kato8studios-site/src/components/KickstarterButton.jsx',
+    description: 'Green CTA linking to a Kickstarter campaign. Rendered on game pages whose data entry defines a kickstarterUrl. Dark-cobalt inset stroke + hard-offset shadow that lifts on hover; arrow slides right.',
+  },
+  {
+    name: 'our-story-timeline',
+    label: 'OurStoryTimeline',
+    status: 'wip',
+    source: 'src/components/OurStoryTimeline.jsx',
+    description: 'About-page "Our Story" milestone timeline: alternating cards zigzag around a centered line, collapsing to a left rail under 767px. WIP from external-site branch about-timeline-section — not yet on main, vendored here.',
+  },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))

@@ -28,7 +28,10 @@ function Gallery() {
           {previews.map((entry) => (
             <li key={entry.name} className="previews-gallery_item">
               <Link to={`/components/${entry.name}`} className="previews-gallery_item-link">
-                <h2 className="previews-gallery_item-title">{entry.label}</h2>
+                <div className="previews-gallery_item-head">
+                  <h2 className="previews-gallery_item-title">{entry.label}</h2>
+                  <StatusBadge status={entry.status} />
+                </div>
                 <p className="previews-gallery_item-desc">{entry.description}</p>
                 <span className="previews-gallery_item-cta">
                   Open preview →
@@ -51,11 +54,35 @@ function SinglePreview({ entry }) {
         <div className="container preview-frame_bar-inner">
           <Link to="/components" className="preview-frame_back">← Components</Link>
           <span className="preview-frame_label">{entry.label}</span>
+          <StatusBadge status={entry.status} />
           <span className="preview-frame_desc">{entry.description}</span>
         </div>
       </div>
-      <div className="preview-frame_stage">{entry.render()}</div>
+      <div className="preview-frame_stage">
+        {typeof entry.render === 'function' ? (
+          entry.render()
+        ) : (
+          <div className="container preview-frame_norender">
+            <p>
+              No renderer is wired for <code>{entry.name}</code> yet. Add one to{' '}
+              <code>src/previews/registry.jsx</code> to preview it live.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
+  )
+}
+
+// Lifecycle badge derived from each entry's `status`. 'stable' is the
+// default and shows nothing to keep the gallery quiet; everything else
+// (wip / vendored / deprecated / custom) renders a small pill.
+function StatusBadge({ status }) {
+  if (!status || status === 'stable') return null
+  return (
+    <span className="status-badge" data-status={status}>
+      {status}
+    </span>
   )
 }
 

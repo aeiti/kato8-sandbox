@@ -1,7 +1,9 @@
 /**
- * Dev-only home manager — a Vite middleware plugin that lets you edit
- * the home-page listings (Browse / Pages / Experiments) from a browser
- * UI and publish them to the live site.
+ * Dev-only admin panel — a Vite middleware plugin that lets you edit the
+ * home-page listings (Browse / Pages / Experiments) AND the component
+ * preview library (name, slug, status, description, and — for components
+ * vendored in this repo — their actual source), then push to the live
+ * site from a browser UI.
  *
  * Reachable at http://localhost:5173/__admin during `npm run dev`.
  *
@@ -15,14 +17,19 @@
  *
  * Endpoints (all under /__admin):
  *   GET  /__admin                     → the manager UI (index.html)
- *   GET  /__admin/api/data            → { sections, pages, experiments }
- *   PUT  /__admin/api/block/<name>    → rewrite one array in homeSections.js
- *   POST /__admin/api/publish         → commit homeSections.js + push
+ *   GET  /__admin/api/info            → { branch, isMain }
+ *   GET  /__admin/api/data            → { sections, pages, experiments, components }
+ *   PUT  /__admin/api/block/<name>    → rewrite one home-listing array
+ *   POST /__admin/api/components      → rewrite previewEntries (+ slug renames)
+ *   GET  /__admin/api/source?name=<n> → read one component's source file
+ *   PUT  /__admin/api/source          → write one vendored component's source
+ *   POST /__admin/api/publish         → commit + push the managed files
  *
- * Publish commits ONLY homeSections.js and pushes the current branch to
- * origin. Run on `main` (the normal case) that triggers the Pages
- * deploy; on any other branch it reports back that you need to merge to
- * main. It never force-pushes and never touches other files.
+ * Push commits ONLY the files this panel manages (home listings, the
+ * preview entries + registry, and vendored component source) and pushes
+ * the current branch to origin. On `main` (the normal case) that triggers
+ * the Pages deploy; on any other branch it reports that you need to merge
+ * to main. It never force-pushes and never touches unmanaged files.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -32,17 +39,30 @@ import { execFileSync } from 'node:child_process'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const UI_HTML = path.join(__dirname, 'index.html')
 
-// The editable blocks: which file, and the anchor that precedes each
-// data literal. All three live in one file today, but the shape allows
-// spreading across files later (like external-site's dev-admin).
-const TARGET_FILE = 'src/data/homeSections.js'
-const BLOCKS = {
-  sections: { file: TARGET_FILE, anchor: 'export const sections = ' },
-  pages: { file: TARGET_FILE, anchor: 'export const pages = ' },
-  experiments: { file: TARGET_FILE, anchor: 'export const experiments = ' },
+const HOME_FILE = 'src/data/homeSections.js'
+const ENTRIES_FILE = 'src/previews/entries.js'
+const REGISTRY_FILE = 'src/previews/registry.jsx'
+const ENTRIES_ANCHOR = 'export const previewEntries = '
+
+// Home-listing blocks — plain-data arrays edited by anchor.
+const LISTING_BLOCKS = {
+  sections: { file: HOME_FILE, anchor: 'export const sections = ' },
+  pages: { file: HOME_FILE, anchor: 'export const pages = ' },
+  experiments: { file: HOME_FILE, anchor: 'export const experiments = ' },
 }
 
-const COMMIT_MESSAGE = 'Update home page listings via manager'
+// Files Push is allowed to commit — everything this panel can write, and
+// nothing else. `src/components` is a directory (vendored component
+// source); the rest are single files.
+const MANAGED_PATHS = [
+  HOME_FILE,
+  ENTRIES_FILE,
+  REGISTRY_FILE,
+  'src/components',
+]
+
+const COMMIT_MESSAGE = 'Update home + components via admin panel'
+const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 function sendJson(res, status, body) {
   res.statusCode = status
@@ -55,7 +75,7 @@ function readJsonBody(req) {
     let data = ''
     req.on('data', (chunk) => {
       data += chunk
-      if (data.length > 1_000_000) reject(new Error('body too large'))
+      if (data.length > 2_000_000) reject(new Error('body too large'))
     })
     req.on('end', () => {
       try {
@@ -72,6 +92,47 @@ function git(root, args) {
   return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
 }
 
+/**
+ * Resolve a component `source` (as stored in entries.js) to an absolute
+ * path plus whether it's editable here. `src/...` paths are vendored in
+ * this repo and editable; anything else resolves through node_modules
+ * (the sibling external-site checkout) and is read-only. Returns null for
+ * paths that escape their allowed root (traversal guard).
+ */
+function resolveSource(root, source) {
+  if (typeof source !== 'string' || !source) return null
+  if (source.startsWith('src/')) {
+    const base = path.join(root, 'src')
+    const abs = path.resolve(root, source)
+    if (abs !== base && !abs.startsWith(base + path.sep)) return null
+    return { abs, editable: true }
+  }
+  const base = path.join(root, 'node_modules')
+  const abs = path.resolve(base, source)
+  if (!abs.startsWith(base + path.sep)) return null
+  return { abs, editable: false }
+}
+
+/**
+ * Rename one renderer key in registry.jsx (`'from': (…)` → `'to': (…)`),
+ * so the preview keeps rendering after a slug change. Throws if `from`
+ * isn't present exactly once, or `to` already exists.
+ */
+function renameRegistryKey(src, from, to) {
+  const fromKey = "'" + from + "':"
+  const toKey = "'" + to + "':"
+  if (src.includes(toKey)) {
+    throw new Error(`registry already has a renderer for '${to}'`)
+  }
+  const parts = src.split(fromKey)
+  if (parts.length !== 2) {
+    throw new Error(
+      `expected exactly one renderer for '${from}' in registry.jsx, found ${parts.length - 1}`
+    )
+  }
+  return parts.join(toKey)
+}
+
 export function devAdmin() {
   return {
     name: 'kato8-dev-admin',
@@ -82,8 +143,15 @@ export function devAdmin() {
       // as a request-time 500 rather than crashing the whole dev server.
       const load = () => import('./serialize.mjs')
 
+      const readEntries = async () => {
+        const { readBlock } = await load()
+        const src = fs.readFileSync(path.join(root, ENTRIES_FILE), 'utf8')
+        return readBlock(src, ENTRIES_ANCHOR)
+      }
+
       server.middlewares.use('/__admin', async (req, res, next) => {
-        const url = (req.url || '/').split('?')[0]
+        const [rawUrl, query = ''] = (req.url || '/').split('?')
+        const url = rawUrl
 
         try {
           // GET /__admin — serve the UI
@@ -109,20 +177,28 @@ export function devAdmin() {
           if (req.method === 'GET' && url === '/api/data') {
             const { readBlock } = await load()
             const data = {}
-            for (const [name, def] of Object.entries(BLOCKS)) {
+            for (const [name, def] of Object.entries(LISTING_BLOCKS)) {
               const src = fs.readFileSync(path.join(root, def.file), 'utf8')
               data[name] = readBlock(src, def.anchor)
             }
+            data.components = await readEntries()
             sendJson(res, 200, data)
             return
           }
 
-          // PUT /__admin/api/block/<name> — rewrite one block
+          // PUT /__admin/api/block/<name> — rewrite one home-listing block
           const blockMatch = url.match(/^\/api\/block\/([a-zA-Z]+)$/)
           if (req.method === 'PUT' && blockMatch) {
             const name = blockMatch[1]
-            const def = BLOCKS[name]
-            if (!def) return sendJson(res, 404, { error: `unknown block: ${name}` })
+            const def = LISTING_BLOCKS[name]
+            if (!def) {
+              return sendJson(res, 404, {
+                error:
+                  name === 'components'
+                    ? 'use POST /api/components for the component library'
+                    : `unknown block: ${name}`,
+              })
+            }
 
             const value = await readJsonBody(req)
             if (!Array.isArray(value)) {
@@ -132,13 +208,124 @@ export function devAdmin() {
             const { writeBlock } = await load()
             const filePath = path.join(root, def.file)
             const src = fs.readFileSync(filePath, 'utf8')
-            const next = writeBlock(src, def.anchor, value)
-            fs.writeFileSync(filePath, next)
+            const nextSrc = writeBlock(src, def.anchor, value)
+            fs.writeFileSync(filePath, nextSrc)
             sendJson(res, 200, { ok: true, block: name, count: value.length })
             return
           }
 
-          // POST /__admin/api/publish — commit + push homeSections.js
+          // POST /__admin/api/components — rewrite previewEntries. Body:
+          //   { entries: [...], renames: [{ from, to }] }
+          // Renames keep registry.jsx's render keys in sync with slugs.
+          if (req.method === 'POST' && url === '/api/components') {
+            const body = await readJsonBody(req)
+            const entries = body && body.entries
+            const renames = (body && body.renames) || []
+            if (!Array.isArray(entries)) {
+              return sendJson(res, 400, { error: 'expected { entries: [...] }' })
+            }
+
+            // Validate slugs (unique, well-formed).
+            const seen = new Set()
+            for (const e of entries) {
+              if (!e || typeof e.name !== 'string' || !SLUG.test(e.name)) {
+                return sendJson(res, 400, {
+                  error: `invalid slug: ${JSON.stringify(e && e.name)} (use lowercase, digits, hyphens)`,
+                })
+              }
+              if (seen.has(e.name)) {
+                return sendJson(res, 400, { error: `duplicate slug: ${e.name}` })
+              }
+              seen.add(e.name)
+            }
+
+            // Apply renames to registry.jsx first; if any fails we abort
+            // before touching entries.js so nothing goes half-written.
+            const registryPath = path.join(root, REGISTRY_FILE)
+            if (renames.length) {
+              let registrySrc = fs.readFileSync(registryPath, 'utf8')
+              for (const { from, to } of renames) {
+                if (!SLUG.test(from) || !SLUG.test(to)) {
+                  return sendJson(res, 400, {
+                    error: `invalid rename ${from} → ${to}`,
+                  })
+                }
+                registrySrc = renameRegistryKey(registrySrc, from, to)
+              }
+              fs.writeFileSync(registryPath, registrySrc)
+            }
+
+            const { writeBlock } = await load()
+            const entriesPath = path.join(root, ENTRIES_FILE)
+            const src = fs.readFileSync(entriesPath, 'utf8')
+            const nextSrc = writeBlock(src, ENTRIES_ANCHOR, entries)
+            fs.writeFileSync(entriesPath, nextSrc)
+            sendJson(res, 200, {
+              ok: true,
+              count: entries.length,
+              renamed: renames.length,
+            })
+            return
+          }
+
+          // GET /__admin/api/source?name=<name> — read a component's source
+          if (req.method === 'GET' && url === '/api/source') {
+            const params = new URLSearchParams(query)
+            const name = params.get('name')
+            const entries = await readEntries()
+            const entry = entries.find((e) => e.name === name)
+            if (!entry) return sendJson(res, 404, { error: `unknown component: ${name}` })
+
+            const resolved = resolveSource(root, entry.source)
+            if (!resolved) {
+              return sendJson(res, 200, {
+                name,
+                source: entry.source,
+                editable: false,
+                exists: false,
+                content: '',
+                note: 'No resolvable source path for this component.',
+              })
+            }
+            const exists = fs.existsSync(resolved.abs)
+            sendJson(res, 200, {
+              name,
+              source: entry.source,
+              editable: resolved.editable,
+              exists,
+              content: exists ? fs.readFileSync(resolved.abs, 'utf8') : '',
+            })
+            return
+          }
+
+          // PUT /__admin/api/source — write a vendored component's source.
+          // Body: { name, content }. Sibling (read-only) sources are 403.
+          if (req.method === 'PUT' && url === '/api/source') {
+            const body = await readJsonBody(req)
+            const name = body && body.name
+            const content = body && body.content
+            if (typeof content !== 'string') {
+              return sendJson(res, 400, { error: 'expected { name, content }' })
+            }
+            const entries = await readEntries()
+            const entry = entries.find((e) => e.name === name)
+            if (!entry) return sendJson(res, 404, { error: `unknown component: ${name}` })
+
+            const resolved = resolveSource(root, entry.source)
+            if (!resolved) {
+              return sendJson(res, 400, { error: `unresolvable source: ${entry.source}` })
+            }
+            if (!resolved.editable) {
+              return sendJson(res, 403, {
+                error: `${entry.source} lives in external-site and is read-only here.`,
+              })
+            }
+            fs.writeFileSync(resolved.abs, content)
+            sendJson(res, 200, { ok: true, name, bytes: Buffer.byteLength(content) })
+            return
+          }
+
+          // POST /__admin/api/publish — commit + push the managed files
           if (req.method === 'POST' && url === '/api/publish') {
             let branch
             try {
@@ -147,17 +334,19 @@ export function devAdmin() {
               return sendJson(res, 500, { error: 'not a git repository' })
             }
 
-            git(root, ['add', '--', TARGET_FILE])
-            const staged = git(root, ['diff', '--cached', '--name-only', '--', TARGET_FILE])
+            git(root, ['add', '--', ...MANAGED_PATHS])
+            const staged = git(root, [
+              'diff', '--cached', '--name-only', '--', ...MANAGED_PATHS,
+            ])
             if (!staged) {
               return sendJson(res, 200, {
                 published: false,
-                reason: 'No changes to publish — save an edit first.',
+                reason: 'No changes to push — save an edit first.',
                 branch,
               })
             }
 
-            git(root, ['commit', '-m', COMMIT_MESSAGE, '--', TARGET_FILE])
+            git(root, ['commit', '-m', COMMIT_MESSAGE, '--', ...MANAGED_PATHS])
             const sha = git(root, ['rev-parse', '--short', 'HEAD'])
 
             try {
@@ -177,6 +366,7 @@ export function devAdmin() {
               sha,
               isMain,
               deploy: isMain,
+              files: staged.split('\n').filter(Boolean),
               message: isMain
                 ? `Pushed ${sha} to main — the Pages deploy is starting.`
                 : `Pushed ${sha} to ${branch}. Merge it to main to deploy.`,
