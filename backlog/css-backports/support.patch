@@ -1,0 +1,22 @@
+--- a/src/styles/main/support.css
++++ b/src/styles/main/support.css
+@@ -5,7 +5,8 @@
+   justify-content: flex-start;
+   align-items: center;
+   width: 100%;
+-  margin-block: 96px;
++  margin-top: 96px;
++  margin-bottom: 48px;
+   text-decoration: none;
+   display: flex;
+   position: relative;
+@@ -50,7 +51,8 @@
+ 
+ @media screen and (max-width: 991px) {
+   .support-kato8-section {
+-          margin-block: 48px;
++          margin-top: 48px;
++          margin-bottom: 24px;
+         }
+ 
+   .support-section {
