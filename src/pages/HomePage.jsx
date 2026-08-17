@@ -5,6 +5,20 @@ import '../styles/home.css'
 
 const experiments = [
   {
+    path: '/our-story-timeline',
+    title: 'Our Story timeline',
+    active: true,
+    description:
+      'Milestone timeline proposed for the bottom of the About page — alternating cards zigzag around a centered line, collapsing to a left rail on mobile. WIP from external-site branch about-timeline-section; vendored here (not yet on main).',
+  },
+  {
+    path: '/newsletter-on-about',
+    title: 'Newsletter on About',
+    active: true,
+    description:
+      'NewsletterSignup mounted below the Support Kato.8 section on the About page, with the top spacing tightened so the form hugs the section above. WIP from external-site branch mount-newsletter-on-about.',
+  },
+  {
     path: '/kickstarter-button-v2',
     title: 'Kickstarter Button v2',
     active: true,

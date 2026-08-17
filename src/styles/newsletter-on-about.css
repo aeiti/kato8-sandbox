@@ -1,0 +1,25 @@
+/*
+ * Newsletter-on-About spacing tweak — the only CSS the external-site
+ * `mount-newsletter-on-about` branch adds (commit 8c32eb9, in
+ * `src/styles/main/newsletter-signup.css`). On the branch it changes
+ * `.newsletter-signup` globally; here it's scoped under
+ * `.newsletter-on-about` so the standalone NewsletterSignup gallery
+ * preview (/components/newsletter-signup) keeps its normal centered
+ * padding.
+ *
+ * The pull-up cancels half of the support-kato8-section's 96px desktop
+ * bottom margin so the form sits ~48px below the GoFundMe widget; scaled
+ * down at ≤991px where the support section's block margin is already
+ * 48px. Verify against staging (the source of truth) before shipping.
+ */
+
+.newsletter-on-about .newsletter-signup {
+  margin: -3rem auto 0;
+  padding: 0 1rem 2rem;
+}
+
+@media screen and (max-width: 991px) {
+  .newsletter-on-about .newsletter-signup {
+    margin-top: -1rem;
+  }
+}

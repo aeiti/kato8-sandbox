@@ -1,0 +1,39 @@
+/*
+ * Shared intro header for sandbox experiment pages that preview a
+ * real main-site section (timeline, newsletter-on-About). A short
+ * title + explanatory blurb above the previewed section, matching the
+ * type treatment used elsewhere in the sandbox chrome.
+ */
+
+.experiment-intro {
+  padding-block: var(--space-3) var(--space-2);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+.experiment-intro_title {
+  margin: 0 0 0.35rem;
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.experiment-intro_subtitle {
+  margin: 0;
+  max-width: 720px;
+  font-family: var(--font-body);
+  font-size: 1.13rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  opacity: 0.75;
+}
+
+.experiment-intro_subtitle code {
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--dark-cobalt) 8%, transparent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

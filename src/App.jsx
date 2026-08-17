@@ -6,6 +6,8 @@ import KickstarterButtonsPage from './pages/KickstarterButtonsPage'
 import KickstarterButtonV2Page from './pages/KickstarterButtonV2Page'
 import CrowdfundingGamesPage from './pages/CrowdfundingGamesPage'
 import CrowdfundingGamePage from './pages/CrowdfundingGamePage'
+import OurStoryTimelinePage from './pages/OurStoryTimelinePage'
+import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
 import PreviewPage from './previews/PreviewPage'
 
 export default function App() {
@@ -35,6 +37,8 @@ export default function App() {
         <Route path="/kickstarter-button-v2" element={<KickstarterButtonV2Page />} />
         <Route path="/crowdfunding-games" element={<CrowdfundingGamesPage />} />
         <Route path="/crowdfunding-games/:slug" element={<CrowdfundingGamePage />} />
+        <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
+        <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
         <Route path="/components" element={<PreviewPage />} />
         <Route path="/components/:name" element={<PreviewPage />} />
       </Routes>
