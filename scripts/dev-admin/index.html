@@ -248,6 +248,21 @@
     .source-note { font-size: 0.78rem; color: var(--muted); }
     .source-note.readonly { color: #8a5b12; }
 
+    /* Live preview pane (components) */
+    a.btn { text-decoration: none; display: inline-flex; align-items: center; }
+    .preview-body { margin-top: 10px; display: none; }
+    .preview-body.open { display: block; }
+    .preview-toolbar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .preview-toolbar .spacer { flex: 1; }
+    .preview-iframe {
+      display: block;
+      width: 100%;
+      height: 440px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
     .block__foot {
       display: flex;
       align-items: center;
@@ -363,7 +378,7 @@
 
     function makeEntry(def) {
       if (def.kind === 'component') {
-        return { name: '', label: '', status: 'stable', source: '', description: '' }
+        return { name: '', label: '', status: 'stable', source: '', styles: '', description: '' }
       }
       const e = { path: '/', title: '', description: '' }
       if (def.hasActive) e.active = true
@@ -591,21 +606,31 @@
       return f
     }
 
-    // Collapsible source viewer/editor. Editable only for src/… (vendored)
-    // sources; sibling external-site sources open read-only.
+    // Collapsible source editor + live preview. Source is editable only
+    // for src/… (vendored) sources; sibling external-site sources open
+    // read-only. The preview iframe embeds the real /components/<slug>
+    // route (bare) and updates on save via Vite HMR.
     function sourcePanel(item) {
       const panel = document.createElement('div')
       panel.className = 'source-panel'
 
       const head = document.createElement('div')
       head.className = 'source-head'
-      const toggle = document.createElement('button')
-      toggle.className = 'btn btn--sm'
-      toggle.textContent = 'View / edit source'
+      const srcToggle = document.createElement('button')
+      srcToggle.className = 'btn btn--sm'
+      srcToggle.textContent = 'View / edit source'
+      const styleToggle = document.createElement('button')
+      styleToggle.className = 'btn btn--sm'
+      styleToggle.textContent = 'View / edit styles'
+      const previewToggle = document.createElement('button')
+      previewToggle.className = 'btn btn--sm'
+      previewToggle.textContent = 'Live preview'
       const path = document.createElement('span')
       path.className = 'source-path'
       path.textContent = item.source || '(no source path)'
-      head.appendChild(toggle)
+      head.appendChild(srcToggle)
+      head.appendChild(styleToggle)
+      head.appendChild(previewToggle)
       head.appendChild(path)
       panel.appendChild(head)
 
@@ -613,38 +638,127 @@
       body.className = 'source-body'
       panel.appendChild(body)
 
-      let loaded = false
-      toggle.onclick = async () => {
+      const styleBody = document.createElement('div')
+      styleBody.className = 'source-body'
+      panel.appendChild(styleBody)
+
+      const preview = document.createElement('div')
+      preview.className = 'preview-body'
+      panel.appendChild(preview)
+
+      let loadedSource = false
+      srcToggle.onclick = async () => {
         const open = body.classList.toggle('open')
-        toggle.textContent = open ? 'Hide source' : 'View / edit source'
-        if (open && !loaded) { loaded = true; await loadSource(item, body) }
+        srcToggle.textContent = open ? 'Hide source' : 'View / edit source'
+        if (open && !loadedSource) { loadedSource = true; await loadFile(item, body, 'source') }
+      }
+
+      let loadedStyles = false
+      styleToggle.onclick = async () => {
+        const open = styleBody.classList.toggle('open')
+        styleToggle.textContent = open ? 'Hide styles' : 'View / edit styles'
+        if (open && !loadedStyles) { loadedStyles = true; await loadFile(item, styleBody, 'styles') }
+      }
+
+      let mountedPreview = false
+      previewToggle.onclick = () => {
+        const open = preview.classList.toggle('open')
+        previewToggle.textContent = open ? 'Hide preview' : 'Live preview'
+        if (open && !mountedPreview) { mountedPreview = true; mountPreview(item, preview) }
       }
       return panel
     }
 
-    async function loadSource(item, body) {
-      const origName = item.__origName
-      if (!origName) {
-        body.innerHTML = '<p class="source-note">Save this component first, then its source becomes editable.</p>'
+    // Embed the real preview route (bare) in an iframe. It's the same app
+    // the gallery uses, so edits to a vendored source file hot-update here
+    // via Vite HMR — live on save. Keyed to the on-disk slug (__origName)
+    // so it points at a route that actually exists.
+    function mountPreview(item, container) {
+      const slug = item.__origName
+      if (!slug) {
+        container.innerHTML =
+          '<p class="source-note">Save this component first, then it can be previewed.</p>'
         return
       }
-      body.innerHTML = '<p class="source-note">Loading source…</p>'
+      const url = '/components/' + encodeURIComponent(slug) + '?bare=1'
+
+      const toolbar = document.createElement('div')
+      toolbar.className = 'preview-toolbar'
+      const note = document.createElement('span')
+      note.className = 'source-note'
+      note.textContent = 'Live — hot-updates when you save source or styles.'
+      const spacer = document.createElement('span')
+      spacer.className = 'spacer'
+      const reload = document.createElement('button')
+      reload.className = 'btn btn--sm'
+      reload.textContent = '↻ Reload'
+      reload.onclick = () => reloadPreview(slug)
+      const openTab = document.createElement('a')
+      openTab.className = 'btn btn--sm'
+      openTab.href = url
+      openTab.target = '_blank'
+      openTab.rel = 'noreferrer'
+      openTab.textContent = 'Open ↗'
+      toolbar.appendChild(note)
+      toolbar.appendChild(spacer)
+      toolbar.appendChild(reload)
+      toolbar.appendChild(openTab)
+
+      const frame = document.createElement('iframe')
+      frame.className = 'preview-iframe'
+      frame.src = url
+      frame.title = 'Live preview of ' + slug
+      frame.setAttribute('data-preview-slug', slug)
+
+      container.appendChild(toolbar)
+      container.appendChild(frame)
+    }
+
+    function reloadPreview(slug) {
+      const frame = document.querySelector('iframe[data-preview-slug="' + slug + '"]')
+      if (!frame) return
+      try { frame.contentWindow.location.reload() }
+      catch { frame.src = frame.src }
+    }
+
+    // Load one of a component's files (field: 'source' | 'styles') into a
+    // code editor. Editable when it's vendored in this repo; sibling
+    // external-site files open read-only. Saving writes the file, which
+    // hot-updates any open live-preview via Vite HMR.
+    async function loadFile(item, body, field) {
+      const origName = item.__origName
+      if (!origName) {
+        body.innerHTML = '<p class="source-note">Save this component first, then its ' + field + ' becomes editable.</p>'
+        return
+      }
+      body.innerHTML = '<p class="source-note">Loading ' + field + '…</p>'
       let data
       try {
-        const res = await fetch('/__admin/api/source?name=' + encodeURIComponent(origName))
+        const res = await fetch('/__admin/api/source?name=' + encodeURIComponent(origName) + '&field=' + field)
         data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'failed to read source')
+        if (!res.ok) throw new Error(data.error || 'failed to read ' + field)
       } catch (err) {
         body.innerHTML = '<p class="source-note readonly">' + err.message + '</p>'
         return
       }
 
+      if (!data.source) {
+        body.innerHTML = '<p class="source-note">No ' + field + ' file is set for this component.</p>'
+        return
+      }
+
       body.innerHTML = ''
+      const pathLine = document.createElement('div')
+      pathLine.className = 'source-path'
+      pathLine.style.marginBottom = '6px'
+      pathLine.textContent = data.source
+      body.appendChild(pathLine)
+
       const ta = document.createElement('textarea')
       ta.className = 'code'
       ta.value = data.exists ? data.content : ''
       ta.readOnly = !data.editable
-      if (!data.exists) ta.placeholder = 'Source file not found: ' + (data.source || '')
+      if (!data.exists) ta.placeholder = field + ' file not found: ' + (data.source || '')
       body.appendChild(ta)
 
       const actions = document.createElement('div')
@@ -653,27 +767,27 @@
       note.className = 'source-note' + (data.editable ? '' : ' readonly')
       note.textContent = data.editable
         ? 'Vendored in this repo — edits are saved to the file directly.'
-        : 'Read-only — this component lives in external-site.'
+        : 'Read-only — this file lives in external-site.'
       actions.appendChild(note)
       actions.appendChild(document.createElement('span')).className = 'spacer'
 
       if (data.editable) {
         const saveBtn = document.createElement('button')
         saveBtn.className = 'btn btn--primary btn--sm'
-        saveBtn.textContent = 'Save source'
+        saveBtn.textContent = 'Save ' + field
         saveBtn.onclick = async () => {
           saveBtn.disabled = true
           try {
             const res = await fetch('/__admin/api/source', {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name: origName, content: ta.value }),
+              body: JSON.stringify({ name: origName, content: ta.value, field }),
             })
             const b = await res.json()
             if (!res.ok) throw new Error(b.error || 'save failed')
-            toast('Saved source for ' + origName + ' (' + b.bytes + ' bytes).', 'ok')
+            toast('Saved ' + field + ' for ' + origName + ' (' + b.bytes + ' bytes).', 'ok')
           } catch (err) {
-            toast('Source save failed: ' + err.message, 'err')
+            toast(field + ' save failed: ' + err.message, 'err')
           } finally {
             saveBtn.disabled = false
           }

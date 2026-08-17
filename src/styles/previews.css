@@ -213,6 +213,12 @@
   min-height: calc(100vh - 4rem);
 }
 
+/* Bare mode: no preview bar (used by the admin panel's live-preview
+   iframe), so the stage fills the whole frame. */
+.preview-frame--bare .preview-frame_stage {
+  min-height: 100vh;
+}
+
 .previews-notfound {
   padding: var(--space-3) 5% var(--space-4);
   color: var(--text-primary);

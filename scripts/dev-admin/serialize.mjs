@@ -22,9 +22,9 @@
 // Canonical key order so saved objects don't churn regardless of the
 // order the UI sends keys in. Covers both editable literals:
 //   home listings  → { path, title, active, description }
-//   preview entries → { name, label, status, source, description }
+//   preview entries → { name, label, status, source, styles, description }
 // Unknown keys sort after these, alphabetical + stable.
-const KEY_ORDER = ['name', 'label', 'path', 'title', 'active', 'status', 'source', 'description']
+const KEY_ORDER = ['name', 'label', 'path', 'title', 'active', 'status', 'source', 'styles', 'description']
 const IDENT = /^[A-Za-z_$][\w$]*$/
 
 function orderedKeys(obj) {
@@ -141,9 +141,29 @@ export function readBlock(src, anchor) {
 }
 
 /**
+ * JSON.stringify with object keys sorted recursively, so the comparison
+ * is by DATA, not key order. printValue re-emits objects in canonical
+ * KEY_ORDER, so a value whose keys arrive in a different order (e.g. a
+ * newly-added entry with `active` last) is still an equal round-trip.
+ */
+function stableStringify(value) {
+  if (Array.isArray(value)) {
+    return '[' + value.map(stableStringify).join(',') + ']'
+  }
+  if (value && typeof value === 'object') {
+    const parts = Object.keys(value)
+      .sort()
+      .map((k) => JSON.stringify(k) + ':' + stableStringify(value[k]))
+    return '{' + parts.join(',') + '}'
+  }
+  return JSON.stringify(value)
+}
+
+/**
  * Return a new source string with the literal after `anchor` replaced by
  * `value`, pretty-printed. Throws (leaving nothing changed) if the
- * regenerated literal doesn't re-parse to a deep-equal value.
+ * regenerated literal doesn't re-parse to a deep-equal value (compared by
+ * data, independent of key order).
  */
 export function writeBlock(src, anchor, value) {
   const { start, end } = findBlock(src, anchor)
@@ -151,7 +171,7 @@ export function writeBlock(src, anchor, value) {
   const next = src.slice(0, start) + literal + src.slice(end)
 
   const reparsed = readBlock(next, anchor)
-  if (JSON.stringify(reparsed) !== JSON.stringify(value)) {
+  if (stableStringify(reparsed) !== stableStringify(value)) {
     throw new Error('writeBlock: round-trip mismatch for ' + anchor)
   }
   return next

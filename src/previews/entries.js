@@ -4,14 +4,16 @@
  * a JSX transform. registry.jsx builds on this list to attach render
  * thunks, and seo-config.js uses it to derive per-preview OG meta.
  *
- * Entry shape: { name, label, status, source, description }
+ * Entry shape: { name, label, status, source, styles, description }
  *   name        route slug + registry render key (`/components/<name>`).
  *   label       display name shown in the gallery and preview bar.
  *   status      lifecycle badge: 'stable' | 'wip' | 'vendored' | 'deprecated'.
  *   source      where the rendered component lives, as an import-style path.
- *               `src/...` paths are vendored in this repo (editable from the
- *               admin panel); `kato8studios-site/...` paths live in the
- *               sibling external-site checkout (read-only here).
+ *   styles      the component's primary stylesheet, same path convention.
+ *               For both `source` and `styles`: `src/...` paths are
+ *               vendored in this repo (editable from the admin panel);
+ *               `kato8studios-site/...` paths live in the sibling
+ *               external-site checkout (read-only here).
  *   description one-line summary for the gallery card + OG meta.
  *
  * This whole array is a plain-data literal: keep it that way (no imports,
@@ -26,6 +28,7 @@ export const previewEntries = [
     label: 'Nav',
     status: 'stable',
     source: 'kato8studios-site/src/components/Nav.jsx',
+    styles: 'kato8studios-site/src/styles/main/nav.css',
     description: 'Top navigation bar with games dropdown, About link, and social icons. Mobile viewports collapse to a hamburger + MobileMenu.',
   },
   {
@@ -33,6 +36,7 @@ export const previewEntries = [
     label: 'Footer',
     status: 'stable',
     source: 'kato8studios-site/src/components/Footer.jsx',
+    styles: 'kato8studios-site/src/styles/main/footer.css',
     description: 'Site-wide footer: studio blurb, per-game links, community links, and the bottom legal bar.',
   },
   {
@@ -40,6 +44,7 @@ export const previewEntries = [
     label: 'Hero',
     status: 'stable',
     source: 'kato8studios-site/src/components/Hero.jsx',
+    styles: 'kato8studios-site/src/styles/main/pages/home.css',
     description: 'Home-page hero: studio logo + mission tagline. Uses responsive srcSet for the logo image.',
   },
   {
@@ -47,6 +52,7 @@ export const previewEntries = [
     label: 'GameGrid',
     status: 'stable',
     source: 'kato8studios-site/src/components/GameGrid.jsx',
+    styles: 'kato8studios-site/src/styles/main/pages/games.css',
     description: 'Home-page grid of GameCards, driven by the games data. Renders one card per entry in games.js.',
   },
   {
@@ -54,6 +60,7 @@ export const previewEntries = [
     label: 'GameCard',
     status: 'stable',
     source: 'kato8studios-site/src/components/GameCard.jsx',
+    styles: 'kato8studios-site/src/styles/main/pages/games.css',
     description: 'A single game tile. Rendered here with the first entry from games.js.',
   },
   {
@@ -61,6 +68,7 @@ export const previewEntries = [
     label: 'MobileMenu',
     status: 'stable',
     source: 'kato8studios-site/src/components/MobileMenu.jsx',
+    styles: 'kato8studios-site/src/styles/mobile-menu.css',
     description: 'Slide-in menu used on narrow viewports. Rendered here in the always-open state; the close button is a no-op in preview.',
   },
   {
@@ -68,6 +76,7 @@ export const previewEntries = [
     label: 'GoFundMeWidget',
     status: 'stable',
     source: 'kato8studios-site/src/components/GoFundMeWidget.jsx',
+    styles: 'kato8studios-site/src/styles/main/support.css',
     description: 'Embedded GoFundMe campaign iframe. Loads from gofundme.com.',
   },
   {
@@ -75,6 +84,7 @@ export const previewEntries = [
     label: 'SupportSection',
     status: 'stable',
     source: 'kato8studios-site/src/components/SupportSection.jsx',
+    styles: 'kato8studios-site/src/styles/main/support.css',
     description: 'Home-page "Help Us Build Something Special" block: heading + pitch + GoFundMe widget.',
   },
   {
@@ -82,6 +92,7 @@ export const previewEntries = [
     label: 'SocialIcons',
     status: 'stable',
     source: 'kato8studios-site/src/components/SocialIcons.jsx',
+    styles: 'kato8studios-site/src/styles/main/social-icons.css',
     description: 'Row of social-media icon links used by Nav and MobileMenu. Icons come from public/assets/img/social/.',
   },
   {
@@ -89,6 +100,7 @@ export const previewEntries = [
     label: 'NewsletterSignup',
     status: 'stable',
     source: 'kato8studios-site/src/components/NewsletterSignup.jsx',
+    styles: 'kato8studios-site/src/styles/main/newsletter-signup.css',
     description: 'Email signup form. No network call when VITE_NEWSLETTER_ENDPOINT is unset (dev / preview default).',
   },
   {
@@ -96,6 +108,7 @@ export const previewEntries = [
     label: 'DiscordSignupForm',
     status: 'stable',
     source: 'kato8studios-site/src/components/DiscordSignupForm.jsx',
+    styles: 'kato8studios-site/src/styles/main/signup-form.css',
     description: 'Per-game Discord community signup form. No network call without an endpoint prop.',
   },
   {
@@ -103,6 +116,7 @@ export const previewEntries = [
     label: 'PlaytestSignupForm',
     status: 'stable',
     source: 'kato8studios-site/src/components/PlaytestSignupForm.jsx',
+    styles: 'kato8studios-site/src/styles/main/signup-form.css',
     description: 'Per-game playtest signup form. No network call without an endpoint prop.',
   },
   {
@@ -110,6 +124,7 @@ export const previewEntries = [
     label: 'KickstarterButton',
     status: 'stable',
     source: 'kato8studios-site/src/components/KickstarterButton.jsx',
+    styles: 'kato8studios-site/src/styles/main/kickstarter-button.css',
     description: 'Green CTA linking to a Kickstarter campaign. Rendered on game pages whose data entry defines a kickstarterUrl. Dark-cobalt inset stroke + hard-offset shadow that lifts on hover; arrow slides right.',
   },
   {
@@ -117,6 +132,7 @@ export const previewEntries = [
     label: 'OurStoryTimeline',
     status: 'wip',
     source: 'src/components/OurStoryTimeline.jsx',
+    styles: 'src/styles/our-story-timeline.css',
     description: 'About-page "Our Story" milestone timeline: alternating cards zigzag around a centered line, collapsing to a left rail under 767px. WIP from external-site branch about-timeline-section — not yet on main, vendored here.',
   },
 ]
