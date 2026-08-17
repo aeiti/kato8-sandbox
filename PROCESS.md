@@ -76,7 +76,7 @@ and **Experiments** (`experiments`) — live as plain-data arrays in
 edited without touching JSX.
 
 During `npm run dev` there's a small manager at
-**http://localhost:5173/__manage** for editing those lists from a
+**http://localhost:5173/__admin** for editing those lists from a
 browser instead of hand-editing the file:
 
 - Toggle each experiment **Active / Concluded**, edit path/title/

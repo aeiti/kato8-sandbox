@@ -3,21 +3,21 @@
  * the home-page listings (Browse / Pages / Experiments) from a browser
  * UI and publish them to the live site.
  *
- * Reachable at http://localhost:5173/__manage during `npm run dev`.
+ * Reachable at http://localhost:5173/__admin during `npm run dev`.
  *
  * How it stays out of production (three structural guards, no env checks):
  *   1. `apply: 'serve'` — Vite only loads this plugin for `vite` / dev,
  *      never for `vite build`.
  *   2. It lives in `scripts/`, outside `src/`, so it can't be imported
  *      into the app bundle.
- *   3. `/__manage` is a dev-server HTTP route, not a React route — the
+ *   3. `/__admin` is a dev-server HTTP route, not a React route — the
  *      built SPA has no knowledge of it.
  *
- * Endpoints (all under /__manage):
- *   GET  /__manage                     → the manager UI (index.html)
- *   GET  /__manage/api/data            → { sections, pages, experiments }
- *   PUT  /__manage/api/block/<name>    → rewrite one array in homeSections.js
- *   POST /__manage/api/publish         → commit homeSections.js + push
+ * Endpoints (all under /__admin):
+ *   GET  /__admin                     → the manager UI (index.html)
+ *   GET  /__admin/api/data            → { sections, pages, experiments }
+ *   PUT  /__admin/api/block/<name>    → rewrite one array in homeSections.js
+ *   POST /__admin/api/publish         → commit homeSections.js + push
  *
  * Publish commits ONLY homeSections.js and pushes the current branch to
  * origin. Run on `main` (the normal case) that triggers the Pages
@@ -82,18 +82,18 @@ export function devAdmin() {
       // as a request-time 500 rather than crashing the whole dev server.
       const load = () => import('./serialize.mjs')
 
-      server.middlewares.use('/__manage', async (req, res, next) => {
+      server.middlewares.use('/__admin', async (req, res, next) => {
         const url = (req.url || '/').split('?')[0]
 
         try {
-          // GET /__manage — serve the UI
+          // GET /__admin — serve the UI
           if (req.method === 'GET' && (url === '/' || url === '')) {
             res.setHeader('Content-Type', 'text/html')
             res.end(fs.readFileSync(UI_HTML, 'utf8'))
             return
           }
 
-          // GET /__manage/api/info — current git branch (for the UI header)
+          // GET /__admin/api/info — current git branch (for the UI header)
           if (req.method === 'GET' && url === '/api/info') {
             let branch = null
             try {
@@ -105,7 +105,7 @@ export function devAdmin() {
             return
           }
 
-          // GET /__manage/api/data — read all blocks
+          // GET /__admin/api/data — read all blocks
           if (req.method === 'GET' && url === '/api/data') {
             const { readBlock } = await load()
             const data = {}
@@ -117,7 +117,7 @@ export function devAdmin() {
             return
           }
 
-          // PUT /__manage/api/block/<name> — rewrite one block
+          // PUT /__admin/api/block/<name> — rewrite one block
           const blockMatch = url.match(/^\/api\/block\/([a-zA-Z]+)$/)
           if (req.method === 'PUT' && blockMatch) {
             const name = blockMatch[1]
@@ -138,7 +138,7 @@ export function devAdmin() {
             return
           }
 
-          // POST /__manage/api/publish — commit + push homeSections.js
+          // POST /__admin/api/publish — commit + push homeSections.js
           if (req.method === 'POST' && url === '/api/publish') {
             let branch
             try {
