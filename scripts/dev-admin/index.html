@@ -240,7 +240,7 @@
     function clone(v) { return JSON.parse(JSON.stringify(v)) }
 
     async function load() {
-      const res = await fetch('/__manage/api/data')
+      const res = await fetch('/__admin/api/data')
       if (!res.ok) { app.innerHTML = '<p class="empty">Failed to load data.</p>'; return }
       const data = await res.json()
       state = clone(data)
@@ -430,7 +430,7 @@
 
     async function saveBlock(key) {
       try {
-        const res = await fetch('/__manage/api/block/' + key, {
+        const res = await fetch('/__admin/api/block/' + key, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(state[key]),
@@ -458,7 +458,7 @@
         }
       }
       try {
-        const res = await fetch('/__manage/api/publish', { method: 'POST' })
+        const res = await fetch('/__admin/api/publish', { method: 'POST' })
         const body = await res.json()
         if (!res.ok) throw new Error(body.error || 'publish failed')
         if (body.published === false) { toast(body.reason, 'ok'); return }
@@ -471,7 +471,7 @@
     document.getElementById('publish').onclick = publish
 
     // Show the current branch so it's obvious where Publish will push.
-    fetch('/__manage/api/info')
+    fetch('/__admin/api/info')
       .then((r) => r.json())
       .then((info) => {
         const el = document.getElementById('branch')

@@ -3,7 +3,7 @@
  * Browse (`sections`), Pages (`pages`), and Experiments (`experiments`).
  *
  * Split out of `HomePage.jsx` so the dev-only home manager
- * (`scripts/dev-admin/`, reachable at http://localhost:5173/__manage
+ * (`scripts/dev-admin/`, reachable at http://localhost:5173/__admin
  * during `npm run dev`) can rewrite these arrays in place without
  * touching JSX. Each array is a plain-data literal: keep it that way
  * (no imports, no expressions) so the manager's serializer can parse
