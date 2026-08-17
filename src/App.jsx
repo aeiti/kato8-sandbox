@@ -19,6 +19,20 @@ export default function App() {
   const isFullWidthPage = /^\/crowdfunding-games\/[^/]+/.test(location.pathname)
   const bodyClass = isFullWidthPage ? 'body-2' : 'body'
 
+  // `?bare=1` (used by the dev admin panel's live-preview iframe) renders the
+  // routed page alone — no back bar, Nav, or Footer — so a single component
+  // fills the pane. PreviewPage also drops its own preview bar in this mode.
+  const isBare = new URLSearchParams(location.search).get('bare') === '1'
+  if (isBare) {
+    return (
+      <div className={`${bodyClass} body--bare`}>
+        <Routes>
+          <Route path="/components/:name" element={<PreviewPage />} />
+        </Routes>
+      </div>
+    )
+  }
+
   return (
     <div className={bodyClass}>
       {/* Standard sandbox chrome, shared by every page: a thin "← Sandbox"
