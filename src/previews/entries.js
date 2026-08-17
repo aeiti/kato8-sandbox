@@ -19,6 +19,7 @@ export const previewEntries = [
   { name: 'discord-signup-form',  label: 'DiscordSignupForm',    description: 'Per-game Discord community signup form. No network call without an endpoint prop.' },
   { name: 'playtest-signup-form', label: 'PlaytestSignupForm',   description: 'Per-game playtest signup form. No network call without an endpoint prop.' },
   { name: 'kickstarter-button',   label: 'KickstarterButton',    description: 'Green CTA linking to a Kickstarter campaign. Rendered on game pages whose data entry defines a kickstarterUrl. Dark-cobalt inset stroke + hard-offset shadow that lifts on hover; arrow slides right.' },
+  { name: 'our-story-timeline',   label: 'OurStoryTimeline',     description: 'About-page "Our Story" milestone timeline: alternating cards zigzag around a centered line, collapsing to a left rail under 767px. WIP from external-site branch about-timeline-section — not yet on main, vendored here.' },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))

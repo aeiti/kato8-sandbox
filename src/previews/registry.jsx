@@ -12,6 +12,9 @@ import DiscordSignupForm from 'kato8studios-site/src/components/DiscordSignupFor
 import PlaytestSignupForm from 'kato8studios-site/src/components/PlaytestSignupForm'
 import ProdKickstarterButton from 'kato8studios-site/src/components/KickstarterButton'
 import { games } from 'kato8studios-site/src/data/games'
+// Vendored WIP (external-site branch about-timeline-section, not on main
+// yet) — local import rather than from kato8studios-site. See PROCESS §1b.
+import OurStoryTimeline from '../components/OurStoryTimeline'
 import { previewEntries, entryByName } from './entries.js'
 
 // Render thunks keyed by preview name. Kept separate from entries.js
@@ -53,6 +56,7 @@ const renderers = {
       <ProdKickstarterButton href="https://www.kickstarter.com/projects/kato8-lastlight/universal-serial-blade-usb" />
     </div>
   ),
+  'our-story-timeline':   () => <OurStoryTimeline />,
 }
 
 export const previews = previewEntries.map((entry) => ({
