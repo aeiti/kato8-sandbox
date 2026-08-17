@@ -84,12 +84,51 @@
   transform: translateY(-2px);
 }
 
+.previews-gallery_item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 .previews-gallery_item-title {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-family: 'RocknRoll One', sans-serif;
   font-size: 1.13rem;
   font-weight: 400;
   color: var(--text-primary);
+}
+
+/* Lifecycle status badge (gallery cards + single-preview bar) */
+.status-badge {
+  flex-shrink: 0;
+  align-self: center;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: color-mix(in srgb, var(--dark-cobalt) 8%, transparent);
+  color: var(--text-primary);
+}
+
+.status-badge[data-status='wip'] { background: #fbf0da; color: #8a5b12; }
+.status-badge[data-status='vendored'] { background: #e8ecfb; color: #35468a; }
+.status-badge[data-status='deprecated'] { background: #fbe5e8; color: #8a2733; }
+
+.preview-frame_bar .status-badge {
+  background: color-mix(in srgb, var(--light-pearl) 18%, transparent);
+  color: var(--light-pearl);
+}
+
+.preview-frame_norender {
+  padding: var(--space-3) 0;
+  color: var(--text-primary);
+  font-family: var(--font-body);
 }
 
 .previews-gallery_item-desc {

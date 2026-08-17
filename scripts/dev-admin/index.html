@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex" />
-  <title>Sandbox Home Manager</title>
+  <title>Sandbox Admin Panel</title>
   <style>
     :root {
       --cobalt: #1b1b26;
@@ -19,6 +19,7 @@
       --amber: #c98a1a;
       --radius: 12px;
       --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
     * { box-sizing: border-box; }
     body {
@@ -30,10 +31,12 @@
     }
     a { color: var(--pink-ink); }
 
-    .topbar {
+    .appbar {
       position: sticky;
       top: 0;
       z-index: 20;
+    }
+    .topbar {
       background: var(--cobalt);
       color: #fff;
       padding: 14px 24px;
@@ -42,6 +45,49 @@
       gap: 20px;
       flex-wrap: wrap;
     }
+
+    /* Category tabs — one page per block */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--cobalt-2);
+      padding: 0 16px;
+      border-bottom: 1px solid #3a3a52;
+      overflow-x: auto;
+    }
+    .tab {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: #b9b9cc;
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      padding: 11px 16px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .tab:hover { color: #fff; }
+    .tab.active { color: #fff; border-bottom-color: var(--pink); }
+    .tab .tab-count {
+      font-size: 0.75rem;
+      color: #7a7a9a;
+      background: rgba(255,255,255,0.06);
+      border-radius: 999px;
+      padding: 1px 7px;
+    }
+    .tab.active .tab-count { color: #cdcde0; }
+    .tab .tab-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .tab.is-dirty .tab-dot { opacity: 1; }
     .topbar h1 {
       margin: 0;
       font-size: 1.15rem;
@@ -57,7 +103,7 @@
       padding: 3px 10px;
     }
 
-    main { max-width: 900px; margin: 0 auto; padding: 24px; }
+    main { max-width: 940px; margin: 0 auto; padding: 24px; }
 
     .block {
       background: var(--panel);
@@ -95,6 +141,8 @@
       gap: 10px 14px;
     }
     .entry__fields { display: grid; gap: 8px; }
+    .entry__fields--component { grid-template-columns: 1fr 1fr; }
+    .entry__fields--component .field--wide { grid-column: 1 / -1; }
     .entry__side {
       display: flex;
       flex-direction: column;
@@ -102,6 +150,7 @@
       gap: 6px;
       justify-content: flex-start;
     }
+    .entry > .source-panel { grid-column: 1 / -1; }
     .field { display: grid; gap: 3px; }
     .field label {
       font-size: 0.7rem;
@@ -109,7 +158,7 @@
       letter-spacing: 0.04em;
       color: var(--muted);
     }
-    input[type="text"], textarea {
+    input[type="text"], textarea, select {
       font: inherit;
       font-size: 0.9rem;
       padding: 7px 10px;
@@ -120,8 +169,9 @@
       width: 100%;
       resize: vertical;
     }
-    input:focus, textarea:focus { outline: 2px solid var(--pink); border-color: var(--pink); }
+    input:focus, textarea:focus, select:focus { outline: 2px solid var(--pink); border-color: var(--pink); }
     textarea { min-height: 58px; }
+    .field .mono { font-family: var(--mono); font-size: 0.82rem; }
 
     .btn {
       font: inherit;
@@ -138,13 +188,14 @@
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
     .btn--primary { background: var(--pink); border-color: var(--pink); color: #fff; }
     .btn--primary:hover { background: var(--pink-ink); border-color: var(--pink-ink); }
-    .btn--publish { background: #fff; color: var(--cobalt); border: none; font-weight: 600; }
+    .btn--push { background: #fff; color: var(--cobalt); border: none; font-weight: 600; }
     .btn--ghost { border: none; background: transparent; color: var(--muted); padding: 4px 8px; }
     .btn--ghost:hover { color: var(--pink-ink); }
     .btn--danger:hover { color: #c0392b; }
+    .btn--sm { font-size: 0.78rem; padding: 5px 10px; }
     .icon-row { display: flex; gap: 2px; }
 
-    /* Active/Concluded toggle */
+    /* Active/Concluded toggle (home experiments) */
     .toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.82rem; user-select: none; }
     .toggle input { position: absolute; opacity: 0; pointer-events: none; }
     .toggle .track {
@@ -160,6 +211,43 @@
     .toggle input:checked + .track::after { transform: translateX(18px); }
     .toggle .state-label { min-width: 66px; color: var(--muted); }
 
+    /* Status badge (components) */
+    .status-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+    .status-badge[data-status="stable"]     { background: #e5f4ec; color: #1e6f4e; }
+    .status-badge[data-status="wip"]        { background: #fbf0da; color: #8a5b12; }
+    .status-badge[data-status="vendored"]   { background: #e8ecfb; color: #35468a; }
+    .status-badge[data-status="deprecated"] { background: #fbe5e8; color: #8a2733; }
+
+    /* Source editor (components) */
+    .source-panel { margin-top: 4px; border-top: 1px dashed var(--line); padding-top: 10px; }
+    .source-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .source-path { font-family: var(--mono); font-size: 0.78rem; color: var(--muted); word-break: break-all; }
+    .source-body { margin-top: 10px; display: none; }
+    .source-body.open { display: block; }
+    textarea.code {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.45;
+      min-height: 320px;
+      white-space: pre;
+      overflow: auto;
+      tab-size: 2;
+    }
+    textarea.code[readonly] { background: #f7f7fb; color: #40404f; }
+    .source-actions { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+    .source-actions .spacer { flex: 1; }
+    .source-note { font-size: 0.78rem; color: var(--muted); }
+    .source-note.readonly { color: #8a5b12; }
+
     .block__foot {
       display: flex;
       align-items: center;
@@ -171,7 +259,7 @@
     .block__foot .spacer { flex: 1; }
     .save-note { font-size: 0.8rem; color: var(--muted); }
 
-    /* Toast / publish feedback */
+    /* Toast / push feedback */
     #toast {
       position: fixed;
       right: 20px; bottom: 20px;
@@ -186,6 +274,7 @@
       transform: translateY(8px);
       transition: opacity 0.2s, transform 0.2s;
       pointer-events: none;
+      z-index: 40;
     }
     #toast.show { opacity: 1; transform: translateY(0); }
     #toast.ok { background: #1e6f4e; }
@@ -195,15 +284,18 @@
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div>
-      <h1>Sandbox Home Manager</h1>
-      <p class="sub">Edit the home-page listings, then Publish to deploy.</p>
+  <header class="appbar">
+    <div class="topbar">
+      <div>
+        <h1>Sandbox Admin Panel</h1>
+        <p class="sub">Pick a category, edit, then Push to deploy.</p>
+      </div>
+      <div class="spacer"></div>
+      <span class="env" id="branch">branch …</span>
+      <button class="btn btn--push" id="publish">Push</button>
     </div>
-    <div class="spacer"></div>
-    <span class="env" id="branch">branch …</span>
-    <button class="btn btn--publish" id="publish">Publish → deploy</button>
-  </div>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
 
   <main id="app">
     <p class="empty">Loading…</p>
@@ -212,10 +304,16 @@
   <div id="toast"></div>
 
   <script type="module">
-    const SECTIONS = [
-      { key: 'sections', title: 'Browse', hasActive: false, noun: 'entry' },
-      { key: 'pages', title: 'Pages', hasActive: false, noun: 'page' },
-      { key: 'experiments', title: 'Experiments', hasActive: true, noun: 'experiment' },
+    const STATUSES = ['stable', 'wip', 'vendored', 'deprecated']
+
+    // Each block: which array it edits and how it renders. `kind`
+    // 'listing' → home listings (path/title/description [+active]);
+    // 'component' → the preview library (name/label/status/source/desc).
+    const BLOCKS = [
+      { key: 'sections',    title: 'Browse',      kind: 'listing',   hasActive: false, noun: 'entry' },
+      { key: 'pages',       title: 'Pages',       kind: 'listing',   hasActive: false, noun: 'page' },
+      { key: 'experiments', title: 'Experiments', kind: 'listing',   hasActive: true,  noun: 'experiment' },
+      { key: 'components',  title: 'Components',  kind: 'component',                    noun: 'component' },
     ]
 
     // state[key] = current (possibly edited) array; saved[key] = last-saved baseline
@@ -233,8 +331,21 @@
       toastTimer = setTimeout(() => { toastEl.className = '' }, 5000)
     }
 
+    // __origName is a client-only field tracking each component's slug as
+    // it exists on disk, so we can (a) compute renames on save and (b) key
+    // source reads/writes to the file that actually exists. Stripped
+    // before anything is sent back to the server.
+    function stripInternal(arr) {
+      return arr.map((o) => {
+        const c = {}
+        for (const k of Object.keys(o)) if (!k.startsWith('__')) c[k] = o[k]
+        return c
+      })
+    }
+
     function isDirty(key) {
-      return JSON.stringify(state[key]) !== JSON.stringify(saved[key])
+      return JSON.stringify(stripInternal(state[key] || [])) !==
+             JSON.stringify(stripInternal(saved[key] || []))
     }
 
     function clone(v) { return JSON.parse(JSON.stringify(v)) }
@@ -243,23 +354,59 @@
       const res = await fetch('/__admin/api/data')
       if (!res.ok) { app.innerHTML = '<p class="empty">Failed to load data.</p>'; return }
       const data = await res.json()
+      // Stamp __origName on components so renames are detectable.
+      ;(data.components || []).forEach((e) => { e.__origName = e.name })
       state = clone(data)
       saved = clone(data)
       render()
     }
 
-    function makeEntry(hasActive) {
+    function makeEntry(def) {
+      if (def.kind === 'component') {
+        return { name: '', label: '', status: 'stable', source: '', description: '' }
+      }
       const e = { path: '/', title: '', description: '' }
-      if (hasActive) e.active = true
+      if (def.hasActive) e.active = true
       return e
     }
 
-    function render() {
-      app.innerHTML = ''
-      for (const def of SECTIONS) {
-        app.appendChild(renderBlock(def))
+    // Which category page is showing, from the URL hash (#/components).
+    // Falls back to the first block for an empty/unknown hash.
+    function currentKey() {
+      const k = location.hash.replace(/^#\/?/, '').trim()
+      return BLOCKS.some((b) => b.key === k) ? k : BLOCKS[0].key
+    }
+
+    function renderTabs() {
+      const nav = document.getElementById('tabs')
+      const active = currentKey()
+      nav.innerHTML = ''
+      for (const def of BLOCKS) {
+        const items = state[def.key] || []
+        const tab = document.createElement('button')
+        tab.className =
+          'tab' +
+          (def.key === active ? ' active' : '') +
+          (isDirty(def.key) ? ' is-dirty' : '')
+        tab.innerHTML =
+          `${def.title}` +
+          `<span class="tab-count">${items.length}</span>` +
+          `<span class="tab-dot" title="Unsaved changes"></span>`
+        tab.onclick = () => { location.hash = '#/' + def.key }
+        nav.appendChild(tab)
       }
     }
+
+    // One category page at a time. State for every block stays in memory,
+    // so switching tabs never drops an in-progress (unsaved) edit.
+    function render() {
+      renderTabs()
+      const def = BLOCKS.find((b) => b.key === currentKey())
+      app.innerHTML = ''
+      app.appendChild(renderBlock(def))
+    }
+
+    window.addEventListener('hashchange', render)
 
     function renderBlock(def) {
       const items = state[def.key] || []
@@ -277,7 +424,7 @@
       addBtn.className = 'btn'
       addBtn.textContent = '+ Add ' + def.noun
       addBtn.onclick = () => {
-        state[def.key] = [...items, makeEntry(def.hasActive)]
+        state[def.key] = [...items, makeEntry(def)]
         render()
       }
       head.appendChild(addBtn)
@@ -291,7 +438,8 @@
         p.textContent = 'No ' + def.noun + 's yet.'
         list.appendChild(p)
       }
-      items.forEach((item, i) => list.appendChild(renderEntry(def, item, i)))
+      const renderer = def.kind === 'component' ? renderComponentEntry : renderListingEntry
+      items.forEach((item, i) => list.appendChild(renderer(def, item, i)))
       wrap.appendChild(list)
 
       const foot = document.createElement('div')
@@ -303,7 +451,7 @@
       saveBtn.className = 'btn btn--primary'
       saveBtn.textContent = 'Save ' + def.title
       saveBtn.disabled = !isDirty(def.key)
-      saveBtn.onclick = () => saveBlock(def.key)
+      saveBtn.onclick = () => saveByKey(def.key)
       foot.appendChild(note)
       foot.appendChild(document.createElement('span')).className = 'spacer'
       foot.appendChild(saveBtn)
@@ -312,7 +460,8 @@
       return wrap
     }
 
-    function renderEntry(def, item, index) {
+    // ── Home listing entry ───────────────────────────────────────────
+    function renderListingEntry(def, item, index) {
       const items = state[def.key]
       const el = document.createElement('div')
       el.className = 'entry'
@@ -326,25 +475,52 @@
 
       const side = document.createElement('div')
       side.className = 'entry__side'
-
       if (def.hasActive) {
         side.appendChild(activeToggle(item, () => { markDirty(def.key); render() }))
       }
+      side.appendChild(rowControls(def, items, index))
+      el.appendChild(side)
+      return el
+    }
 
+    // ── Component entry ──────────────────────────────────────────────
+    function renderComponentEntry(def, item, index) {
+      const items = state[def.key]
+      const el = document.createElement('div')
+      el.className = 'entry'
+
+      const fields = document.createElement('div')
+      fields.className = 'entry__fields entry__fields--component'
+      fields.appendChild(textField('Name', item.label, (v) => { item.label = v; markDirty(def.key) }))
+      fields.appendChild(slugField('Slug (route id)', item.name, (v) => { item.name = v; markDirty(def.key) }))
+      fields.appendChild(statusField(item, () => markDirty(def.key)))
+      fields.appendChild(sourcePathField(item))
+      const desc = textArea('Description', item.description, (v) => { item.description = v; markDirty(def.key) })
+      desc.classList.add('field--wide')
+      fields.appendChild(desc)
+      el.appendChild(fields)
+
+      const side = document.createElement('div')
+      side.className = 'entry__side'
+      side.appendChild(rowControls(def, items, index))
+      el.appendChild(side)
+
+      el.appendChild(sourcePanel(item))
+      return el
+    }
+
+    function rowControls(def, items, index) {
       const icons = document.createElement('div')
       icons.className = 'icon-row'
-      icons.appendChild(iconBtn('↑', 'Move up', index === 0, () => { move(def.key, index, -1) }))
-      icons.appendChild(iconBtn('↓', 'Move down', index === items.length - 1, () => { move(def.key, index, 1) }))
+      icons.appendChild(iconBtn('↑', 'Move up', index === 0, () => move(def.key, index, -1)))
+      icons.appendChild(iconBtn('↓', 'Move down', index === items.length - 1, () => move(def.key, index, 1)))
       const rm = iconBtn('✕', 'Remove', false, () => {
         state[def.key] = items.filter((_, j) => j !== index)
         render()
       })
       rm.classList.add('btn--danger')
       icons.appendChild(rm)
-      side.appendChild(icons)
-
-      el.appendChild(side)
-      return el
+      return icons
     }
 
     function textField(label, value, onInput) {
@@ -361,6 +537,12 @@
       return f
     }
 
+    function slugField(label, value, onInput) {
+      const f = textField(label, value, (v) => onInput(v.trim().toLowerCase()))
+      f.querySelector('input').classList.add('mono')
+      return f
+    }
+
     function textArea(label, value, onInput) {
       const f = document.createElement('div')
       f.className = 'field'
@@ -372,6 +554,133 @@
       f.appendChild(l)
       f.appendChild(ta)
       return f
+    }
+
+    function statusField(item, onChange) {
+      const f = document.createElement('div')
+      f.className = 'field'
+      const l = document.createElement('label')
+      l.textContent = 'Status'
+      const sel = document.createElement('select')
+      for (const s of STATUSES) {
+        const opt = document.createElement('option')
+        opt.value = s
+        opt.textContent = s
+        if ((item.status || 'stable') === s) opt.selected = true
+        sel.appendChild(opt)
+      }
+      sel.onchange = () => { item.status = sel.value; onChange() }
+      f.appendChild(l)
+      f.appendChild(sel)
+      return f
+    }
+
+    function sourcePathField(item) {
+      const f = document.createElement('div')
+      f.className = 'field'
+      const l = document.createElement('label')
+      l.textContent = 'Source path'
+      const input = document.createElement('input')
+      input.type = 'text'
+      input.className = 'mono'
+      input.value = item.source || ''
+      input.readOnly = true
+      input.title = 'Where this preview renders from. Edit the file below (vendored sources only).'
+      f.appendChild(l)
+      f.appendChild(input)
+      return f
+    }
+
+    // Collapsible source viewer/editor. Editable only for src/… (vendored)
+    // sources; sibling external-site sources open read-only.
+    function sourcePanel(item) {
+      const panel = document.createElement('div')
+      panel.className = 'source-panel'
+
+      const head = document.createElement('div')
+      head.className = 'source-head'
+      const toggle = document.createElement('button')
+      toggle.className = 'btn btn--sm'
+      toggle.textContent = 'View / edit source'
+      const path = document.createElement('span')
+      path.className = 'source-path'
+      path.textContent = item.source || '(no source path)'
+      head.appendChild(toggle)
+      head.appendChild(path)
+      panel.appendChild(head)
+
+      const body = document.createElement('div')
+      body.className = 'source-body'
+      panel.appendChild(body)
+
+      let loaded = false
+      toggle.onclick = async () => {
+        const open = body.classList.toggle('open')
+        toggle.textContent = open ? 'Hide source' : 'View / edit source'
+        if (open && !loaded) { loaded = true; await loadSource(item, body) }
+      }
+      return panel
+    }
+
+    async function loadSource(item, body) {
+      const origName = item.__origName
+      if (!origName) {
+        body.innerHTML = '<p class="source-note">Save this component first, then its source becomes editable.</p>'
+        return
+      }
+      body.innerHTML = '<p class="source-note">Loading source…</p>'
+      let data
+      try {
+        const res = await fetch('/__admin/api/source?name=' + encodeURIComponent(origName))
+        data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'failed to read source')
+      } catch (err) {
+        body.innerHTML = '<p class="source-note readonly">' + err.message + '</p>'
+        return
+      }
+
+      body.innerHTML = ''
+      const ta = document.createElement('textarea')
+      ta.className = 'code'
+      ta.value = data.exists ? data.content : ''
+      ta.readOnly = !data.editable
+      if (!data.exists) ta.placeholder = 'Source file not found: ' + (data.source || '')
+      body.appendChild(ta)
+
+      const actions = document.createElement('div')
+      actions.className = 'source-actions'
+      const note = document.createElement('span')
+      note.className = 'source-note' + (data.editable ? '' : ' readonly')
+      note.textContent = data.editable
+        ? 'Vendored in this repo — edits are saved to the file directly.'
+        : 'Read-only — this component lives in external-site.'
+      actions.appendChild(note)
+      actions.appendChild(document.createElement('span')).className = 'spacer'
+
+      if (data.editable) {
+        const saveBtn = document.createElement('button')
+        saveBtn.className = 'btn btn--primary btn--sm'
+        saveBtn.textContent = 'Save source'
+        saveBtn.onclick = async () => {
+          saveBtn.disabled = true
+          try {
+            const res = await fetch('/__admin/api/source', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: origName, content: ta.value }),
+            })
+            const b = await res.json()
+            if (!res.ok) throw new Error(b.error || 'save failed')
+            toast('Saved source for ' + origName + ' (' + b.bytes + ' bytes).', 'ok')
+          } catch (err) {
+            toast('Source save failed: ' + err.message, 'err')
+          } finally {
+            saveBtn.disabled = false
+          }
+        }
+        actions.appendChild(saveBtn)
+      }
+      body.appendChild(actions)
     }
 
     function activeToggle(item, onChange) {
@@ -412,23 +721,26 @@
       render()
     }
 
-    // Re-render just enough to reflect dirty state without losing focus:
-    // update the block's dirty class + save button. Full re-render on
-    // structural changes (add/remove/move/toggle) happens via render().
+    // Reflect dirty state without a full re-render (keeps input focus).
+    // Only the active block is on screen; also refresh the tab dots.
     function markDirty(key) {
-      const blocks = app.querySelectorAll('.block')
-      const idx = SECTIONS.findIndex((s) => s.key === key)
-      const block = blocks[idx]
-      if (!block) return render()
-      const dirty = isDirty(key)
-      block.classList.toggle('is-dirty', dirty)
-      const saveBtn = block.querySelector('.btn--primary')
-      if (saveBtn) saveBtn.disabled = !dirty
-      const note = block.querySelector('.save-note')
-      if (note) note.textContent = dirty ? 'Unsaved changes' : 'Saved'
+      const block = key === currentKey() ? app.querySelector('.block') : null
+      if (block) {
+        const dirty = isDirty(key)
+        block.classList.toggle('is-dirty', dirty)
+        const saveBtn = block.querySelector('.btn--primary')
+        if (saveBtn) saveBtn.disabled = !dirty
+        const note = block.querySelector('.save-note')
+        if (note) note.textContent = dirty ? 'Unsaved changes' : 'Saved'
+      }
+      renderTabs()
     }
 
-    async function saveBlock(key) {
+    function saveByKey(key) {
+      return key === 'components' ? saveComponents() : saveListing(key)
+    }
+
+    async function saveListing(key) {
       try {
         const res = await fetch('/__admin/api/block/' + key, {
           method: 'PUT',
@@ -439,38 +751,65 @@
         if (!res.ok) throw new Error(body.error || 'save failed')
         saved[key] = clone(state[key])
         render()
-        toast('Saved ' + key + ' (' + body.count + ' items) to homeSections.js.', 'ok')
+        toast('Saved ' + key + ' (' + body.count + ' items).', 'ok')
+      } catch (err) {
+        toast('Save failed: ' + err.message, 'err')
+      }
+    }
+
+    async function saveComponents() {
+      const items = state.components || []
+      const renames = []
+      for (const it of items) {
+        if (it.__origName && it.__origName !== it.name) {
+          renames.push({ from: it.__origName, to: it.name })
+        }
+      }
+      try {
+        const res = await fetch('/__admin/api/components', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ entries: stripInternal(items), renames }),
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error || 'save failed')
+        // Renames applied — re-baseline __origName to the new slugs.
+        items.forEach((it) => { it.__origName = it.name })
+        saved.components = clone(items)
+        render()
+        const extra = body.renamed ? ' (' + body.renamed + ' renamed)' : ''
+        toast('Saved components (' + body.count + ' items)' + extra + '.', 'ok')
       } catch (err) {
         toast('Save failed: ' + err.message, 'err')
       }
     }
 
     async function publish() {
-      const dirtyKeys = SECTIONS.map((s) => s.key).filter(isDirty)
+      const dirtyKeys = BLOCKS.map((s) => s.key).filter(isDirty)
       if (dirtyKeys.length) {
         const ok = confirm(
           'You have unsaved changes in: ' + dirtyKeys.join(', ') +
-          '.\nOnly saved changes are published. Save them first?\n\n' +
-          'OK = save all, then publish. Cancel = publish only saved changes.'
+          '.\nOnly saved changes are pushed. Save them first?\n\n' +
+          'OK = save all, then push. Cancel = push only saved changes.'
         )
         if (ok) {
-          for (const k of dirtyKeys) await saveBlock(k)
+          for (const k of dirtyKeys) await saveByKey(k)
         }
       }
       try {
         const res = await fetch('/__admin/api/publish', { method: 'POST' })
         const body = await res.json()
-        if (!res.ok) throw new Error(body.error || 'publish failed')
+        if (!res.ok) throw new Error(body.error || 'push failed')
         if (body.published === false) { toast(body.reason, 'ok'); return }
         toast(body.message, body.deploy ? 'ok' : '')
       } catch (err) {
-        toast('Publish failed: ' + err.message, 'err')
+        toast('Push failed: ' + err.message, 'err')
       }
     }
 
     document.getElementById('publish').onclick = publish
 
-    // Show the current branch so it's obvious where Publish will push.
+    // Show the current branch so it's obvious where Push will land.
     fetch('/__admin/api/info')
       .then((r) => r.json())
       .then((info) => {
