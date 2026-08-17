@@ -22,9 +22,9 @@
 // Canonical key order so saved objects don't churn regardless of the
 // order the UI sends keys in. Covers both editable literals:
 //   home listings  → { path, title, active, description }
-//   preview entries → { name, label, status, source, description }
+//   preview entries → { name, label, status, source, styles, description }
 // Unknown keys sort after these, alphabetical + stable.
-const KEY_ORDER = ['name', 'label', 'path', 'title', 'active', 'status', 'source', 'description']
+const KEY_ORDER = ['name', 'label', 'path', 'title', 'active', 'status', 'source', 'styles', 'description']
 const IDENT = /^[A-Za-z_$][\w$]*$/
 
 function orderedKeys(obj) {

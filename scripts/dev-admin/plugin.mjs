@@ -268,29 +268,39 @@ export function devAdmin() {
             return
           }
 
-          // GET /__admin/api/source?name=<name> — read a component's source
+          // GET /__admin/api/source?name=<name>&field=<source|styles>
+          // Read one of a component's files. `field` defaults to source.
           if (req.method === 'GET' && url === '/api/source') {
             const params = new URLSearchParams(query)
             const name = params.get('name')
+            const field = params.get('field') || 'source'
+            if (field !== 'source' && field !== 'styles') {
+              return sendJson(res, 400, { error: `unknown field: ${field}` })
+            }
             const entries = await readEntries()
             const entry = entries.find((e) => e.name === name)
             if (!entry) return sendJson(res, 404, { error: `unknown component: ${name}` })
 
-            const resolved = resolveSource(root, entry.source)
+            const rel = entry[field]
+            const resolved = resolveSource(root, rel)
             if (!resolved) {
               return sendJson(res, 200, {
                 name,
-                source: entry.source,
+                field,
+                source: rel || '',
                 editable: false,
                 exists: false,
                 content: '',
-                note: 'No resolvable source path for this component.',
+                note: rel
+                  ? 'No resolvable path for this file.'
+                  : `This component has no ${field} path set.`,
               })
             }
             const exists = fs.existsSync(resolved.abs)
             sendJson(res, 200, {
               name,
-              source: entry.source,
+              field,
+              source: rel,
               editable: resolved.editable,
               exists,
               content: exists ? fs.readFileSync(resolved.abs, 'utf8') : '',
@@ -298,30 +308,36 @@ export function devAdmin() {
             return
           }
 
-          // PUT /__admin/api/source — write a vendored component's source.
-          // Body: { name, content }. Sibling (read-only) sources are 403.
+          // PUT /__admin/api/source — write one of a component's vendored
+          // files. Body: { name, content, field? }. field defaults to
+          // source. Sibling (read-only) files are 403.
           if (req.method === 'PUT' && url === '/api/source') {
             const body = await readJsonBody(req)
             const name = body && body.name
             const content = body && body.content
+            const field = (body && body.field) || 'source'
             if (typeof content !== 'string') {
               return sendJson(res, 400, { error: 'expected { name, content }' })
+            }
+            if (field !== 'source' && field !== 'styles') {
+              return sendJson(res, 400, { error: `unknown field: ${field}` })
             }
             const entries = await readEntries()
             const entry = entries.find((e) => e.name === name)
             if (!entry) return sendJson(res, 404, { error: `unknown component: ${name}` })
 
-            const resolved = resolveSource(root, entry.source)
+            const rel = entry[field]
+            const resolved = resolveSource(root, rel)
             if (!resolved) {
-              return sendJson(res, 400, { error: `unresolvable source: ${entry.source}` })
+              return sendJson(res, 400, { error: `unresolvable ${field}: ${rel}` })
             }
             if (!resolved.editable) {
               return sendJson(res, 403, {
-                error: `${entry.source} lives in external-site and is read-only here.`,
+                error: `${rel} lives in external-site and is read-only here.`,
               })
             }
             fs.writeFileSync(resolved.abs, content)
-            sendJson(res, 200, { ok: true, name, bytes: Buffer.byteLength(content) })
+            sendJson(res, 200, { ok: true, name, field, bytes: Buffer.byteLength(content) })
             return
           }
 
