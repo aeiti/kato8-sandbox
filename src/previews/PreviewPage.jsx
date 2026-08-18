@@ -35,8 +35,17 @@ function ComponentStage({ entry }) {
 const CATEGORY_ORDER = ['Navigation', 'Sections', 'Games', 'Forms', 'Fundraising']
 const OTHER_CATEGORY = 'Other'
 
-// Group previews into [{ category, items }] blocks in CATEGORY_ORDER,
-// preserving each entry's original order within its group.
+// Status sort priority within a category: most-active (live) first,
+// deprecated last. Unknown/custom statuses sort just before deprecated.
+const STATUS_ORDER = ['stable', 'wip', 'vendored', 'deprecated']
+
+function statusRank(status) {
+  const i = STATUS_ORDER.indexOf(status || 'stable')
+  return i === -1 ? STATUS_ORDER.length - 1 : i
+}
+
+// Group previews into [{ category, items }] blocks in CATEGORY_ORDER.
+// Within each group, entries sort by status (active first) then by label.
 function groupByCategory(entries) {
   const groups = new Map()
   for (const entry of entries) {
@@ -51,7 +60,14 @@ function groupByCategory(entries) {
   }
   return [...groups.entries()]
     .sort(([a], [b]) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0))
-    .map(([category, items]) => ({ category, items }))
+    .map(([category, items]) => ({
+      category,
+      items: items.sort(
+        (a, b) =>
+          statusRank(a.status) - statusRank(b.status) ||
+          (a.label || '').localeCompare(b.label || ''),
+      ),
+    }))
 }
 
 function Gallery() {
