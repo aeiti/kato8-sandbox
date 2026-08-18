@@ -29,7 +29,33 @@ function ComponentStage({ entry }) {
   )
 }
 
+// Preferred order for known category headings. Anything not listed here
+// (including entries with no category) is appended after these, sorted
+// alphabetically, with an empty category collapsed to 'Other'.
+const CATEGORY_ORDER = ['Navigation', 'Sections', 'Games', 'Forms', 'Fundraising']
+const OTHER_CATEGORY = 'Other'
+
+// Group previews into [{ category, items }] blocks in CATEGORY_ORDER,
+// preserving each entry's original order within its group.
+function groupByCategory(entries) {
+  const groups = new Map()
+  for (const entry of entries) {
+    const category = entry.category || OTHER_CATEGORY
+    if (!groups.has(category)) groups.set(category, [])
+    groups.get(category).push(entry)
+  }
+  const rank = (c) => {
+    const i = CATEGORY_ORDER.indexOf(c)
+    if (i !== -1) return i
+    return c === OTHER_CATEGORY ? Infinity : CATEGORY_ORDER.length
+  }
+  return [...groups.entries()]
+    .sort(([a], [b]) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0))
+    .map(([category, items]) => ({ category, items }))
+}
+
 function Gallery() {
+  const sections = groupByCategory(previews)
   return (
     <main className="previews-gallery">
       <Seo path="/components" {...staticRoutes['/components']} />
@@ -37,26 +63,34 @@ function Gallery() {
         <header className="previews-gallery_header">
           <h1 className="previews-gallery_title">Components</h1>
           <p className="previews-gallery_subtitle">
-            Every component from the main site, rendered in isolation. Click a card to view it on its own page.
+            Every component from the main site, rendered in isolation, grouped by category. Click a card to view it on its own page.
           </p>
         </header>
 
-        <ul className="previews-gallery_list">
-          {previews.map((entry) => (
-            <li key={entry.name} className="previews-gallery_item">
-              <Link to={`/components/${entry.name}`} className="previews-gallery_item-link">
-                <div className="previews-gallery_item-head">
-                  <h2 className="previews-gallery_item-title">{entry.label}</h2>
-                  <StatusBadge status={entry.status} />
-                </div>
-                <p className="previews-gallery_item-desc">{entry.description}</p>
-                <span className="previews-gallery_item-cta">
-                  Open preview →
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {sections.map(({ category, items }) => (
+          <section key={category} className="previews-gallery_section">
+            <h2 className="previews-gallery_section-title">
+              {category}
+              <span className="previews-gallery_section-count">{items.length}</span>
+            </h2>
+            <ul className="previews-gallery_list">
+              {items.map((entry) => (
+                <li key={entry.name} className="previews-gallery_item">
+                  <Link to={`/components/${entry.name}`} className="previews-gallery_item-link">
+                    <div className="previews-gallery_item-head">
+                      <h3 className="previews-gallery_item-title">{entry.label}</h3>
+                      <StatusBadge status={entry.status} />
+                    </div>
+                    <p className="previews-gallery_item-desc">{entry.description}</p>
+                    <span className="previews-gallery_item-cta">
+                      Open preview →
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
       </div>
     </main>
   )
