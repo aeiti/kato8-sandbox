@@ -45,6 +45,44 @@
   opacity: 0.75;
 }
 
+.previews-gallery_section {
+  margin-bottom: var(--space-4);
+}
+
+.previews-gallery_section:last-child {
+  margin-bottom: 0;
+}
+
+.previews-gallery_section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 0 var(--space-2);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.previews-gallery_section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: var(--squid-pink);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
 .previews-gallery_list {
   list-style: none;
   margin: 0;

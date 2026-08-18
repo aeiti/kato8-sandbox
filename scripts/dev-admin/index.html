@@ -320,10 +320,14 @@
 
   <script type="module">
     const STATUSES = ['stable', 'wip', 'vendored', 'deprecated']
+    // Gallery grouping headings. Keep in sync with CATEGORY_ORDER in
+    // src/previews/PreviewPage.jsx. The category <select> also folds in
+    // any categories already present on disk, so this list can lag.
+    const CATEGORIES = ['Navigation', 'Sections', 'Games', 'Forms', 'Fundraising']
 
     // Each block: which array it edits and how it renders. `kind`
     // 'listing' → home listings (path/title/description [+active]);
-    // 'component' → the preview library (name/label/status/source/desc).
+    // 'component' → the preview library (name/label/status/category/source/desc).
     const BLOCKS = [
       { key: 'sections',    title: 'Browse',      kind: 'listing',   hasActive: false, noun: 'entry' },
       { key: 'pages',       title: 'Pages',       kind: 'listing',   hasActive: false, noun: 'page' },
@@ -378,7 +382,7 @@
 
     function makeEntry(def) {
       if (def.kind === 'component') {
-        return { name: '', label: '', status: 'stable', source: '', styles: '', description: '' }
+        return { name: '', label: '', status: 'stable', category: CATEGORIES[0], source: '', styles: '', description: '' }
       }
       const e = { path: '/', title: '', description: '' }
       if (def.hasActive) e.active = true
@@ -509,6 +513,7 @@
       fields.appendChild(textField('Name', item.label, (v) => { item.label = v; markDirty(def.key) }))
       fields.appendChild(slugField('Slug (route id)', item.name, (v) => { item.name = v; markDirty(def.key) }))
       fields.appendChild(statusField(item, () => markDirty(def.key)))
+      fields.appendChild(categoryField(item, () => markDirty(def.key)))
       fields.appendChild(sourcePathField(item))
       const desc = textArea('Description', item.description, (v) => { item.description = v; markDirty(def.key) })
       desc.classList.add('field--wide')
@@ -585,6 +590,29 @@
         sel.appendChild(opt)
       }
       sel.onchange = () => { item.status = sel.value; onChange() }
+      f.appendChild(l)
+      f.appendChild(sel)
+      return f
+    }
+
+    function categoryField(item, onChange) {
+      const f = document.createElement('div')
+      f.className = 'field'
+      const l = document.createElement('label')
+      l.textContent = 'Category'
+      const sel = document.createElement('select')
+      // Base list + any category already on disk not covered by it, so
+      // the current value is always selectable even if CATEGORIES lags.
+      const opts = [...CATEGORIES]
+      if (item.category && !opts.includes(item.category)) opts.push(item.category)
+      for (const c of opts) {
+        const opt = document.createElement('option')
+        opt.value = c
+        opt.textContent = c
+        if ((item.category || CATEGORIES[0]) === c) opt.selected = true
+        sel.appendChild(opt)
+      }
+      sel.onchange = () => { item.category = sel.value; onChange() }
       f.appendChild(l)
       f.appendChild(sel)
       return f
