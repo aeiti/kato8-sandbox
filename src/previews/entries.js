@@ -152,6 +152,33 @@ export const previewEntries = [
     styles: 'src/styles/our-story-timeline.css',
     description: 'About-page "Our Story" milestone timeline: alternating cards zigzag around a centered line, collapsing to a left rail under 767px. WIP from external-site branch about-timeline-section — not yet on main, vendored here.',
   },
+  {
+    name: 'investor-request-form',
+    label: 'InvestorRequestForm',
+    status: 'vendored',
+    category: 'Forms',
+    source: 'src/components/InvestorRequestForm.jsx',
+    styles: 'src/styles/investor-request-form.css',
+    description: 'Investor-relations request form (name, email, company, investment range, message). Reuses the shared signup-form styling; no network call when VITE_INVESTOR_ENDPOINT is unset. New in the sandbox, not yet on main.',
+  },
+  {
+    name: 'sandbox-nav',
+    label: 'SandboxNav',
+    status: 'vendored',
+    category: 'Navigation',
+    source: 'src/components/SandboxNav.jsx',
+    styles: 'kato8studios-site/src/styles/main/nav.css',
+    description: 'Copy of the main-site Nav with an added "Investors" tab (links to /investors). Used as the sandbox\'s global nav to preview the proposed tab. Not yet on main.',
+  },
+  {
+    name: 'sandbox-mobile-menu',
+    label: 'SandboxMobileMenu',
+    status: 'vendored',
+    category: 'Navigation',
+    source: 'src/components/SandboxMobileMenu.jsx',
+    styles: 'kato8studios-site/src/styles/mobile-menu.css',
+    description: 'Copy of the main-site MobileMenu with an added "Investors" link in the Studio section. Rendered here in the always-open state; the close button is a no-op in preview. Not yet on main.',
+  },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))
