@@ -1,5 +1,8 @@
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
-import Nav from 'kato8studios-site/src/components/Nav'
+// Sandbox nav is a vendored copy of the main-site Nav with an added
+// "Investors" tab (not yet upstream — PROCESS.md §1b). Swap back to the
+// imported `kato8studios-site/src/components/Nav` when the tab graduates.
+import Nav from './components/SandboxNav'
 import Footer from 'kato8studios-site/src/components/Footer'
 import HomePage from './pages/HomePage'
 import KickstarterButtonsPage from './pages/KickstarterButtonsPage'
@@ -8,6 +11,7 @@ import CrowdfundingGamesPage from './pages/CrowdfundingGamesPage'
 import CrowdfundingGamePage from './pages/CrowdfundingGamePage'
 import OurStoryTimelinePage from './pages/OurStoryTimelinePage'
 import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
+import InvestorsPage from './pages/InvestorsPage'
 import PreviewPage from './previews/PreviewPage'
 
 export default function App() {
@@ -53,6 +57,7 @@ export default function App() {
         <Route path="/crowdfunding-games/:slug" element={<CrowdfundingGamePage />} />
         <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
         <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
+        <Route path="/investors" element={<InvestorsPage />} />
         <Route path="/components" element={<PreviewPage />} />
         <Route path="/components/:name" element={<PreviewPage />} />
       </Routes>
