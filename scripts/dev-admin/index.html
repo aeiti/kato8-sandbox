@@ -330,7 +330,7 @@
     // 'component' → the preview library (name/label/status/category/source/desc).
     const BLOCKS = [
       { key: 'sections',    title: 'Browse',      kind: 'listing',   hasActive: false, noun: 'entry' },
-      { key: 'pages',       title: 'Pages',       kind: 'listing',   hasActive: false, noun: 'page' },
+      { key: 'pages',       title: 'Pages',       kind: 'page',      hasActive: false, noun: 'page' },
       { key: 'experiments', title: 'Experiments', kind: 'listing',   hasActive: true,  noun: 'experiment' },
       { key: 'components',  title: 'Components',  kind: 'component',                    noun: 'component' },
     ]
@@ -457,7 +457,10 @@
         p.textContent = 'No ' + def.noun + 's yet.'
         list.appendChild(p)
       }
-      const renderer = def.kind === 'component' ? renderComponentEntry : renderListingEntry
+      const renderer =
+        def.kind === 'component' ? renderComponentEntry :
+        def.kind === 'page' ? renderPageEntry :
+        renderListingEntry
       items.forEach((item, i) => list.appendChild(renderer(def, item, i)))
       wrap.appendChild(list)
 
@@ -500,6 +503,286 @@
       side.appendChild(rowControls(def, items, index))
       el.appendChild(side)
       return el
+    }
+
+    // ── Page entry ───────────────────────────────────────────────────
+    // Like a listing (path/title/description) plus, once the page has a
+    // real source file, an editor + live preview. Before that, a button
+    // scaffolds the file and wires its route.
+    function renderPageEntry(def, item, index) {
+      const items = state[def.key]
+      const el = document.createElement('div')
+      el.className = 'entry'
+
+      const fields = document.createElement('div')
+      fields.className = 'entry__fields'
+      // Once a page has a file + route, its path is fixed (the route in
+      // App.jsx isn't rewired on rename) — show it read-only. New pages
+      // still need an editable path to name the route being created.
+      if (item.source) {
+        const pf = textField('Path (route — fixed)', item.path, () => {})
+        const inp = pf.querySelector('input')
+        inp.readOnly = true
+        inp.classList.add('mono')
+        inp.title = 'The route is wired to this path in App.jsx. To change it, remove this page and create a new one.'
+        fields.appendChild(pf)
+      } else {
+        fields.appendChild(textField('Path', item.path, (v) => { item.path = v; markDirty(def.key) }))
+      }
+      fields.appendChild(textField('Title', item.title, (v) => { item.title = v; markDirty(def.key) }))
+      fields.appendChild(textArea('Description', item.description, (v) => { item.description = v; markDirty(def.key) }))
+      el.appendChild(fields)
+
+      const side = document.createElement('div')
+      side.className = 'entry__side'
+      side.appendChild(rowControls(def, items, index))
+      el.appendChild(side)
+
+      el.appendChild(item.source ? pageSourcePanel(item) : pageCreatePanel(def, item, index))
+      return el
+    }
+
+    // Shown for a page that has no source file yet: scaffold + wire route.
+    function pageCreatePanel(def, item, index) {
+      const panel = document.createElement('div')
+      panel.className = 'source-panel'
+      const note = document.createElement('span')
+      note.className = 'source-note'
+      note.textContent = 'No page file yet — create one to edit its content and preview it.'
+      const btn = document.createElement('button')
+      btn.className = 'btn btn--primary btn--sm'
+      btn.textContent = 'Create file & route'
+      btn.style.marginLeft = '10px'
+      btn.onclick = () => createPage(def, item, index)
+      panel.appendChild(note)
+      panel.appendChild(btn)
+      return panel
+    }
+
+    // Scaffold the page file + route on the server, then adopt the fresh
+    // pages array it returns as the new saved baseline.
+    async function createPage(def, item, index) {
+      const path = (item.path || '').trim()
+      if (!/^\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(path)) {
+        toast('Give the page a path like /my-page (lowercase, hyphens) first.', 'err')
+        return
+      }
+      if (!item.title || !item.title.trim()) {
+        toast('Give the page a title first.', 'err')
+        return
+      }
+      try {
+        const res = await fetch('/__admin/api/pages/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path,
+            title: item.title,
+            description: item.description || '',
+            pages: stripInternal(state.pages),
+          }),
+        })
+        const body = await res.json()
+        if (!res.ok) throw new Error(body.error || 'create failed')
+        state.pages = clone(body.pages)
+        saved.pages = clone(body.pages)
+        render()
+        toast('Created ' + body.component + ' (' + body.created.source + ') and wired its route.', 'ok')
+      } catch (err) {
+        toast('Create failed: ' + err.message, 'err')
+      }
+    }
+
+    // Collapsible source editor + live preview for a materialized page.
+    // Source read/written by path (src/pages/*.jsx) via /api/file; the
+    // preview iframe embeds the real route (bare) and hot-updates on save.
+    function pageSourcePanel(item) {
+      const panel = document.createElement('div')
+      panel.className = 'source-panel'
+
+      const head = document.createElement('div')
+      head.className = 'source-head'
+      const srcToggle = document.createElement('button')
+      srcToggle.className = 'btn btn--sm'
+      srcToggle.textContent = 'View / edit source'
+      const previewToggle = document.createElement('button')
+      previewToggle.className = 'btn btn--sm'
+      previewToggle.textContent = 'Live preview'
+      const pathEl = document.createElement('span')
+      pathEl.className = 'source-path'
+      pathEl.textContent = item.source
+      head.appendChild(srcToggle)
+      head.appendChild(previewToggle)
+      head.appendChild(pathEl)
+      panel.appendChild(head)
+
+      const body = document.createElement('div')
+      body.className = 'source-body'
+      panel.appendChild(body)
+
+      const preview = document.createElement('div')
+      preview.className = 'preview-body'
+      panel.appendChild(preview)
+
+      let loadedSource = false
+      srcToggle.onclick = async () => {
+        const open = body.classList.toggle('open')
+        srcToggle.textContent = open ? 'Hide source' : 'View / edit source'
+        if (open && !loadedSource) { loadedSource = true; await loadPageFile(item, body) }
+      }
+
+      let mountedPreview = false
+      previewToggle.onclick = () => {
+        const open = preview.classList.toggle('open')
+        previewToggle.textContent = open ? 'Hide preview' : 'Live preview'
+        if (open && !mountedPreview) { mountedPreview = true; mountPagePreview(item, preview) }
+      }
+      return panel
+    }
+
+    async function loadPageFile(item, body) {
+      body.innerHTML = '<p class="source-note">Loading source…</p>'
+      let data
+      try {
+        const res = await fetch('/__admin/api/file?path=' + encodeURIComponent(item.source))
+        data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'failed to read source')
+      } catch (err) {
+        body.innerHTML = '<p class="source-note readonly">' + err.message + '</p>'
+        return
+      }
+
+      body.innerHTML = ''
+      const pathLine = document.createElement('div')
+      pathLine.className = 'source-path'
+      pathLine.style.marginBottom = '6px'
+      pathLine.textContent = data.path + (data.exists ? '' : ' (new file)')
+      body.appendChild(pathLine)
+
+      const ta = document.createElement('textarea')
+      ta.className = 'code'
+      ta.value = data.exists ? data.content : ''
+      body.appendChild(ta)
+
+      const actions = document.createElement('div')
+      actions.className = 'source-actions'
+      const note = document.createElement('span')
+      note.className = 'source-note'
+      note.textContent = 'Any HTML/JSX works. Add images with the button, then Save.'
+      actions.appendChild(note)
+      actions.appendChild(document.createElement('span')).className = 'spacer'
+
+      const imgBtn = document.createElement('button')
+      imgBtn.className = 'btn btn--sm'
+      imgBtn.textContent = '+ Image'
+      imgBtn.title = 'Upload an image and insert an <img> tag at the cursor'
+      imgBtn.onclick = () => pickAndInsertImage(ta)
+      actions.appendChild(imgBtn)
+
+      const saveBtn = document.createElement('button')
+      saveBtn.className = 'btn btn--primary btn--sm'
+      saveBtn.textContent = 'Save source'
+      saveBtn.onclick = async () => {
+        saveBtn.disabled = true
+        try {
+          const res = await fetch('/__admin/api/file', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ path: item.source, content: ta.value }),
+          })
+          const b = await res.json()
+          if (!res.ok) throw new Error(b.error || 'save failed')
+          toast('Saved ' + item.source + ' (' + b.bytes + ' bytes).', 'ok')
+        } catch (err) {
+          toast('Source save failed: ' + err.message, 'err')
+        } finally {
+          saveBtn.disabled = false
+        }
+      }
+      actions.appendChild(saveBtn)
+      body.appendChild(actions)
+    }
+
+    // Upload an image, then splice an <img> tag at the textarea caret.
+    function pickAndInsertImage(textarea) {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = 'image/png,image/jpeg,image/gif,image/svg+xml,image/webp'
+      input.onchange = async () => {
+        const file = input.files && input.files[0]
+        if (!file) return
+        toast('Uploading ' + file.name + '…')
+        try {
+          const dataUrl = await new Promise((resolve, reject) => {
+            const r = new FileReader()
+            r.onload = () => resolve(r.result)
+            r.onerror = () => reject(new Error('could not read file'))
+            r.readAsDataURL(file)
+          })
+          const res = await fetch('/__admin/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: file.name, dataUrl }),
+          })
+          const b = await res.json()
+          if (!res.ok) throw new Error(b.error || 'upload failed')
+          const tag = '<img src={' + b.snippet + '} alt="" />'
+          insertAtCursor(textarea, tag)
+          toast('Uploaded ' + b.file + ' and inserted an <img> tag. Needs asset() imported.', 'ok')
+        } catch (err) {
+          toast('Upload failed: ' + err.message, 'err')
+        }
+      }
+      input.click()
+    }
+
+    function insertAtCursor(textarea, text) {
+      const start = textarea.selectionStart ?? textarea.value.length
+      const end = textarea.selectionEnd ?? textarea.value.length
+      textarea.value = textarea.value.slice(0, start) + text + textarea.value.slice(end)
+      const caret = start + text.length
+      textarea.focus()
+      textarea.setSelectionRange(caret, caret)
+    }
+
+    function mountPagePreview(item, container) {
+      const url = item.path + '?bare=1'
+      const key = item.path
+
+      const toolbar = document.createElement('div')
+      toolbar.className = 'preview-toolbar'
+      const note = document.createElement('span')
+      note.className = 'source-note'
+      note.textContent = 'Live — hot-updates when you save the page source.'
+      const spacer = document.createElement('span')
+      spacer.className = 'spacer'
+      const reload = document.createElement('button')
+      reload.className = 'btn btn--sm'
+      reload.textContent = '↻ Reload'
+      reload.onclick = () => {
+        const f = document.querySelector('iframe[data-preview-page="' + key + '"]')
+        if (!f) return
+        try { f.contentWindow.location.reload() } catch { f.src = f.src }
+      }
+      const openTab = document.createElement('a')
+      openTab.className = 'btn btn--sm'
+      openTab.href = url
+      openTab.target = '_blank'
+      openTab.rel = 'noreferrer'
+      openTab.textContent = 'Open ↗'
+      toolbar.appendChild(note)
+      toolbar.appendChild(spacer)
+      toolbar.appendChild(reload)
+      toolbar.appendChild(openTab)
+
+      const frame = document.createElement('iframe')
+      frame.className = 'preview-iframe'
+      frame.src = url
+      frame.title = 'Live preview of ' + item.path
+      frame.setAttribute('data-preview-page', key)
+
+      container.appendChild(toolbar)
+      container.appendChild(frame)
     }
 
     // ── Component entry ──────────────────────────────────────────────
@@ -887,7 +1170,7 @@
         const res = await fetch('/__admin/api/block/' + key, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(state[key]),
+          body: JSON.stringify(stripInternal(state[key])),
         })
         const body = await res.json()
         if (!res.ok) throw new Error(body.error || 'save failed')
