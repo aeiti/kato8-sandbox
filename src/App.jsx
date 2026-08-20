@@ -13,6 +13,10 @@ import OurStoryTimelinePage from './pages/OurStoryTimelinePage'
 import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
 import InvestorsPage from './pages/InvestorsPage'
 import PreviewPage from './previews/PreviewPage'
+// Pages scaffolded from the dev admin panel (scripts/dev-admin) auto-insert
+// their `import` line directly below the next marker. Keep the marker line
+// intact and on its own — the panel splices new imports right after it.
+// ADMIN:PAGE-IMPORTS
 
 export default function App() {
   const location = useLocation()
@@ -23,18 +27,31 @@ export default function App() {
   const isFullWidthPage = /^\/crowdfunding-games\/[^/]+/.test(location.pathname)
   const bodyClass = isFullWidthPage ? 'body-2' : 'body'
 
+  // The route table, shared by the normal and bare renders so a page added
+  // from the admin panel shows up in both. New page routes auto-insert below
+  // the ADMIN:PAGE-ROUTES marker (see scripts/dev-admin).
+  const routes = (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/kickstarter-buttons" element={<KickstarterButtonsPage />} />
+      <Route path="/kickstarter-button-v2" element={<KickstarterButtonV2Page />} />
+      <Route path="/crowdfunding-games" element={<CrowdfundingGamesPage />} />
+      <Route path="/crowdfunding-games/:slug" element={<CrowdfundingGamePage />} />
+      <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
+      <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
+      <Route path="/investors" element={<InvestorsPage />} />
+      {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}
+      <Route path="/components" element={<PreviewPage />} />
+      <Route path="/components/:name" element={<PreviewPage />} />
+    </Routes>
+  )
+
   // `?bare=1` (used by the dev admin panel's live-preview iframe) renders the
-  // routed page alone — no back bar, Nav, or Footer — so a single component
-  // fills the pane. PreviewPage also drops its own preview bar in this mode.
+  // routed page alone — no back bar, Nav, or Footer — so a single component or
+  // page fills the pane. PreviewPage also drops its own preview bar in this mode.
   const isBare = new URLSearchParams(location.search).get('bare') === '1'
   if (isBare) {
-    return (
-      <div className={`${bodyClass} body--bare`}>
-        <Routes>
-          <Route path="/components/:name" element={<PreviewPage />} />
-        </Routes>
-      </div>
-    )
+    return <div className={`${bodyClass} body--bare`}>{routes}</div>
   }
 
   return (
@@ -49,18 +66,7 @@ export default function App() {
         </div>
       )}
       <Nav />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/kickstarter-buttons" element={<KickstarterButtonsPage />} />
-        <Route path="/kickstarter-button-v2" element={<KickstarterButtonV2Page />} />
-        <Route path="/crowdfunding-games" element={<CrowdfundingGamesPage />} />
-        <Route path="/crowdfunding-games/:slug" element={<CrowdfundingGamePage />} />
-        <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
-        <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
-        <Route path="/investors" element={<InvestorsPage />} />
-        <Route path="/components" element={<PreviewPage />} />
-        <Route path="/components/:name" element={<PreviewPage />} />
-      </Routes>
+      {routes}
       <Footer />
     </div>
   )

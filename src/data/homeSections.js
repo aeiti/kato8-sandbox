@@ -10,9 +10,13 @@
  * and re-emit it. Comments inside the arrays are dropped on save.
  *
  * Entry shapes:
- *   sections / pages: { path, title, description }
- *   experiments:      { path, title, active, description }
+ *   sections:    { path, title, description }
+ *   pages:       { path, title, source, description }
+ *   experiments: { path, title, active, description }
  * `active` drives the Active/Concluded badge on the Experiments list.
+ * `source` (pages only) is the page's React source file under src/pages/;
+ * the dev admin panel edits it in place and lives-previews it, and the
+ * admin's "Add page" scaffolds the file + wires its route in src/App.jsx.
  */
 
 export const sections = [
@@ -28,6 +32,7 @@ export const pages = [
   {
     path: '/crowdfunding-games',
     title: 'Crowdfunding Games',
+    source: 'src/pages/CrowdfundingGamesPage.jsx',
     description:
       'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
   },
