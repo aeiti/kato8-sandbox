@@ -15,6 +15,11 @@ import { games } from 'kato8studios-site/src/data/games'
 // Vendored WIP (external-site branch about-timeline-section, not on main
 // yet) — local import rather than from kato8studios-site. See PROCESS §1b.
 import OurStoryTimeline from '../components/OurStoryTimeline'
+// Vendored investor-page prototypes (not on main yet — see PROCESS §1b):
+// a request form plus the Nav / MobileMenu copies that add the Investors tab.
+import InvestorRequestForm from '../components/InvestorRequestForm'
+import SandboxNav from '../components/SandboxNav'
+import SandboxMobileMenu from '../components/SandboxMobileMenu'
 import { previewEntries, entryByName } from './entries.js'
 
 // Render thunks keyed by preview name. Kept separate from entries.js
@@ -57,6 +62,9 @@ const renderers = {
     </div>
   ),
   'our-story-timeline':   () => <OurStoryTimeline />,
+  'investor-request-form': () => <InvestorRequestForm source="sandbox" />,
+  'sandbox-nav':          () => <SandboxNav />,
+  'sandbox-mobile-menu':  () => <SandboxMobileMenu open onClose={() => {}} />,
 }
 
 export const previews = previewEntries.map((entry) => ({

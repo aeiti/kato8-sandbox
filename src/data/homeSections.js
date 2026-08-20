@@ -40,6 +40,12 @@ export const pages = [
 
 export const experiments = [
   {
+    path: '/investors',
+    title: 'Investors page',
+    active: true,
+    description: 'Prototype investor page — an investor-relations hero plus a request form for investor materials, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
+  },
+  {
     path: '/kickstarter-button-v2',
     title: 'Kickstarter Button v2',
     active: true,

@@ -74,6 +74,14 @@ export const staticRoutes = {
     ogDescription:
       'Preview of NewsletterSignup mounted on the About page with tightened spacing.',
   },
+  '/investors': {
+    title: 'Investors | Kato.8 Sandbox',
+    description:
+      'Prototype investor page for Kato.8 — an investor-relations hero plus a request form for investor materials. Adds an "Investors" nav tab. WIP preview.',
+    ogTitle: 'Investors — page prototype',
+    ogDescription:
+      'Prototype investor page: investor-relations hero + request form, with a new Investors nav tab.',
+  },
   '/crowdfunding-games': {
     title: 'Crowdfunding Games | Kato.8 Sandbox',
     description:

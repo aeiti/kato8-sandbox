@@ -1,0 +1,88 @@
+/*
+ * Investor page (sandbox prototype). Layout for the hero + highlights
+ * above the shared `.signup-form` request form. Type + color come from
+ * the main-site tokens (RocknRoll One headings, Reem Kufi body, --text-*
+ * / --space-* variables), so this stays consistent with the live site
+ * and picks up light/dark automatically.
+ */
+
+.investors-page {
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-block: var(--space-3, 2.5rem) var(--space-4, 4rem);
+  padding-inline: 1rem;
+  color: var(--text-primary);
+  font-family: 'Reem Kufi', sans-serif;
+}
+
+.investors-hero {
+  text-align: center;
+  margin-bottom: var(--space-3, 2.5rem);
+}
+
+.investors-hero_eyebrow {
+  margin: 0 0 0.5rem;
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--squid-pink, #ff4d8d);
+}
+
+.investors-hero_title {
+  margin: 0 0 1rem;
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.investors-hero_lead {
+  margin: 0 auto;
+  max-width: 38rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.investors-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-bottom: var(--space-3, 2.5rem);
+}
+
+.investors-highlight {
+  padding: 1.25rem;
+  border: 2px solid color-mix(in srgb, var(--text-primary) 18%, transparent);
+  border-radius: 0.75rem;
+}
+
+.investors-highlight_title {
+  margin: 0 0 0.4rem;
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.investors-highlight_body {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  opacity: 0.8;
+}
+
+/* The submit button's block-shadow cleanup lives with the form
+   component itself — see src/styles/investor-request-form.css. */
+
+@media (max-width: 640px) {
+  .investors-highlights {
+    grid-template-columns: 1fr;
+    gap: 0.9rem;
+  }
+}
