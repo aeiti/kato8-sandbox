@@ -1,0 +1,47 @@
+/**
+ * Scoped styles for the archived "Home — USB Background" page
+ * (src/pages/HomeUsbBackgroundPage.jsx).
+ *
+ * The sandbox already imports the main site's home.css + games.css globally
+ * (see src/main.jsx), so the hero and game-card base styles come from there.
+ * This file only carries the *deltas* that the archived homepage introduced and
+ * that aren't on external-site `main` yet:
+ *   - the fixed/parallax backdrop on `.home-main`
+ *   - the per-card logo block that replaced the card title/tags
+ *
+ * Kept as a frozen snapshot of the look reviewed in the 2026-08 UI/UX pass;
+ * it does not track later changes to the live homepage.
+ */
+
+/* Fixed/parallax backdrop — image + white scrim set inline on the element in
+ * the page component; these pin and size it. `fixed` holds the art still while
+ * the page scrolls in front of it. */
+.home-main.has-fixed-bg {
+  background-attachment: fixed;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding-block: 2.5rem;
+}
+
+/* Per-card logo, shown in place of the (removed) card title + tags. */
+.game-card-logo-block {
+  justify-content: flex-start;
+  align-items: flex-end;
+  max-width: 72%;
+  display: flex;
+}
+
+.game-card-logo {
+  width: auto;
+  max-width: 100%;
+  max-height: 6rem;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 767px) {
+  /* iOS ignores a fixed attachment — fall back to a scrolling backdrop. */
+  .home-main.has-fixed-bg {
+    background-attachment: scroll;
+  }
+}

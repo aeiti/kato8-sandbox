@@ -33,8 +33,13 @@ export const pages = [
     path: '/crowdfunding-games',
     title: 'Crowdfunding Games',
     source: 'src/pages/CrowdfundingGamesPage.jsx',
-    description:
-      'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
+    description: 'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
+  },
+  {
+    path: '/home-usb-background',
+    title: 'Home — USB Background',
+    source: 'src/pages/HomeUsbBackgroundPage.jsx',
+    description: 'Archived snapshot of the home page with the fixed/parallax USB cover-art background and cleaned-up game cards (logo + description, no title/tags), from the 2026-08 UI/UX pass. Hero + cards only (no support section).',
   },
 ]
 

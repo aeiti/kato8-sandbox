@@ -17,6 +17,7 @@ import PreviewPage from './previews/PreviewPage'
 // their `import` line directly below the next marker. Keep the marker line
 // intact and on its own — the panel splices new imports right after it.
 // ADMIN:PAGE-IMPORTS
+import HomeUsbBackgroundPage from './pages/HomeUsbBackgroundPage'
 
 export default function App() {
   const location = useLocation()
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
       <Route path="/investors" element={<InvestorsPage />} />
       {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}
+      <Route path="/home-usb-background" element={<HomeUsbBackgroundPage />} />
       <Route path="/components" element={<PreviewPage />} />
       <Route path="/components/:name" element={<PreviewPage />} />
     </Routes>
