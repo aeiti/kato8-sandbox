@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Studio Bios Admin</title>
+  <style>
+    :root {
+      --cobalt: #1b1b26;
+      --cobalt-2: #24243a;
+      --panel: #ffffff;
+      --ink: #1b1b26;
+      --muted: #6b6b7b;
+      --line: #e3e3ec;
+      --pink: #e6738a;
+      --pink-ink: #b23c56;
+      --green: #2f9e6f;
+      --amber: #c98a1a;
+      --radius: 12px;
+      --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f4f8; color: var(--ink); font-family: var(--font); line-height: 1.5; }
+    a { color: var(--pink-ink); }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 20;
+      background: var(--cobalt); color: #fff;
+      padding: 14px 24px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .topbar h1 { font-size: 17px; margin: 0; font-weight: 700; }
+    .topbar .spacer { flex: 1; }
+    .env { font-family: var(--mono); font-size: 12px; color: #b9bece; }
+    .topbar a.crosslink { color: #cdd3e6; font-size: 13px; text-decoration: none; border: 1px solid #3a3a52; padding: 5px 10px; border-radius: 8px; }
+    .topbar a.crosslink:hover { background: var(--cobalt-2); }
+
+    .btn {
+      appearance: none; border: 1px solid var(--line); background: #fff; color: var(--ink);
+      font: inherit; font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: 8px; cursor: pointer;
+    }
+    .btn:hover { border-color: #c7c7d6; }
+    .btn--sm { padding: 4px 9px; font-size: 12px; }
+    .btn--primary { background: var(--pink); border-color: var(--pink); color: #fff; }
+    .btn--primary:hover { background: var(--pink-ink); border-color: var(--pink-ink); }
+    .btn--push { background: var(--green); border-color: var(--green); color: #fff; }
+    .btn--push:hover { filter: brightness(0.94); }
+    .btn--ghost { background: transparent; }
+    .btn--danger { color: #b3352f; border-color: #e7c3c1; }
+    .btn:disabled { opacity: 0.5; cursor: default; }
+
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 460px); gap: 20px; padding: 20px 24px; align-items: start; }
+    @media (max-width: 1000px) { .layout { grid-template-columns: 1fr; } }
+
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
+    .card + .card { margin-top: 18px; }
+    .card__head { padding: 12px 16px; border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 10px; }
+    .card__head h2 { font-size: 14px; margin: 0; }
+    .card__head .spacer { flex: 1; }
+    .card__body { padding: 16px; }
+
+    /* People list */
+    .people { display: flex; flex-direction: column; }
+    .person-row { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 8px; cursor: pointer; background: #fff; }
+    .person-row:hover { border-color: #c7c7d6; }
+    .person-row.active { border-color: var(--pink); box-shadow: 0 0 0 2px rgba(230,115,138,0.18); }
+    .person-row .pr-main { flex: 1; min-width: 0; }
+    .person-row .pr-name { font-weight: 700; font-size: 13px; }
+    .person-row .pr-role { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .person-row .swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); flex: none; }
+    .rowbtns { display: flex; gap: 3px; }
+
+    /* Form */
+    .field { margin-bottom: 12px; }
+    .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+    .field input[type=text], .field input[type=number], .field select, .field textarea {
+      width: 100%; font: inherit; font-size: 13px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: #fff; color: var(--ink);
+    }
+    .field textarea { resize: vertical; min-height: 64px; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .subhead { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--muted); margin: 18px 0 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+
+    .spec { display: grid; grid-template-columns: 130px 1fr auto; gap: 8px; align-items: start; margin-bottom: 8px; }
+    .imgfield { display: flex; align-items: center; gap: 8px; }
+    .imgfield input { flex: 1; }
+    .thumb { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; border: 1px solid var(--line); background: #eee; }
+
+    .empty { color: var(--muted); font-size: 13px; padding: 20px 4px; text-align: center; }
+
+    .preview-wrap { position: sticky; top: 78px; }
+    .preview-iframe { width: 100%; height: 640px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .preview-note { font-size: 12px; color: var(--muted); margin: 8px 2px 0; }
+
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--cobalt); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 13px; opacity: 0; transition: opacity 0.2s; z-index: 40; max-width: 80vw; }
+    .toast.show { opacity: 1; }
+    .toast.err { background: #7a2b2b; }
+    .dirty-dot { color: var(--amber); font-size: 20px; line-height: 0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>🃏 Studio Bios Admin</h1>
+    <span class="env" id="branch">branch …</span>
+    <span class="spacer"></span>
+    <a class="crosslink" href="/__admin">← Home &amp; Components panel</a>
+    <button class="btn btn--primary" id="save" disabled>Save <span class="dirty-dot" id="dirty" style="display:none">●</span></button>
+    <button class="btn btn--push" id="publish">Push</button>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="card">
+        <div class="card__head">
+          <h2>Team</h2>
+          <span class="spacer"></span>
+          <button class="btn btn--sm" id="add">+ Add person</button>
+        </div>
+        <div class="card__body">
+          <div class="people" id="people"></div>
+        </div>
+      </div>
+
+      <div class="card" id="editor-card" style="display:none">
+        <div class="card__head">
+          <h2 id="editor-title">Edit</h2>
+          <span class="spacer"></span>
+          <button class="btn btn--sm btn--danger" id="delete">Delete</button>
+        </div>
+        <div class="card__body" id="form"></div>
+      </div>
+
+      <div class="card">
+        <div class="card__head">
+          <h2>Card types &amp; themes</h2>
+          <span class="spacer"></span>
+          <button class="btn btn--sm" id="save-types" disabled>Save types</button>
+        </div>
+        <div class="card__body" id="types"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="preview-wrap">
+        <div class="card">
+          <div class="card__head">
+            <h2>Live preview</h2>
+            <span class="spacer"></span>
+            <button class="btn btn--sm" id="reload">↻ Reload</button>
+            <a class="btn btn--sm btn--ghost" href="/studio-bios" target="_blank" rel="noreferrer">Open ↗</a>
+          </div>
+          <div class="card__body">
+            <iframe class="preview-iframe" id="preview" src="/studio-bios?bare=1"></iframe>
+            <p class="preview-note">Use the Pokémon / Magic / Yu-Gi-Oh! switcher inside the preview. Saving reloads it.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const state = { people: [], types: {}, selected: -1, dirty: false, typesDirty: false }
+    const $ = (id) => document.getElementById(id)
+
+    function toast(msg, isErr) {
+      const t = $('toast')
+      t.textContent = msg
+      t.className = 'toast show' + (isErr ? ' err' : '')
+      clearTimeout(t._t)
+      t._t = setTimeout(() => { t.className = 'toast' }, isErr ? 4500 : 2500)
+    }
+
+    function markDirty() {
+      state.dirty = true
+      $('save').disabled = false
+      $('dirty').style.display = ''
+    }
+
+    function typeOptions(selected) {
+      return Object.keys(state.types)
+        .map((k) => `<option value="${k}"${k === selected ? ' selected' : ''}>${k}</option>`)
+        .join('')
+    }
+
+    function accentFor(person) {
+      const t = state.types[person && person.type] || state.types.ops || {}
+      return t.accent || '#6b7787'
+    }
+
+    // ---- People list ----
+    function renderList() {
+      const wrap = $('people')
+      wrap.innerHTML = ''
+      if (!state.people.length) {
+        wrap.innerHTML = '<div class="empty">No people yet. Click “+ Add person”.</div>'
+        return
+      }
+      state.people.forEach((p, i) => {
+        const row = document.createElement('div')
+        row.className = 'person-row' + (i === state.selected ? ' active' : '')
+        row.innerHTML =
+          `<span class="swatch" style="background:${accentFor(p)}"></span>` +
+          `<div class="pr-main"><div class="pr-name">${escapeHtml(p.name || '(unnamed)')}</div>` +
+          `<div class="pr-role">${escapeHtml(p.role || '')}</div></div>`
+        const btns = document.createElement('div')
+        btns.className = 'rowbtns'
+        btns.appendChild(iconBtn('↑', () => move(i, -1), i === 0))
+        btns.appendChild(iconBtn('↓', () => move(i, 1), i === state.people.length - 1))
+        row.appendChild(btns)
+        row.querySelector('.pr-main').onclick = () => select(i)
+        row.querySelector('.swatch').onclick = () => select(i)
+        wrap.appendChild(row)
+      })
+    }
+
+    function iconBtn(label, fn, disabled) {
+      const b = document.createElement('button')
+      b.className = 'btn btn--sm btn--ghost'
+      b.textContent = label
+      b.disabled = !!disabled
+      b.onclick = (e) => { e.stopPropagation(); fn() }
+      return b
+    }
+
+    function move(i, dir) {
+      const j = i + dir
+      if (j < 0 || j >= state.people.length) return
+      const arr = state.people
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+      if (state.selected === i) state.selected = j
+      else if (state.selected === j) state.selected = i
+      markDirty(); renderList(); renderForm()
+    }
+
+    function blankPerson() {
+      return {
+        slug: '', name: '', role: '', type: Object.keys(state.types)[0] || 'ops',
+        monogram: '', bio: '', specialties: [],
+        pokemon: { hp: 100, weakness: '', resistance: '', retreat: 1 },
+        magic: { cost: '', rarity: 'Rare', power: 2, toughness: 2 },
+        yugioh: { level: 4, attribute: '', monsterType: '', atk: 1500, def: 1500 },
+      }
+    }
+
+    function addPerson() {
+      state.people.push(blankPerson())
+      state.selected = state.people.length - 1
+      markDirty(); renderList(); renderForm()
+    }
+
+    function del() {
+      if (state.selected < 0) return
+      const p = state.people[state.selected]
+      if (!confirm(`Delete ${p.name || 'this person'}?`)) return
+      state.people.splice(state.selected, 1)
+      state.selected = Math.min(state.selected, state.people.length - 1)
+      markDirty(); renderList(); renderForm()
+    }
+
+    function select(i) {
+      state.selected = i
+      renderList(); renderForm()
+    }
+
+    // ---- Person form ----
+    function renderForm() {
+      const card = $('editor-card')
+      if (state.selected < 0 || !state.people[state.selected]) {
+        card.style.display = 'none'
+        return
+      }
+      card.style.display = ''
+      const p = state.people[state.selected]
+      p.pokemon = p.pokemon || {}
+      p.magic = p.magic || {}
+      p.yugioh = p.yugioh || {}
+      p.specialties = p.specialties || []
+      $('editor-title').textContent = p.name || 'Edit person'
+
+      const form = $('form')
+      form.innerHTML = ''
+
+      form.appendChild(textField('Name', p.name, (v) => { p.name = v; $('editor-title').textContent = v || 'Edit person'; syncRow() }))
+      form.appendChild(row2(
+        textField('Slug (auto from name if blank)', p.slug, (v) => { p.slug = v }),
+        selectField('Type', typeOptions(p.type), (v) => { p.type = v; syncRow() })
+      ))
+      form.appendChild(row2(
+        textField('Role', p.role, (v) => { p.role = v; syncRow() }),
+        textField('Monogram (1–3 chars)', p.monogram, (v) => { p.monogram = v })
+      ))
+      form.appendChild(textArea('Bio (flavor text)', p.bio, (v) => { p.bio = v }))
+      form.appendChild(imageField('Avatar (optional portrait)', p.avatar, (v) => { p.avatar = v; renderForm() }))
+      form.appendChild(imageField('Card image (optional — replaces the whole generated card)', p.cardImage, (v) => { p.cardImage = v; renderForm() }))
+
+      // Specialties
+      const sh = document.createElement('div'); sh.className = 'subhead'; sh.textContent = 'Specialties (attacks / abilities / effects)'
+      form.appendChild(sh)
+      const specWrap = document.createElement('div')
+      p.specialties.forEach((s, si) => specWrap.appendChild(specRow(p, s, si)))
+      form.appendChild(specWrap)
+      const addSpec = document.createElement('button')
+      addSpec.className = 'btn btn--sm'; addSpec.textContent = '+ Add specialty'
+      addSpec.onclick = () => { p.specialties.push({ name: '', text: '' }); markDirty(); renderForm() }
+      form.appendChild(addSpec)
+
+      // Pokémon
+      form.appendChild(subhead('Pokémon frame'))
+      form.appendChild(row3(
+        numField('HP', p.pokemon.hp, (v) => { p.pokemon.hp = v }),
+        textField('Retreat cost', p.pokemon.retreat, (v) => { p.pokemon.retreat = v }),
+        textField('Weakness', p.pokemon.weakness, (v) => { p.pokemon.weakness = v })
+      ))
+      form.appendChild(textField('Resistance', p.pokemon.resistance, (v) => { p.pokemon.resistance = v }))
+
+      // Magic
+      form.appendChild(subhead('Magic frame'))
+      form.appendChild(row2(
+        textField('Mana cost (e.g. 2UU)', p.magic.cost, (v) => { p.magic.cost = v }),
+        textField('Rarity', p.magic.rarity, (v) => { p.magic.rarity = v })
+      ))
+      form.appendChild(row2(
+        numField('Power', p.magic.power, (v) => { p.magic.power = v }),
+        numField('Toughness', p.magic.toughness, (v) => { p.magic.toughness = v })
+      ))
+
+      // Yu-Gi-Oh!
+      form.appendChild(subhead('Yu-Gi-Oh! frame'))
+      form.appendChild(row3(
+        numField('Level (stars)', p.yugioh.level, (v) => { p.yugioh.level = v }),
+        textField('Attribute', p.yugioh.attribute, (v) => { p.yugioh.attribute = v }),
+        textField('Monster type', p.yugioh.monsterType, (v) => { p.yugioh.monsterType = v })
+      ))
+      form.appendChild(row2(
+        numField('ATK', p.yugioh.atk, (v) => { p.yugioh.atk = v }),
+        numField('DEF', p.yugioh.def, (v) => { p.yugioh.def = v })
+      ))
+    }
+
+    function syncRow() {
+      const rows = $('people').querySelectorAll('.person-row')
+      const row = rows[state.selected]
+      if (!row) return
+      const p = state.people[state.selected]
+      row.querySelector('.pr-name').textContent = p.name || '(unnamed)'
+      row.querySelector('.pr-role').textContent = p.role || ''
+      row.querySelector('.swatch').style.background = accentFor(p)
+    }
+
+    function specRow(p, s, si) {
+      const el = document.createElement('div')
+      el.className = 'spec'
+      const name = document.createElement('input'); name.type = 'text'; name.value = s.name || ''; name.placeholder = 'Name'
+      name.oninput = () => { s.name = name.value; markDirty() }
+      const text = document.createElement('input'); text.type = 'text'; text.value = s.text || ''; text.placeholder = 'Description'
+      text.oninput = () => { s.text = text.value; markDirty() }
+      const rm = document.createElement('button'); rm.className = 'btn btn--sm btn--danger'; rm.textContent = '✕'
+      rm.onclick = () => { p.specialties.splice(si, 1); markDirty(); renderForm() }
+      el.append(name, text, rm)
+      return el
+    }
+
+    // ---- Field builders ----
+    function wrapField(labelText, input) {
+      const f = document.createElement('div'); f.className = 'field'
+      const l = document.createElement('label'); l.textContent = labelText
+      f.append(l, input)
+      return f
+    }
+    function textField(label, val, onInput) {
+      const i = document.createElement('input'); i.type = 'text'; i.value = val == null ? '' : val
+      i.oninput = () => { onInput(i.value); markDirty() }
+      return wrapField(label, i)
+    }
+    function numField(label, val, onInput) {
+      const i = document.createElement('input'); i.type = 'number'; i.value = val == null ? '' : val
+      i.oninput = () => { onInput(i.value); markDirty() }
+      return wrapField(label, i)
+    }
+    function textArea(label, val, onInput) {
+      const i = document.createElement('textarea'); i.value = val == null ? '' : val
+      i.oninput = () => { onInput(i.value); markDirty() }
+      return wrapField(label, i)
+    }
+    function selectField(label, optionsHtml, onInput) {
+      const s = document.createElement('select'); s.innerHTML = optionsHtml
+      s.oninput = () => { onInput(s.value); markDirty() }
+      return wrapField(label, s)
+    }
+    function imageField(label, val, onSet) {
+      const f = document.createElement('div'); f.className = 'field'
+      const l = document.createElement('label'); l.textContent = label
+      const rowEl = document.createElement('div'); rowEl.className = 'imgfield'
+      const thumb = document.createElement('img'); thumb.className = 'thumb'
+      if (val) thumb.src = val.replace(/^\//, '/'); else thumb.style.visibility = 'hidden'
+      const path = document.createElement('input'); path.type = 'text'; path.value = val == null ? '' : val; path.placeholder = '/assets/sandbox/…'
+      path.oninput = () => { onSet(path.value); }
+      const up = document.createElement('button'); up.className = 'btn btn--sm'; up.textContent = 'Upload'
+      up.onclick = () => pickImage((p) => onSet(p))
+      rowEl.append(thumb, path, up)
+      f.append(l, rowEl)
+      return f
+    }
+    function row2(a, b) { const d = document.createElement('div'); d.className = 'grid2'; d.append(a, b); return d }
+    function row3(a, b, c) { const d = document.createElement('div'); d.className = 'grid3'; d.append(a, b, c); return d }
+    function subhead(t) { const d = document.createElement('div'); d.className = 'subhead'; d.textContent = t; return d }
+
+    // ---- Types editor ----
+    function renderTypes() {
+      const wrap = $('types')
+      wrap.innerHTML = ''
+      Object.entries(state.types).forEach(([key, t]) => {
+        const head = document.createElement('div'); head.className = 'subhead'; head.textContent = key
+        wrap.appendChild(head)
+        const grid = document.createElement('div'); grid.className = 'grid2'
+        const color = document.createElement('div'); color.className = 'field'
+        color.innerHTML = '<label>Accent</label>'
+        const ci = document.createElement('input'); ci.type = 'color'; ci.value = t.accent || '#6b7787'; ci.style.width = '100%'; ci.style.height = '34px'
+        ci.oninput = () => { t.accent = ci.value; state.typesDirty = true; $('save-types').disabled = false; renderList() }
+        color.appendChild(ci)
+        grid.appendChild(color)
+        grid.appendChild(typeText('Pokémon type', t, 'pokemonType'))
+        wrap.appendChild(grid)
+        const grid2 = document.createElement('div'); grid2.className = 'grid2'
+        grid2.appendChild(typeText('Magic color', t, 'magicColor'))
+        grid2.appendChild(typeText('Yu-Gi-Oh! attribute', t, 'yugiohAttribute'))
+        wrap.appendChild(grid2)
+      })
+    }
+    function typeText(label, obj, key) {
+      const f = document.createElement('div'); f.className = 'field'
+      f.innerHTML = `<label>${label}</label>`
+      const i = document.createElement('input'); i.type = 'text'; i.value = obj[key] == null ? '' : obj[key]
+      i.oninput = () => { obj[key] = i.value; state.typesDirty = true; $('save-types').disabled = false }
+      f.appendChild(i)
+      return f
+    }
+
+    // ---- Image upload ----
+    function pickImage(cb) {
+      const input = document.createElement('input')
+      input.type = 'file'; input.accept = 'image/png,image/jpeg,image/gif,image/svg+xml,image/webp'
+      input.onchange = () => {
+        const file = input.files && input.files[0]
+        if (!file) return
+        const reader = new FileReader()
+        reader.onload = async () => {
+          try {
+            const res = await fetch('/__bios/api/upload', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ filename: file.name, dataUrl: reader.result }),
+            })
+            const j = await res.json()
+            if (!res.ok) throw new Error(j.error || 'upload failed')
+            cb(j.path); markDirty(); renderForm()
+            toast('Uploaded ' + j.file)
+          } catch (e) { toast(e.message, true) }
+        }
+        reader.readAsDataURL(file)
+      }
+      input.click()
+    }
+
+    // ---- Save / publish / load ----
+    async function savePeople() {
+      try {
+        const res = await fetch('/__bios/api/people', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state.people),
+        })
+        const j = await res.json()
+        if (!res.ok) throw new Error(j.error || 'save failed')
+        state.people = j.people
+        state.dirty = false
+        $('save').disabled = true
+        $('dirty').style.display = 'none'
+        renderList(); renderForm()
+        reloadPreview()
+        toast('Saved ' + j.count + ' people')
+      } catch (e) { toast(e.message, true) }
+    }
+
+    async function saveTypes() {
+      try {
+        const res = await fetch('/__bios/api/types', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state.types),
+        })
+        const j = await res.json()
+        if (!res.ok) throw new Error(j.error || 'save failed')
+        state.typesDirty = false
+        $('save-types').disabled = true
+        reloadPreview()
+        toast('Saved types')
+      } catch (e) { toast(e.message, true) }
+    }
+
+    async function publish() {
+      const btn = $('publish'); btn.disabled = true; btn.textContent = 'Pushing…'
+      try {
+        const res = await fetch('/__bios/api/publish', { method: 'POST' })
+        const j = await res.json()
+        if (!res.ok) throw new Error(j.error || 'push failed')
+        toast(j.published ? j.message : j.reason, !j.published && false)
+      } catch (e) { toast(e.message, true) }
+      finally { btn.disabled = false; btn.textContent = 'Push' }
+    }
+
+    function reloadPreview() {
+      const f = $('preview')
+      try { f.contentWindow.location.reload() } catch { f.src = f.src }
+    }
+
+    async function loadInfo() {
+      try {
+        const res = await fetch('/__bios/api/info')
+        const info = await res.json()
+        const el = $('branch')
+        el.textContent = info.branch ? 'branch: ' + info.branch + (info.isMain ? ' → deploys' : '') : 'not a git repo'
+      } catch { $('branch').textContent = '' }
+    }
+
+    async function loadData() {
+      const res = await fetch('/__bios/api/data')
+      const j = await res.json()
+      state.people = j.people || []
+      state.types = j.types || {}
+      renderList(); renderTypes()
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]))
+    }
+
+    $('add').onclick = addPerson
+    $('delete').onclick = del
+    $('save').onclick = savePeople
+    $('save-types').onclick = saveTypes
+    $('publish').onclick = publish
+    $('reload').onclick = reloadPreview
+    window.addEventListener('beforeunload', (e) => {
+      if (state.dirty || state.typesDirty) { e.preventDefault(); e.returnValue = '' }
+    })
+
+    loadInfo(); loadData()
+  </script>
+</body>
+</html>
