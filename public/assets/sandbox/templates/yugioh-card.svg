@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 350" role="img" aria-label="Yu-Gi-Oh! card template placeholder">
+  <!-- PLACEHOLDER card template. Replace with the real Yu-Gi-Oh! card art
+       (same path, or update TEMPLATE_SRC in YugiohTemplateCard). Slot
+       rectangles match .sb-tpl__* under .sb-tpl--ygo in studio-bios.css. -->
+  <rect x="3" y="3" width="244" height="344" rx="12" fill="#c88f45" stroke="#8a5a24" stroke-width="2"/>
+  <!-- name bar -->
+  <rect x="14" y="12" width="222" height="28" rx="4" fill="#e7dcc4" stroke="#3a2a12" stroke-width="1"/>
+  <!-- attribute badge (top-right) -->
+  <circle cx="222" cy="26" r="12" fill="#efe6d0" stroke="#3a2a12" stroke-width="1.5"/>
+  <!-- level stars strip -->
+  <rect x="14" y="44" width="222" height="14" fill="#b57f39"/>
+  <!-- art window (square-ish) -->
+  <rect x="20" y="62" width="210" height="150" fill="#efe6d0" stroke="#3a2a12" stroke-width="2"/>
+  <!-- monster-type line -->
+  <rect x="16" y="216" width="218" height="16" fill="#e7dcc4" stroke="#3a2a12" stroke-width="1"/>
+  <!-- effect text box -->
+  <rect x="16" y="234" width="218" height="86" fill="#f1ece0" stroke="#3a2a12" stroke-width="1"/>
+  <text x="125" y="337" text-anchor="middle" font-family="Gill Sans, Segoe UI, sans-serif" font-size="7" letter-spacing="1.2" fill="#3a2a12" opacity="0.55">YU-GI-OH! TEMPLATE · PLACEHOLDER</text>
+</svg>

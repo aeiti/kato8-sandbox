@@ -20,10 +20,14 @@ import OurStoryTimeline from '../components/OurStoryTimeline'
 import InvestorRequestForm from '../components/InvestorRequestForm'
 import SandboxNav from '../components/SandboxNav'
 import SandboxMobileMenu from '../components/SandboxMobileMenu'
-// Studio-bio collector cards: three frames over one shared BioCard base.
+// Studio-bio collector cards: three CSS-drawn frames over one shared
+// BioCard base, plus three image-template variants over TemplateBioCard.
 import PokemonBioCard from '../components/PokemonBioCard'
 import MagicBioCard from '../components/MagicBioCard'
 import YugiohBioCard from '../components/YugiohBioCard'
+import PokemonTemplateCard from '../components/PokemonTemplateCard'
+import MagicTemplateCard from '../components/MagicTemplateCard'
+import YugiohTemplateCard from '../components/YugiohTemplateCard'
 import { studioBios } from '../data/studioBios'
 import { previewEntries, entryByName } from './entries.js'
 
@@ -71,17 +75,40 @@ const renderers = {
   'sandbox-nav':          () => <SandboxNav />,
   'sandbox-mobile-menu':  () => <SandboxMobileMenu open onClose={() => {}} />,
   'bio-cards':            () => {
-    // One member across all three frames, so the shared BioCard base is
-    // obvious at a glance. studioBios[0] is the founder (a `vision` type).
+    // One member across all SIX variations side by side — the three
+    // CSS-drawn frames and the three image-template cards — so the whole
+    // set can be compared at a glance. studioBios[0] is the founder.
     const person = studioBios[0]
+    const rowLabel = {
+      width: '100%', margin: '0 0 10px', textAlign: 'center',
+      font: '700 12px/1 system-ui, sans-serif', letterSpacing: '0.6px',
+      textTransform: 'uppercase', color: '#6b6b7b',
+    }
+    const row = { display: 'flex', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }
     return (
-      <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <PokemonBioCard person={person} />
-        <MagicBioCard person={person} />
-        <YugiohBioCard person={person} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div>
+          <p style={rowLabel}>CSS-drawn frames</p>
+          <div style={row}>
+            <PokemonBioCard person={person} />
+            <MagicBioCard person={person} />
+            <YugiohBioCard person={person} />
+          </div>
+        </div>
+        <div>
+          <p style={rowLabel}>Image templates</p>
+          <div style={row}>
+            <PokemonTemplateCard person={person} />
+            <MagicTemplateCard person={person} />
+            <YugiohTemplateCard person={person} />
+          </div>
+        </div>
       </div>
     )
   },
+  'pokemon-template-card': () => <PokemonTemplateCard person={studioBios[0]} />,
+  'magic-template-card':   () => <MagicTemplateCard person={studioBios[0]} />,
+  'yugioh-template-card':  () => <YugiohTemplateCard person={studioBios[0]} />,
 }
 
 export const previews = previewEntries.map((entry) => ({
