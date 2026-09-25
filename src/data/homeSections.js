@@ -45,6 +45,12 @@ export const pages = [
 
 export const experiments = [
   {
+    path: '/studio-bios',
+    title: 'Studio Bios',
+    active: true,
+    description: 'Meet-the-team page prototype — each studio member’s bio dealt out as a collector’s card, with a switcher to flip the whole grid between Pokémon, Magic, and Yu-Gi-Oh! frames. One shared placeholder data source drives all three.',
+  },
+  {
     path: '/investors',
     title: 'Investors page',
     active: true,

@@ -1,0 +1,571 @@
+/**
+ * Styles for the Studio Bios page (`/studio-bios`) and its three
+ * collector-card frames (Pokémon, Magic, Yu-Gi-Oh!). All selectors are
+ * namespaced `sb-` so they don't collide with the rest of the sandbox.
+ *
+ * Each card reads its accent color from the `--sb-accent` custom property,
+ * set inline per person from `studioBios.js` via `getCardTheme()`. The art
+ * window is a themed placeholder (monogram over an accent gradient) that a
+ * real portrait (`avatar`) or a fully pre-rendered card (`cardImage`)
+ * replaces when those fields are filled in.
+ */
+
+.sb-page {
+  color: var(--text-primary);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, #2a2f45 0%, #14161f 55%, #0d0e15 100%);
+  min-height: 100vh;
+  padding-bottom: 96px;
+}
+
+/* ---------- Page heading ---------- */
+
+.sb-heading {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding: 56px 24px 8px;
+  text-align: center;
+}
+
+.sb-heading__title {
+  margin: 0;
+  color: #fff;
+  font-family: "RocknRoll One", sans-serif;
+  font-size: clamp(28px, 5vw, 44px);
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+.sb-heading__description {
+  margin: 14px auto 0;
+  max-width: 620px;
+  color: #b9bece;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* ---------- Style switcher ---------- */
+
+.sb-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 28px auto 40px;
+  padding: 6px;
+  width: fit-content;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
+.sb-switcher__btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #c7ccdb;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.sb-switcher__btn:hover {
+  color: #fff;
+}
+
+.sb-switcher__btn[aria-pressed="true"] {
+  background: #fff;
+  color: #14161f;
+}
+
+/* ---------- Gallery grid ---------- */
+
+.sb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 32px;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 24px;
+  justify-items: center;
+}
+
+/* ---------- Shared card shell ---------- */
+
+.sb-card {
+  --sb-accent: #6b7787;
+  position: relative;
+  width: 300px;
+  aspect-ratio: 5 / 7;
+  border-radius: 18px;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  overflow: hidden;
+  user-select: none;
+}
+
+.sb-card:hover {
+  transform: translateY(-8px) rotate(-0.6deg);
+  box-shadow: 0 30px 60px -16px rgba(0, 0, 0, 0.7);
+}
+
+/* Fully pre-rendered card image (escape hatch) fills the shell. */
+.sb-card--image {
+  padding: 0;
+}
+.sb-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Shared art-window placeholder: monogram over an accent gradient. */
+.sb-art {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--sb-accent) 55%, #fff) 0%, var(--sb-accent) 45%, color-mix(in srgb, var(--sb-accent) 70%, #000) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sb-art__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sb-art__monogram {
+  font-family: "RocknRoll One", sans-serif;
+  font-size: 64px;
+  color: rgba(255, 255, 255, 0.92);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18);
+  letter-spacing: 2px;
+}
+
+.sb-art__sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
+}
+
+/* =====================================================================
+   POKÉMON FRAME  (.sb-poke)
+   ===================================================================== */
+
+.sb-poke {
+  background: linear-gradient(160deg, #f7d774 0%, #e7b93f 50%, #d9a531 100%);
+  padding: 10px;
+  font-family: "Gill Sans", "Segoe UI", sans-serif;
+}
+
+.sb-poke__inner {
+  height: 100%;
+  border-radius: 10px;
+  background: #f5f0e2;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  padding: 8px 9px 9px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sb-poke__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 2px 4px;
+}
+
+.sb-poke__stage {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6a6a5a;
+  letter-spacing: 0.4px;
+}
+
+.sb-poke__name {
+  font-size: 19px;
+  font-weight: 800;
+  color: #1c1c1c;
+  line-height: 1;
+  flex: 1;
+}
+
+.sb-poke__hp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #d8382b;
+  white-space: nowrap;
+}
+.sb-poke__hp b {
+  font-size: 16px;
+}
+
+.sb-poke__type-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--sb-accent);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.sb-poke__art {
+  aspect-ratio: 4 / 3;
+  border: 3px solid #cda94a;
+  border-radius: 3px;
+  margin-bottom: 5px;
+}
+
+.sb-poke__role {
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #4a4a3a;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  padding: 3px 4px;
+  margin-bottom: 5px;
+}
+
+.sb-poke__attacks {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sb-poke__attack {
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 4px;
+}
+
+.sb-poke__attack-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sb-poke__energy {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--sb-accent);
+  border: 1.5px solid rgba(0, 0, 0, 0.25);
+  flex: none;
+}
+
+.sb-poke__attack-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #1c1c1c;
+  flex: 1;
+}
+
+.sb-poke__attack-dmg {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1c1c1c;
+}
+
+.sb-poke__attack-text {
+  font-size: 9.5px;
+  line-height: 1.35;
+  color: #3a3a30;
+  margin: 2px 0 0 19px;
+}
+
+.sb-poke__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 6px;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
+  font-size: 8px;
+  color: #4a4a3a;
+}
+.sb-poke__footer span b {
+  font-weight: 800;
+}
+
+/* =====================================================================
+   MAGIC FRAME  (.sb-mtg)
+   ===================================================================== */
+
+.sb-mtg {
+  background:
+    linear-gradient(160deg, #2b2620 0%, #1a1712 100%);
+  padding: 12px 11px;
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.sb-mtg__inner {
+  height: 100%;
+  border-radius: 6px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sb-accent) 30%, #d9cbb0) 0%, color-mix(in srgb, var(--sb-accent) 18%, #c9b896) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.sb-mtg__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: linear-gradient(180deg, #f3ecdc 0%, #ddd0b6 100%);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 20px / 50%;
+  padding: 4px 12px;
+}
+
+.sb-mtg__name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.1;
+}
+
+.sb-mtg__cost {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+
+.sb-mtg__art {
+  aspect-ratio: 4 / 3;
+  border: 2px solid #2b2620;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.sb-mtg__type {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  background: linear-gradient(180deg, #f3ecdc 0%, #ddd0b6 100%);
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 20px / 50%;
+  padding: 3px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.sb-mtg__set {
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.sb-mtg__text {
+  flex: 1;
+  background: linear-gradient(180deg, #f6f0e2 0%, #efe6d2 100%);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 2px;
+  padding: 7px 9px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.sb-mtg__ability {
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: #1c1c1c;
+}
+.sb-mtg__ability b {
+  font-weight: 700;
+}
+
+.sb-mtg__flavor {
+  margin-top: auto;
+  padding-top: 5px;
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
+  font-style: italic;
+  font-size: 10px;
+  line-height: 1.4;
+  color: #443c30;
+}
+
+.sb-mtg__footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 0 2px;
+}
+
+.sb-mtg__meta {
+  font-size: 8px;
+  color: #2c261c;
+  opacity: 0.85;
+  line-height: 1.3;
+}
+
+.sb-mtg__pt {
+  background: linear-gradient(180deg, #f3ecdc 0%, #d3c4a4 100%);
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 16px / 55%;
+  padding: 2px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+/* =====================================================================
+   YU-GI-OH! FRAME  (.sb-ygo)
+   ===================================================================== */
+
+.sb-ygo {
+  background: linear-gradient(160deg, #d8a24a 0%, #b9793a 100%);
+  padding: 9px;
+  font-family: "Gill Sans", "Segoe UI", sans-serif;
+}
+
+.sb-ygo__inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  overflow: hidden;
+}
+
+.sb-ygo__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 1px 2px 0;
+}
+
+.sb-ygo__name {
+  font-size: 17px;
+  font-weight: 700;
+  color: #241a10;
+  line-height: 1;
+  font-family: "Georgia", serif;
+  flex: 1;
+}
+
+.sb-ygo__attr {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, #fff 0%, var(--sb-accent) 45%, color-mix(in srgb, var(--sb-accent) 60%, #000) 100%);
+  border: 1.5px solid #3a2a14;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  flex: none;
+}
+
+.sb-ygo__stars {
+  display: flex;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 0 2px;
+}
+
+.sb-ygo__star {
+  width: 11px;
+  height: 11px;
+  color: #e8a020;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.35));
+}
+
+.sb-ygo__art {
+  aspect-ratio: 3 / 2;
+  border: 2px solid #241a10;
+}
+
+.sb-ygo__type {
+  background: #e9e2d2;
+  border: 1px solid #241a10;
+  font-size: 9.5px;
+  font-weight: 800;
+  color: #241a10;
+  padding: 2px 6px;
+}
+
+.sb-ygo__text {
+  flex: 1;
+  min-height: 0;
+  background: #f2ede0;
+  border: 1px solid #241a10;
+  border-bottom: 0;
+  padding: 6px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.sb-ygo__effect {
+  font-size: 9.5px;
+  line-height: 1.35;
+  color: #1c1610;
+}
+.sb-ygo__effect b {
+  font-weight: 800;
+}
+
+.sb-ygo__stats {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex: none;
+  background: #f2ede0;
+  border: 1px solid #241a10;
+  border-top: 1px solid rgba(0, 0, 0, 0.35);
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #1c1610;
+  font-family: "Georgia", serif;
+}
+
+.sb-ygo__serial {
+  margin-right: auto;
+  font-family: "Gill Sans", "Segoe UI", sans-serif;
+  font-size: 7px;
+  font-weight: 600;
+  color: #3a2c18;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  .sb-grid {
+    gap: 24px;
+  }
+  .sb-card {
+    width: min(300px, 86vw);
+  }
+}

@@ -90,6 +90,14 @@ export const staticRoutes = {
     ogDescription:
       'Preview of the crowdfunding games landing page and its per-game detail pages.',
   },
+  '/studio-bios': {
+    title: 'Studio Bios | Kato.8 Sandbox',
+    description:
+      'Meet-the-team page prototype: each studio member’s bio rendered as a collector’s card, with a switcher for Pokémon, Magic, and Yu-Gi-Oh! frames. Placeholder people.',
+    ogTitle: 'Studio Bios — collector cards',
+    ogDescription:
+      'The studio team as collector cards — Pokémon, Magic, and Yu-Gi-Oh! frames over one shared bio data source. Placeholder content.',
+  },
 }
 
 // Per-component preview routes, derived from the registry so adding a

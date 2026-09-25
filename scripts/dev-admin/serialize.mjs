@@ -20,11 +20,24 @@
  */
 
 // Canonical key order so saved objects don't churn regardless of the
-// order the UI sends keys in. Covers both editable literals:
+// order the UI sends keys in. Covers every editable literal:
 //   home listings  → { path, title, active, description }
 //   preview entries → { name, label, status, category, source, styles, description }
-// Unknown keys sort after these, alphabetical + stable.
-const KEY_ORDER = ['name', 'label', 'path', 'title', 'active', 'status', 'category', 'source', 'styles', 'description']
+//   studio bios    → { slug, name, role, type, monogram, …, specialties, pokemon, magic, yugioh }
+// The blocks share this one list; each object only carries its own subset,
+// and the relative order of the home/component keys is preserved (they sit
+// before the bios-only keys), so adding the bios keys causes no churn in
+// homeSections.js or entries.js. Unknown keys sort after all of these,
+// alphabetical + stable.
+const KEY_ORDER = [
+  // shared / home / component identity
+  'name', 'label', 'slug', 'role', 'type',
+  'path', 'title', 'active', 'status', 'category', 'source', 'styles',
+  // studio-bio content
+  'monogram', 'avatar', 'cardImage', 'bio', 'text', 'specialties',
+  'pokemon', 'magic', 'yugioh',
+  'description',
+]
 const IDENT = /^[A-Za-z_$][\w$]*$/
 
 function orderedKeys(obj) {

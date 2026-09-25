@@ -12,6 +12,7 @@ import CrowdfundingGamePage from './pages/CrowdfundingGamePage'
 import OurStoryTimelinePage from './pages/OurStoryTimelinePage'
 import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
 import InvestorsPage from './pages/InvestorsPage'
+import StudioBiosPage from './pages/StudioBiosPage'
 import PreviewPage from './previews/PreviewPage'
 // Pages scaffolded from the dev admin panel (scripts/dev-admin) auto-insert
 // their `import` line directly below the next marker. Keep the marker line
@@ -41,6 +42,7 @@ export default function App() {
       <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
       <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
       <Route path="/investors" element={<InvestorsPage />} />
+      <Route path="/studio-bios" element={<StudioBiosPage />} />
       {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}
       <Route path="/home-usb-background" element={<HomeUsbBackgroundPage />} />
       <Route path="/components" element={<PreviewPage />} />
