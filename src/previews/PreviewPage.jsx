@@ -32,7 +32,7 @@ function ComponentStage({ entry }) {
 // Preferred order for known category headings. Anything not listed here
 // (including entries with no category) is appended after these, sorted
 // alphabetically, with an empty category collapsed to 'Other'.
-const CATEGORY_ORDER = ['Navigation', 'Sections', 'Games', 'Forms', 'Fundraising']
+const CATEGORY_ORDER = ['Navigation', 'Sections', 'Games', 'Forms', 'Fundraising', 'Studio']
 const OTHER_CATEGORY = 'Other'
 
 // Status sort priority within a category: most-active (live) first,
