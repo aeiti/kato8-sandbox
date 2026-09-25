@@ -188,6 +188,33 @@ export const previewEntries = [
     styles: 'src/styles/studio-bios.css',
     description: 'Studio-bio collector cards. A shared BioCard base (card shell, --sb-accent theming, and the cardImage escape hatch) that the Pokémon, Magic, and Yu-Gi-Oh! frames build on. Shown here as all three frames for one team member. Drives the /studio-bios page.',
   },
+  {
+    name: 'pokemon-template-card',
+    label: 'PokemonTemplateCard',
+    status: 'wip',
+    category: 'Studio',
+    source: 'src/components/PokemonTemplateCard.jsx',
+    styles: 'src/styles/studio-bios.css',
+    description: 'Bio data overlaid on a real Pokémon card TEMPLATE IMAGE (vs. the CSS-drawn frame). Built on the shared TemplateBioCard base. Currently shows a placeholder template SVG — drop the real art in at public/assets/sandbox/templates/pokemon-card.svg and re-tune the .sb-tpl slot positions.',
+  },
+  {
+    name: 'magic-template-card',
+    label: 'MagicTemplateCard',
+    status: 'wip',
+    category: 'Studio',
+    source: 'src/components/MagicTemplateCard.jsx',
+    styles: 'src/styles/studio-bios.css',
+    description: 'Bio data overlaid on a real Magic card TEMPLATE IMAGE (vs. the CSS-drawn frame). Built on the shared TemplateBioCard base. Currently shows a placeholder template SVG — drop the real art in at public/assets/sandbox/templates/magic-card.svg and re-tune the .sb-tpl slot positions.',
+  },
+  {
+    name: 'yugioh-template-card',
+    label: 'YugiohTemplateCard',
+    status: 'wip',
+    category: 'Studio',
+    source: 'src/components/YugiohTemplateCard.jsx',
+    styles: 'src/styles/studio-bios.css',
+    description: 'Bio data overlaid on a real Yu-Gi-Oh! card TEMPLATE IMAGE (vs. the CSS-drawn frame). Built on the shared TemplateBioCard base. Currently shows a placeholder template SVG — drop the real art in at public/assets/sandbox/templates/yugioh-card.svg and re-tune the .sb-tpl slot positions.',
+  },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))

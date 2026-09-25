@@ -20,10 +20,14 @@ import OurStoryTimeline from '../components/OurStoryTimeline'
 import InvestorRequestForm from '../components/InvestorRequestForm'
 import SandboxNav from '../components/SandboxNav'
 import SandboxMobileMenu from '../components/SandboxMobileMenu'
-// Studio-bio collector cards: three frames over one shared BioCard base.
+// Studio-bio collector cards: three CSS-drawn frames over one shared
+// BioCard base, plus three image-template variants over TemplateBioCard.
 import PokemonBioCard from '../components/PokemonBioCard'
 import MagicBioCard from '../components/MagicBioCard'
 import YugiohBioCard from '../components/YugiohBioCard'
+import PokemonTemplateCard from '../components/PokemonTemplateCard'
+import MagicTemplateCard from '../components/MagicTemplateCard'
+import YugiohTemplateCard from '../components/YugiohTemplateCard'
 import { studioBios } from '../data/studioBios'
 import { previewEntries, entryByName } from './entries.js'
 
@@ -82,6 +86,9 @@ const renderers = {
       </div>
     )
   },
+  'pokemon-template-card': () => <PokemonTemplateCard person={studioBios[0]} />,
+  'magic-template-card':   () => <MagicTemplateCard person={studioBios[0]} />,
+  'yugioh-template-card':  () => <YugiohTemplateCard person={studioBios[0]} />,
 }
 
 export const previews = previewEntries.map((entry) => ({
