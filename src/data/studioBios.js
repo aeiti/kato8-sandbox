@@ -83,11 +83,11 @@ export const CARD_TYPES = {
 
 export const studioBios = [
   {
-    name: 'Ada Nakamura',
-    slug: 'ada-nakamura',
+    name: 'Terry Teng',
+    slug: 'terry-teng',
     role: 'Founder & Creative Director',
     type: 'vision',
-    monogram: 'AN',
+    monogram: 'TT',
     bio: 'Started the studio out of a two-bedroom apartment with a whiteboard and too much coffee. Sets the north star for every project and still sketches level ideas on napkins.',
     specialties: [
       {
