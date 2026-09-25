@@ -20,6 +20,11 @@ import OurStoryTimeline from '../components/OurStoryTimeline'
 import InvestorRequestForm from '../components/InvestorRequestForm'
 import SandboxNav from '../components/SandboxNav'
 import SandboxMobileMenu from '../components/SandboxMobileMenu'
+// Studio-bio collector cards: three frames over one shared BioCard base.
+import PokemonBioCard from '../components/PokemonBioCard'
+import MagicBioCard from '../components/MagicBioCard'
+import YugiohBioCard from '../components/YugiohBioCard'
+import { studioBios } from '../data/studioBios'
 import { previewEntries, entryByName } from './entries.js'
 
 // Render thunks keyed by preview name. Kept separate from entries.js
@@ -65,6 +70,18 @@ const renderers = {
   'investor-request-form': () => <InvestorRequestForm source="sandbox" />,
   'sandbox-nav':          () => <SandboxNav />,
   'sandbox-mobile-menu':  () => <SandboxMobileMenu open onClose={() => {}} />,
+  'bio-cards':            () => {
+    // One member across all three frames, so the shared BioCard base is
+    // obvious at a glance. studioBios[0] is the founder (a `vision` type).
+    const person = studioBios[0]
+    return (
+      <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <PokemonBioCard person={person} />
+        <MagicBioCard person={person} />
+        <YugiohBioCard person={person} />
+      </div>
+    )
+  },
 }
 
 export const previews = previewEntries.map((entry) => ({

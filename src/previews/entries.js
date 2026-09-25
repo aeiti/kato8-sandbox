@@ -179,6 +179,15 @@ export const previewEntries = [
     styles: 'kato8studios-site/src/styles/mobile-menu.css',
     description: 'Copy of the main-site MobileMenu with an added "Investors" link in the Studio section. Rendered here in the always-open state; the close button is a no-op in preview. Not yet on main.',
   },
+  {
+    name: 'bio-cards',
+    label: 'BioCard',
+    status: 'wip',
+    category: 'Studio',
+    source: 'src/components/BioCard.jsx',
+    styles: 'src/styles/studio-bios.css',
+    description: 'Studio-bio collector cards. A shared BioCard base (card shell, --sb-accent theming, and the cardImage escape hatch) that the Pokémon, Magic, and Yu-Gi-Oh! frames build on. Shown here as all three frames for one team member. Drives the /studio-bios page.',
+  },
 ]
 
 export const entryByName = Object.fromEntries(previewEntries.map((e) => [e.name, e]))

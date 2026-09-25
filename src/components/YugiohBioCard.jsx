@@ -1,27 +1,19 @@
+import BioCard from './BioCard'
 import BioCardArt from './BioCardArt'
-import { getCardTheme } from '../data/studioBios'
 
 /**
  * Yu-Gi-Oh!-style collector card for one studio member. Name + attribute
  * badge up top, a row of level stars, role folded into the monster-type
  * line, the bio + specialties as effect text, and ATK/DEF from the
- * `yugioh` block. Themed by `type` via `--sb-accent`.
+ * `yugioh` block. Builds on the shared `BioCard` base (shell, `--sb-accent`
+ * theming, `cardImage` escape hatch).
  */
 export default function YugiohBioCard({ person }) {
-  const theme = getCardTheme(person)
   const y = person.yugioh || {}
   const level = y.level ?? 4
 
-  if (person.cardImage) {
-    return (
-      <article className="sb-card sb-card--image">
-        <img className="sb-card__image" src={person.cardImage} alt={person.name} />
-      </article>
-    )
-  }
-
   return (
-    <article className="sb-card sb-ygo" style={{ '--sb-accent': theme.accent }}>
+    <BioCard person={person} frameClass="sb-ygo">
       <div className="sb-ygo__inner">
         <div className="sb-ygo__head">
           <span className="sb-ygo__name">{person.name}</span>
@@ -55,6 +47,6 @@ export default function YugiohBioCard({ person }) {
           <span>DEF/{y.def ?? 1500}</span>
         </div>
       </div>
-    </article>
+    </BioCard>
   )
 }
