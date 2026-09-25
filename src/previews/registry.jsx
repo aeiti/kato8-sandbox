@@ -75,14 +75,34 @@ const renderers = {
   'sandbox-nav':          () => <SandboxNav />,
   'sandbox-mobile-menu':  () => <SandboxMobileMenu open onClose={() => {}} />,
   'bio-cards':            () => {
-    // One member across all three frames, so the shared BioCard base is
-    // obvious at a glance. studioBios[0] is the founder (a `vision` type).
+    // One member across all SIX variations side by side — the three
+    // CSS-drawn frames and the three image-template cards — so the whole
+    // set can be compared at a glance. studioBios[0] is the founder.
     const person = studioBios[0]
+    const rowLabel = {
+      width: '100%', margin: '0 0 10px', textAlign: 'center',
+      font: '700 12px/1 system-ui, sans-serif', letterSpacing: '0.6px',
+      textTransform: 'uppercase', color: '#6b6b7b',
+    }
+    const row = { display: 'flex', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }
     return (
-      <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <PokemonBioCard person={person} />
-        <MagicBioCard person={person} />
-        <YugiohBioCard person={person} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <div>
+          <p style={rowLabel}>CSS-drawn frames</p>
+          <div style={row}>
+            <PokemonBioCard person={person} />
+            <MagicBioCard person={person} />
+            <YugiohBioCard person={person} />
+          </div>
+        </div>
+        <div>
+          <p style={rowLabel}>Image templates</p>
+          <div style={row}>
+            <PokemonTemplateCard person={person} />
+            <MagicTemplateCard person={person} />
+            <YugiohTemplateCard person={person} />
+          </div>
+        </div>
       </div>
     )
   },

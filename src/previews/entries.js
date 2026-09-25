@@ -186,7 +186,7 @@ export const previewEntries = [
     category: 'Studio',
     source: 'src/components/BioCard.jsx',
     styles: 'src/styles/studio-bios.css',
-    description: 'Studio-bio collector cards. A shared BioCard base (card shell, --sb-accent theming, and the cardImage escape hatch) that the Pokémon, Magic, and Yu-Gi-Oh! frames build on. Shown here as all three frames for one team member. Drives the /studio-bios page.',
+    description: 'Studio-bio collector cards. A shared BioCard base (card shell, --sb-accent theming, cardImage escape hatch) that every variation builds on. Shown here as all SIX variations for one member, side by side: the three CSS-drawn frames (Pokémon / Magic / Yu-Gi-Oh!) and the three image-template cards. Drives the /studio-bios page.',
   },
   {
     name: 'pokemon-template-card',
