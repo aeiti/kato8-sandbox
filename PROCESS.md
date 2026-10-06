@@ -97,6 +97,14 @@ only under the dev server — it's never in a `vite build`, lives outside
 `src/`, and has no React route. Editing `src/pages/*` still means writing
 code; the manager only curates what shows up on the home index.
 
+The **Crowdfunding** tab edits the games on `/crowdfunding-games`
+(`src/data/crowdfundingGames.js`): add, delete, reorder, and edit each
+game's title, slug, categories, Coming Soon tag, card/cover images
+(upload or path), card description, and detail-page body (paragraphs
+separated by a blank line). **Save** rewrites the games array *and* the
+`CROWDFUNDING_SLUGS` list in `src/data/seo-config.js`, so every game keeps
+a prerendered OG page. Renaming a slug moves the detail page to a new URL.
+
 Adding a brand-new experiment is still a code task (page + route + SEO
 per §1); use the manager's **Add** to create the home-page listing row
 once the page exists (or to point at an external path).

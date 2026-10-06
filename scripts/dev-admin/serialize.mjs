@@ -24,10 +24,12 @@
 //   home listings  → { path, title, active, description }
 //   preview entries → { name, label, status, category, source, styles, description }
 //   studio bios    → { slug, name, role, type, monogram, …, specialties, pokemon, magic, yugioh }
+//   crowdfunding   → { slug, title, categories, comingSoon, image, coverImage, description, body }
 // The blocks share this one list; each object only carries its own subset,
 // and the relative order of the home/component keys is preserved (they sit
 // before the bios-only keys), so adding the bios keys causes no churn in
-// homeSections.js or entries.js. Unknown keys sort after all of these,
+// homeSections.js or entries.js. The crowdfunding-only keys likewise sit in
+// their own run and appear in no other block. Unknown keys sort after all of these,
 // alphabetical + stable.
 const KEY_ORDER = [
   // shared / home / component identity
@@ -36,7 +38,10 @@ const KEY_ORDER = [
   // studio-bio content
   'monogram', 'avatar', 'cardImage', 'bio', 'text', 'specialties',
   'pokemon', 'magic', 'yugioh',
+  // crowdfunding-game content (coverImage is { src, alt })
+  'categories', 'comingSoon', 'image', 'coverImage', 'src', 'alt',
   'description',
+  'body',
 ]
 const IDENT = /^[A-Za-z_$][\w$]*$/
 
