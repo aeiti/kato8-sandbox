@@ -105,6 +105,18 @@ separated by a blank line). **Save** rewrites the games array *and* the
 `CROWDFUNDING_SLUGS` list in `src/data/seo-config.js`, so every game keeps
 a prerendered OG page. Renaming a slug moves the detail page to a new URL.
 
+Pages whose content has its own editor (the Crowdfunding tab, the
+`/__bios` panel) get an **Edit content →** link on their listing row. A
+new tab declared with a `viewUrl` is linked automatically; a separate
+panel needs one line in `CONTENT_EDITORS` (scripts/dev-admin/index.html).
+
+**Route check.** The panel reads `src/App.jsx` and shows a banner for any
+page route that isn't on a home listing (with a one-click **+ Add to
+Pages**) or has no `staticRoutes` entry in `src/data/seo-config.js` (no
+prerendered link preview). Pages made with **Create file & route** get
+their SEO entry automatically, spliced above the `// ADMIN:SEO-ROUTES`
+marker. Keep that marker as the last line of `staticRoutes`.
+
 Adding a brand-new experiment is still a code task (page + route + SEO
 per §1); use the manager's **Add** to create the home-page listing row
 once the page exists (or to point at an external path).
