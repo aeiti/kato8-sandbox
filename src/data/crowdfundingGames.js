@@ -33,8 +33,8 @@ const LOREM_BODY = [
 
 export const crowdfundingGames = [
   {
-    slug: 'game-one',
-    title: 'Game Name',
+    slug: 'blind-slight',
+    title: 'Blind Slight',
     categories: ['Category', 'Category'],
     comingSoon: true,
     description:
@@ -42,8 +42,8 @@ export const crowdfundingGames = [
     body: LOREM_BODY,
   },
   {
-    slug: 'game-two',
-    title: 'Game Name',
+    slug: 'boardwalk',
+    title: 'Boardwalk',
     categories: ['Category', 'Category'],
     comingSoon: true,
     description:
