@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { asset } from '../utils/asset'
 
 /**
  * A single tile on the Crowdfunding Games grid (`/crowdfunding-games`).
@@ -13,11 +14,12 @@ import { Link } from 'react-router-dom'
  * Props:
  *   game — entry from `src/data/crowdfundingGames.js`. Uses:
  *     - slug, title, categories[], description
- *     - image (optional; falls back to a plain placeholder block)
+ *     - image (optional; `/assets/...` path, piped through `asset()`;
+ *       falls back to a plain placeholder block)
  */
 export default function CrowdfundingGameCard({ game }) {
   const imageStyle = game.image
-    ? { backgroundImage: `url('${game.image}')` }
+    ? { backgroundImage: `url('${asset(game.image)}')` }
     : undefined
 
   return (

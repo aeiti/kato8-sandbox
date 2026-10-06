@@ -10,6 +10,12 @@
  * These are intentionally placeholders — real campaigns, art, and copy get
  * filled in later. Body copy is lorem ipsum.
  *
+ * Editable from the dev admin panel (/__admin → Crowdfunding), which
+ * rewrites the `crowdfundingGames` array below in place and keeps
+ * `CROWDFUNDING_SLUGS` in `src/data/seo-config.js` in sync. Keep the array
+ * a plain literal (no shared constants or computed values) so the panel
+ * can read and rewrite it; comments inside the array are dropped on save.
+ *
  * Shape (all fields optional unless noted):
  *   slug        — REQUIRED. URL slug for `/crowdfunding-games/:slug` and React key.
  *   title       — display title (card + detail hero).
@@ -20,71 +26,101 @@
  *   image       — URL or `/assets/...` path (optional). Card background;
  *                 falls back to a plain placeholder block when absent.
  *   coverImage  — { src, alt } (optional). Portrait cover on the detail hero;
- *                 falls back to a plain placeholder block when absent. Write
- *                 `/assets/...` paths and pipe them through `asset()` if/when
- *                 real art is added (see `src/data/games.js` for the pattern).
+ *                 falls back to a plain placeholder block when absent.
+ *   Image paths are stored base-less (`/assets/sandbox/foo.png`); the card
+ *   and detail page pipe them through `asset()` so they resolve on Pages.
  */
-
-const LOREM_BODY = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-  'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-]
 
 export const crowdfundingGames = [
   {
     slug: 'blind-slight',
     title: 'Blind Slight',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
   {
     slug: 'boardwalk',
     title: 'Boardwalk',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
   {
     slug: 'game-three',
     title: 'Game Name',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
   {
     slug: 'game-four',
     title: 'Game Name',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
   {
     slug: 'game-five',
     title: 'Game Name',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
   {
     slug: 'game-six',
     title: 'Game Name',
-    categories: ['Category', 'Category'],
+    categories: [
+      'Category',
+      'Category',
+    ],
     comingSoon: true,
-    description:
-      'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: LOREM_BODY,
+    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
+    body: [
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
+    ],
   },
 ]
 

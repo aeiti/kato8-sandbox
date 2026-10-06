@@ -1,9 +1,10 @@
 /**
  * Dev-only admin panel — a Vite middleware plugin that lets you edit the
- * home-page listings (Browse / Pages / Experiments) AND the component
+ * home-page listings (Browse / Pages / Experiments), the component
  * preview library (name, slug, status, description, and — for components
- * vendored in this repo — their actual source), then push to the live
- * site from a browser UI.
+ * vendored in this repo — their actual source), AND the crowdfunding
+ * games (add / edit / delete / reorder), then push to the live site from
+ * a browser UI.
  *
  * Reachable at http://localhost:5173/__admin during `npm run dev`.
  *
@@ -18,7 +19,7 @@
  * Endpoints (all under /__admin):
  *   GET  /__admin                     → the manager UI (index.html)
  *   GET  /__admin/api/info            → { branch, isMain }
- *   GET  /__admin/api/data            → { sections, pages, experiments, components }
+ *   GET  /__admin/api/data            → { sections, pages, experiments, components, crowdfunding }
  *   PUT  /__admin/api/block/<name>    → rewrite one home-listing array
  *   POST /__admin/api/components      → rewrite previewEntries (+ slug renames)
  *   GET  /__admin/api/source?name=<n> → read one component's source file
@@ -26,13 +27,14 @@
  *   GET  /__admin/api/file?path=<p>   → read one src/pages/*.jsx page source
  *   PUT  /__admin/api/file            → write one src/pages/*.jsx page source
  *   POST /__admin/api/pages/create    → scaffold a page file + wire its route
+ *   PUT  /__admin/api/crowdfunding    → rewrite crowdfundingGames (+ SEO slug list)
  *   POST /__admin/api/upload          → save an uploaded image under public/assets/sandbox
  *   POST /__admin/api/publish         → commit + push the managed files
  *
  * Push commits ONLY the files this panel manages (home listings, the
  * preview entries + registry, vendored component source, page source under
- * src/pages, the App.jsx route table, and uploaded images under
- * public/assets/sandbox) and pushes the current branch to origin. On `main`
+ * src/pages, the App.jsx route table, the crowdfunding games data + its SEO
+ * slug list, and uploaded images under public/assets/sandbox) and pushes the current branch to origin. On `main`
  * (the normal case) that triggers the Pages deploy; on any other branch it
  * reports that you need to merge to main. It never force-pushes and never
  * touches unmanaged files.
@@ -52,6 +54,13 @@ const APP_FILE = 'src/App.jsx'
 const PAGES_DIR = 'src/pages'
 const ASSETS_DIR = 'public/assets/sandbox'
 const ENTRIES_ANCHOR = 'export const previewEntries = '
+const GAMES_FILE = 'src/data/crowdfundingGames.js'
+const GAMES_ANCHOR = 'export const crowdfundingGames = '
+// seo-config.js keeps its own literal list of game slugs (so the prerender
+// script can load it without importing the data). Rewritten alongside the
+// games so every game keeps a prerendered OG page.
+const SEO_FILE = 'src/data/seo-config.js'
+const SEO_SLUGS_ANCHOR = 'const CROWDFUNDING_SLUGS = '
 const PAGES_ANCHOR = 'export const pages = '
 
 // Insertion markers in App.jsx. A scaffolded page's `import` is spliced in
@@ -77,10 +86,12 @@ const MANAGED_PATHS = [
   APP_FILE,
   'src/components',
   PAGES_DIR,
+  GAMES_FILE,
+  SEO_FILE,
   ASSETS_DIR,
 ]
 
-const COMMIT_MESSAGE = 'Update home + components via admin panel'
+const COMMIT_MESSAGE = 'Update sandbox content via admin panel'
 const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // A page source path this panel is allowed to read/write: exactly one
 // PascalCase-ish file directly under src/pages/, no traversal.
@@ -267,6 +278,49 @@ function stripInternal(arr) {
   })
 }
 
+/** Trimmed string, or '' for null/undefined/non-strings. */
+function str(v) {
+  return typeof v === 'string' ? v.trim() : v == null ? '' : String(v).trim()
+}
+
+/**
+ * Normalize one crowdfunding game from the UI into the on-disk shape (see
+ * the doc comment in crowdfundingGames.js): required slug (derived from
+ * the title if blank), trimmed strings, blank categories/paragraphs
+ * dropped, and the optional image fields omitted when empty so the file
+ * stays tidy. Throws on an unusable record.
+ */
+function normalizeGame(g, index) {
+  if (!g || typeof g !== 'object' || Array.isArray(g)) {
+    throw new Error(`game #${index + 1} is not an object`)
+  }
+  const title = str(g.title)
+  let slug = str(g.slug).toLowerCase()
+  if (!slug) {
+    slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+  }
+  if (!SLUG.test(slug)) {
+    throw new Error(
+      `game #${index + 1}${title ? ` ("${title}")` : ''} needs a valid slug (lowercase, digits, hyphens) — got ${JSON.stringify(slug)}`
+    )
+  }
+
+  const out = {
+    slug,
+    title,
+    categories: (Array.isArray(g.categories) ? g.categories : []).map(str).filter(Boolean),
+    comingSoon: !!g.comingSoon,
+  }
+  const image = str(g.image)
+  if (image) out.image = image
+  const cover = g.coverImage && typeof g.coverImage === 'object' ? g.coverImage : null
+  const coverSrc = str(cover && cover.src)
+  if (coverSrc) out.coverImage = { src: coverSrc, alt: str(cover.alt) || title }
+  out.description = str(g.description)
+  out.body = (Array.isArray(g.body) ? g.body : []).map(str).filter(Boolean)
+  return out
+}
+
 /** Filesystem-safe image basename: lowercase, hyphen-separated. */
 function safeImageName(name, ext) {
   const stem = String(name || '')
@@ -334,6 +388,10 @@ export function devAdmin() {
               data[name] = readBlock(src, def.anchor)
             }
             data.components = await readEntries()
+            data.crowdfunding = readBlock(
+              fs.readFileSync(path.join(root, GAMES_FILE), 'utf8'),
+              GAMES_ANCHOR
+            )
             sendJson(res, 200, data)
             return
           }
@@ -588,6 +646,46 @@ export function devAdmin() {
               created: { path: normPath, title, source: sourceRel, description },
               component,
             })
+            return
+          }
+
+          // PUT /__admin/api/crowdfunding — rewrite the crowdfundingGames
+          // array (add / edit / delete / reorder) and the matching SEO slug
+          // list. Body: the full games array. Responds with the normalized
+          // games so the UI can adopt exactly what landed on disk.
+          if (req.method === 'PUT' && url === '/api/crowdfunding') {
+            const value = await readJsonBody(req)
+            if (!Array.isArray(value)) {
+              return sendJson(res, 400, { error: 'expected a JSON array of games' })
+            }
+            let games
+            try {
+              games = value.map((g, i) => normalizeGame(g, i))
+            } catch (err) {
+              return sendJson(res, 400, { error: err.message })
+            }
+            const seen = new Set()
+            for (const g of games) {
+              if (seen.has(g.slug)) {
+                return sendJson(res, 400, { error: `duplicate slug: ${g.slug}` })
+              }
+              seen.add(g.slug)
+            }
+
+            // Build both new sources before writing either, so a failed
+            // round-trip leaves both files untouched.
+            const { writeBlock } = await load()
+            const gamesPath = path.join(root, GAMES_FILE)
+            const seoPath = path.join(root, SEO_FILE)
+            const nextGames = writeBlock(fs.readFileSync(gamesPath, 'utf8'), GAMES_ANCHOR, games)
+            const nextSeo = writeBlock(
+              fs.readFileSync(seoPath, 'utf8'),
+              SEO_SLUGS_ANCHOR,
+              games.map((g) => g.slug)
+            )
+            fs.writeFileSync(gamesPath, nextGames)
+            fs.writeFileSync(seoPath, nextSeo)
+            sendJson(res, 200, { ok: true, count: games.length, games })
             return
           }
 

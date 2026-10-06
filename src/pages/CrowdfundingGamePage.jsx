@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import Seo from '../components/Seo'
 import { getCrowdfundingGameBySlug } from '../data/crowdfundingGames'
 import { crowdfundingGameRoutes } from '../data/seo-config'
+import { asset } from '../utils/asset'
 import '../styles/simple-game.css'
 
 /**
@@ -47,7 +48,7 @@ export default function CrowdfundingGamePage() {
           <div className="simple-game-cover">
             {game.coverImage ? (
               <img
-                src={game.coverImage.src}
+                src={asset(game.coverImage.src)}
                 alt={game.coverImage.alt}
                 className="simple-game-cover-image"
               />

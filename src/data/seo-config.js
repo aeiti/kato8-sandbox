@@ -116,11 +116,13 @@ export const componentRoutes = Object.fromEntries(
 
 // Per-game meta for the crowdfunding demo detail pages
 // (`/crowdfunding-games/:slug`). Slugs mirror the vendored
-// `src/data/crowdfundingGames.js`; kept in sync by hand so this file stays
-// import-light and Node-loadable by the prerender script.
+// `src/data/crowdfundingGames.js`; kept as a literal (not imported) so this
+// file stays import-light and Node-loadable by the prerender script. The dev
+// admin panel (/__admin → Crowdfunding) rewrites this array whenever it saves
+// the games, so added/renamed/deleted games keep their prerendered OG pages.
 const CROWDFUNDING_SLUGS = [
-  'game-one',
-  'game-two',
+  'blind-slight',
+  'boardwalk',
   'game-three',
   'game-four',
   'game-five',
