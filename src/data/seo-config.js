@@ -121,8 +121,8 @@ export const componentRoutes = Object.fromEntries(
 // admin panel (/__admin → Crowdfunding) rewrites this array whenever it saves
 // the games, so added/renamed/deleted games keep their prerendered OG pages.
 const CROWDFUNDING_SLUGS = [
-  'game-one',
-  'game-two',
+  'blind-slight',
+  'boardwalk',
   'game-three',
   'game-four',
   'game-five',

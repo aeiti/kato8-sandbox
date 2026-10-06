@@ -33,8 +33,8 @@
 
 export const crowdfundingGames = [
   {
-    slug: 'game-one',
-    title: 'Game Name',
+    slug: 'blind-slight',
+    title: 'Blind Slight',
     categories: [
       'Category',
       'Category',
@@ -48,8 +48,8 @@ export const crowdfundingGames = [
     ],
   },
   {
-    slug: 'game-two',
-    title: 'Game Name',
+    slug: 'boardwalk',
+    title: 'Boardwalk',
     categories: [
       'Category',
       'Category',
