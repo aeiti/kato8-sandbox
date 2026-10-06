@@ -63,8 +63,8 @@ export const crowdfundingGames = [
     ],
   },
   {
-    slug: 'game-three',
-    title: 'Game Name',
+    slug: 'dead-hour',
+    title: 'Dead Hour',
     categories: [
       'Category',
       'Category',

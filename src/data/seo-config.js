@@ -98,6 +98,16 @@ export const staticRoutes = {
     ogDescription:
       'The studio team as collector cards — Pokémon, Magic, and Yu-Gi-Oh! frames over one shared bio data source. Placeholder content.',
   },
+  '/home-usb-background': {
+    title: 'Home — USB Background | Kato.8 Sandbox',
+    description:
+      'Archived home-page look: hero over a fixed USB cover-art parallax backdrop with cleaned-up game cards.',
+    ogTitle: 'Home — USB Background — page preview',
+    ogDescription:
+      'Archived home page snapshot with the parallax USB cover-art background and cleaned-up game cards.',
+  },
+  // ADMIN:SEO-ROUTES — pages created from the dev admin panel insert their
+  // entry above this line. Keep it as the last line of staticRoutes.
 }
 
 // Per-component preview routes, derived from the registry so adding a
@@ -123,7 +133,7 @@ export const componentRoutes = Object.fromEntries(
 const CROWDFUNDING_SLUGS = [
   'blind-slight',
   'boardwalk',
-  'game-three',
+  'dead-hour',
   'game-four',
   'game-five',
   'game-six',

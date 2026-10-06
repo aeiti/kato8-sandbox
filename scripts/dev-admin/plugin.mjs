@@ -28,6 +28,7 @@
  *   PUT  /__admin/api/file            → write one src/pages/*.jsx page source
  *   POST /__admin/api/pages/create    → scaffold a page file + wire its route
  *   PUT  /__admin/api/crowdfunding    → rewrite crowdfundingGames (+ SEO slug list)
+ *   GET  /__admin/api/routes          → App.jsx page routes + where each is listed / has SEO
  *   POST /__admin/api/upload          → save an uploaded image under public/assets/sandbox
  *   POST /__admin/api/publish         → commit + push the managed files
  *
@@ -68,6 +69,9 @@ const PAGES_ANCHOR = 'export const pages = '
 // marker, so both the normal and bare (preview) renders pick it up.
 const IMPORT_MARKER = '// ADMIN:PAGE-IMPORTS'
 const ROUTE_MARKER = '{/* ADMIN:PAGE-ROUTES'
+// In seo-config.js, the last line of `staticRoutes`. A scaffolded page's
+// SEO entry is spliced in right above it so it gets a prerendered OG page.
+const SEO_MARKER = '// ADMIN:SEO-ROUTES'
 
 // Home-listing blocks — plain-data arrays edited by anchor.
 const LISTING_BLOCKS = {
@@ -201,6 +205,72 @@ function derivePage(routePath) {
     .join('')
   const component = pascal.endsWith('Page') ? pascal : pascal + 'Page'
   return { slug, component }
+}
+
+/**
+ * Splice a `staticRoutes` entry for a scaffolded page into seo-config.js,
+ * right above the SEO marker, so the page gets prerendered OG meta like
+ * every hand-built page. Throws (before any write) if the marker is missing
+ * or the path already has an entry.
+ */
+function addSeoRoute(seoSrc, { routePath, title, description }, printValue) {
+  if (seoSrc.includes(`'${routePath}': {`)) {
+    throw new Error(`${SEO_FILE} already has an entry for ${routePath}`)
+  }
+  const lines = seoSrc.split('\n')
+  const i = lines.findIndex((l) => l.includes(SEO_MARKER))
+  if (i === -1) throw new Error(`marker not found in ${SEO_FILE}: ${SEO_MARKER}`)
+  const name = title || routePath
+  const desc = description || `Sandbox preview of ${name}.`
+  const entry = {
+    title: `${name} | Kato.8 Sandbox`,
+    description: desc,
+    ogTitle: `${name} — page preview`,
+    ogDescription: desc,
+  }
+  // printValue's KEY_ORDER would put these out of the file's usual
+  // title/description/ogTitle/ogDescription order, so print by hand.
+  const q = (s) => printValue(s)
+  lines.splice(
+    i,
+    0,
+    `  '${routePath}': {`,
+    ...Object.entries(entry).map(([k, v]) => `    ${k}: ${q(v)},`),
+    '  },'
+  )
+  return lines.join('\n')
+}
+
+/**
+ * `{ path: title }` for every key of `staticRoutes` in seo-config.js, read
+ * as text (the object holds identifiers like HOME_TITLE, so it can't be
+ * evaluated in isolation). `title` is null when it isn't a string literal.
+ */
+function listSeoRoutes(seoSrc, findBlock) {
+  const { start, end } = findBlock(seoSrc, 'export const staticRoutes = ')
+  const out = {}
+  const re = /^  '([^']+)': \{\s*\n\s*title: (?:'([^']*)')?/gm
+  for (const m of seoSrc.slice(start, end).matchAll(re)) out[m[1]] = m[2] || null
+  return out
+}
+
+/**
+ * Every concrete page route in App.jsx (`<Route path="/x" element={<X />}`),
+ * with the source file its component is imported from. Skips `/` and
+ * parameterized routes (`/:slug`), which aren't standalone pages.
+ */
+function listAppRoutes(appSrc) {
+  const imports = {}
+  for (const m of appSrc.matchAll(/^import\s+(\w+)\s+from\s+'\.\/([^']+)'/gm)) {
+    imports[m[1]] = `src/${m[2]}.jsx`
+  }
+  const routes = []
+  for (const m of appSrc.matchAll(/<Route\s+path="([^"]+)"\s+element=\{<(\w+)/g)) {
+    const [, routePath, component] = m
+    if (routePath === '/' || routePath.includes(':')) continue
+    routes.push({ path: routePath, component, source: imports[component] || null })
+  }
+  return routes
 }
 
 /** Insert `line` (re-indented to match the marker) right after the first
@@ -627,18 +697,25 @@ export function devAdmin() {
               pages = [...pages, { path: normPath, title, source: sourceRel, description }]
             }
 
-            // Wire App.jsx (validates no route/component collision first).
+            // Wire App.jsx + seo-config.js (each validates no collision first).
+            const { writeBlock, printValue } = await load()
             const appPath = path.join(root, APP_FILE)
             const appSrc = fs.readFileSync(appPath, 'utf8')
             const nextApp = wireAppPage(appSrc, { component, routePath: normPath })
+            const seoPath = path.join(root, SEO_FILE)
+            const nextSeo = addSeoRoute(
+              fs.readFileSync(seoPath, 'utf8'),
+              { routePath: normPath, title, description },
+              printValue
+            )
 
-            // All validated — write pages block, source file, then App.jsx.
-            const { writeBlock } = await load()
+            // All validated — write pages block, source file, App.jsx, SEO.
             const homePath = path.join(root, HOME_FILE)
             const homeSrc = fs.readFileSync(homePath, 'utf8')
             fs.writeFileSync(homePath, writeBlock(homeSrc, PAGES_ANCHOR, pages))
             fs.writeFileSync(abs, scaffoldPage({ component, routePath: normPath, title, description }))
             fs.writeFileSync(appPath, nextApp)
+            fs.writeFileSync(seoPath, nextSeo)
 
             sendJson(res, 200, {
               ok: true,
@@ -646,6 +723,34 @@ export function devAdmin() {
               created: { path: normPath, title, source: sourceRel, description },
               component,
             })
+            return
+          }
+
+          // GET /__admin/api/routes — route discovery. Every page route in
+          // App.jsx, which home listing(s) it appears in, and whether it has
+          // a staticRoutes SEO entry, so the panel can flag pages that were
+          // added in code but never listed (or never given OG meta).
+          if (req.method === 'GET' && url === '/api/routes') {
+            const { readBlock, findBlock } = await load()
+            const homeSrc = fs.readFileSync(path.join(root, HOME_FILE), 'utf8')
+            const listed = {}
+            for (const name of Object.keys(LISTING_BLOCKS)) {
+              for (const e of readBlock(homeSrc, LISTING_BLOCKS[name].anchor)) {
+                ;(listed[e.path] ||= []).push(name)
+              }
+            }
+            // Read from disk (not ssrLoadModule, whose cache lags a write
+            // made a moment earlier, e.g. right after "Create file & route").
+            const seo = listSeoRoutes(fs.readFileSync(path.join(root, SEO_FILE), 'utf8'), findBlock)
+            const routes = listAppRoutes(
+              fs.readFileSync(path.join(root, APP_FILE), 'utf8')
+            ).map((r) => ({
+              ...r,
+              listedIn: listed[r.path] || [],
+              hasSeo: r.path in seo,
+              seoTitle: seo[r.path] || null,
+            }))
+            sendJson(res, 200, { routes })
             return
           }
 

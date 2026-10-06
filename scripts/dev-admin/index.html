@@ -310,6 +310,22 @@
       background: #f0f0f5 center / cover no-repeat;
     }
     .image-thumb.is-cover { width: 34px; height: 46px; }
+
+    /* Route check — App.jsx routes missing a listing or SEO entry */
+    .route-check {
+      background: #fff8ea;
+      border: 1px solid #f0d9a8;
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 18px;
+      font-size: 0.86rem;
+    }
+    .route-check summary { cursor: pointer; font-weight: 600; color: #8a5b12; }
+    .route-check ul { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+    .route-check li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .route-check code { font-family: var(--mono); font-size: 0.8rem; }
+    .route-check .issue { color: var(--muted); }
+    .route-check .spacer { flex: 1; }
   </style>
 </head>
 <body>
@@ -351,6 +367,21 @@
       { key: 'crowdfunding', title: 'Crowdfunding', kind: 'game',                         noun: 'game',
         viewUrl: '/crowdfunding-games' },
     ]
+
+    // Pages whose content is edited somewhere other than their JSX: listing
+    // rows for these paths get an "Edit content →" link. Every tab with a
+    // `viewUrl` is registered automatically, so a new data tab is linked
+    // from its page's listing without another edit here; separate panels
+    // (like /__bios) are listed explicitly.
+    const CONTENT_EDITORS = {
+      ...Object.fromEntries(
+        BLOCKS.filter((b) => b.viewUrl).map((b) => [b.viewUrl, { label: b.title + ' tab', href: '#/' + b.key }])
+      ),
+      '/studio-bios': { label: 'Studio Bios panel', href: '/__bios' },
+    }
+
+    // App.jsx routes from /api/routes, for the route check banner.
+    let routes = []
 
     // state[key] = current (possibly edited) array; saved[key] = last-saved baseline
     let state = {}
@@ -398,6 +429,87 @@
       state = clone(data)
       saved = clone(data)
       render()
+      loadRoutes()
+    }
+
+    async function loadRoutes() {
+      try {
+        const res = await fetch('/__admin/api/routes')
+        if (!res.ok) return
+        routes = (await res.json()).routes || []
+        render()
+      } catch { /* banner is advisory — skip on failure */ }
+    }
+
+    // Routes that would otherwise slip through: not on any home listing
+    // (unreachable from the sandbox index) or without an SEO entry (no
+    // prerendered OG page). Listing status uses the in-memory state, so an
+    // unsaved "Add to Pages" clears it immediately.
+    function routeIssues() {
+      const listed = new Set()
+      for (const key of ['sections', 'pages', 'experiments']) {
+        for (const e of state[key] || []) listed.add(e.path)
+      }
+      return routes
+        .map((r) => ({ ...r, unlisted: !listed.has(r.path), noSeo: !r.hasSeo }))
+        .filter((r) => r.unlisted || r.noSeo)
+    }
+
+    function renderRouteCheck() {
+      const issues = routeIssues()
+      if (!issues.length) return null
+      const box = document.createElement('details')
+      box.className = 'route-check'
+      box.open = true
+      const sum = document.createElement('summary')
+      sum.textContent = issues.length + ' page route' + (issues.length === 1 ? '' : 's') + ' in App.jsx need attention'
+      box.appendChild(sum)
+      const ul = document.createElement('ul')
+      for (const r of issues) {
+        const li = document.createElement('li')
+        const code = document.createElement('code')
+        code.textContent = r.path
+        const what = document.createElement('span')
+        what.className = 'issue'
+        what.textContent = [
+          r.unlisted && 'not on any home listing',
+          r.noSeo && 'no SEO entry in src/data/seo-config.js (no link-preview page)',
+        ].filter(Boolean).join(' · ')
+        li.appendChild(code)
+        li.appendChild(what)
+        li.appendChild(document.createElement('span')).className = 'spacer'
+        if (r.unlisted) {
+          const add = document.createElement('button')
+          add.className = 'btn btn--sm'
+          add.textContent = '+ Add to Pages'
+          add.onclick = () => {
+            const title = (r.seoTitle || '').replace(/\s*\|\s*Kato\.8 Sandbox$/, '') ||
+              r.component.replace(/Page$/, '').replace(/([a-z])([A-Z])/g, '$1 $2')
+            const entry = { path: r.path, title, description: '' }
+            if (r.source && /^src\/pages\//.test(r.source)) entry.source = r.source
+            state.pages = [...(state.pages || []), entry]
+            location.hash = '#/pages'
+            render()
+            toast('Added ' + r.path + ' to Pages — fill in a description, then Save Pages.', 'ok')
+          }
+          li.appendChild(add)
+        }
+        ul.appendChild(li)
+      }
+      box.appendChild(ul)
+      return box
+    }
+
+    // "Edit content →" link for a listing row whose page has its own editor.
+    function contentEditorLink(itemPath) {
+      const ed = CONTENT_EDITORS[itemPath]
+      if (!ed) return null
+      const a = document.createElement('a')
+      a.className = 'btn btn--sm'
+      a.href = ed.href
+      a.textContent = 'Edit content →'
+      a.title = 'Edit this page’s content in the ' + ed.label
+      return a
     }
 
     function makeEntry(def) {
@@ -445,6 +557,8 @@
       renderTabs()
       const def = BLOCKS.find((b) => b.key === currentKey())
       app.innerHTML = ''
+      const check = renderRouteCheck()
+      if (check) app.appendChild(check)
       app.appendChild(renderBlock(def))
     }
 
@@ -534,6 +648,8 @@
         side.appendChild(activeToggle(item, () => { markDirty(def.key); render() }))
       }
       side.appendChild(rowControls(def, items, index))
+      const edit = contentEditorLink(item.path)
+      if (edit) side.appendChild(edit)
       el.appendChild(side)
       return el
     }
@@ -569,6 +685,8 @@
       const side = document.createElement('div')
       side.className = 'entry__side'
       side.appendChild(rowControls(def, items, index))
+      const edit = contentEditorLink(item.path)
+      if (edit) side.appendChild(edit)
       el.appendChild(side)
 
       el.appendChild(item.source ? pageSourcePanel(item) : pageCreatePanel(def, item, index))
@@ -620,6 +738,7 @@
         state.pages = clone(body.pages)
         saved.pages = clone(body.pages)
         render()
+        loadRoutes()
         toast('Created ' + body.component + ' (' + body.created.source + ') and wired its route.', 'ok')
       } catch (err) {
         toast('Create failed: ' + err.message, 'err')
