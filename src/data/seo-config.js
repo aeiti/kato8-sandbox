@@ -133,8 +133,8 @@ export const componentRoutes = Object.fromEntries(
 const CROWDFUNDING_SLUGS = [
   'blind-slight',
   'boardwalk',
+  'hollowbrook-apothecary',
   'dead-hour',
-  'game-four',
   'game-five',
   'game-six',
 ]

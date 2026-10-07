@@ -63,13 +63,18 @@ export const crowdfundingGames = [
     ],
   },
   {
-    slug: 'dead-hour',
-    title: 'Dead Hour',
+    slug: 'hollowbrook-apothecary',
+    title: 'Hollowbrook Apothecary',
     categories: [
       'Category',
       'Category',
     ],
     comingSoon: true,
+    image: '/assets/sandbox/2-garden-afternoon.png',
+    coverImage: {
+      src: '/assets/sandbox/cover-1.png',
+      alt: 'Dead Hour',
+    },
     description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
     body: [
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
@@ -78,13 +83,18 @@ export const crowdfundingGames = [
     ],
   },
   {
-    slug: 'game-four',
-    title: 'Game Name',
+    slug: 'dead-hour',
+    title: 'Dead Hour',
     categories: [
       'Category',
       'Category',
     ],
     comingSoon: true,
+    image: '/assets/sandbox/deadhour-01-horde.png',
+    coverImage: {
+      src: '/assets/sandbox/deadhour-cover-630x500.png',
+      alt: 'Dead Hour',
+    },
     description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
     body: [
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
