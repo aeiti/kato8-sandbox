@@ -5,8 +5,8 @@ import '../styles/investors.css'
 
 /**
  * Investor page prototype (PROCESS.md §1b — new page, not yet on
- * external-site `main`). A short investor-relations hero followed by the
- * `InvestorRequestForm`. The proposed "Investors" tab that links here
+ * external-site `main`). A short hero for investors and publishers
+ * followed by the `InvestorRequestForm` contact form. The proposed "Investors" tab that links here
  * lives in the sandbox's vendored nav (SandboxNav / SandboxMobileMenu).
  *
  * Nav + Footer chrome come from App.jsx, so this renders only the page
@@ -24,7 +24,7 @@ const HIGHLIGHTS = [
   },
   {
     title: 'Early and hands-on',
-    body: 'Come in at the ground floor and shape where Kato.8 goes next, with direct access to the team.',
+    body: 'Partner with us early and help shape where Kato.8 goes next, with direct access to the team.',
   },
 ]
 
@@ -34,13 +34,13 @@ export default function InvestorsPage() {
       <Seo path="/investors" {...staticRoutes['/investors']} />
 
       <header className="investors-hero">
-        <p className="investors-hero_eyebrow">Investor Relations</p>
-        <h1 className="investors-hero_title">Invest in Kato.8</h1>
+        <p className="investors-hero_eyebrow">Investors &amp; Publishers</p>
+        <h1 className="investors-hero_title">Partner with Kato.8</h1>
         <p className="investors-hero_lead">
           Kato.8 is an independent game studio building original titles and the
-          community around them. We’re opening early conversations with people
-          who want to back that journey. Request our investor materials below and
-          we’ll be in touch.
+          community around them. We’re opening early conversations with investors
+          who want to back that journey and publishers who want to help bring our
+          games to more players. Get in touch below and we’ll follow up.
         </p>
       </header>
 
