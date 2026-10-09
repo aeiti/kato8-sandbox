@@ -42,11 +42,21 @@
   gap: 0.5rem 1.5rem;
 }
 
+/*
+ * The shared `.signup-form__checkbox` top-aligns its control (and nudges
+ * it down 0.15rem) so it lines up with the first line of multi-line
+ * consent text. These labels are a single word, so center the radio on
+ * the text instead.
+ */
+.investor-request-form__options .signup-form__checkbox {
+  align-items: center;
+}
+
 .investor-request-form__options input[type="radio"] {
   flex-shrink: 0;
   width: 1.1rem;
   height: 1.1rem;
-  margin: 0.15rem 0 0;
+  margin: 0;
   accent-color: var(--squid-pink);
 }
 
