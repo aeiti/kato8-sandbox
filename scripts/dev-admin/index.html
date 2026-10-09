@@ -1001,6 +1001,9 @@
         item.coverImage = { ...(item.coverImage || {}), src: v }
         dirty()
       }))
+      const itch = textField('itch.io page URL', item.itchUrl, (v) => { item.itchUrl = v; dirty() })
+      itch.querySelector('input').placeholder = 'https://terrytkato8.itch.io/…'
+      fields.appendChild(itch)
 
       const desc = textArea('Card description', item.description, (v) => { item.description = v; dirty() })
       desc.classList.add('field--wide')

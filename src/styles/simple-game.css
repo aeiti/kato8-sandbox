@@ -129,6 +129,13 @@
   margin-bottom: 0;
 }
 
+/* Sandbox addition: external link row (e.g. itch.io) under the description. */
+.simple-game-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
 @media screen and (max-width: 1199px) {
   .simple-game-hero {
           padding-inline: 80px;
