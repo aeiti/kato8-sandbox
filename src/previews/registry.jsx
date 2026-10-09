@@ -18,6 +18,7 @@ import OurStoryTimeline from '../components/OurStoryTimeline'
 // Vendored investor-page prototypes (not on main yet — see PROCESS §1b):
 // a request form plus the Nav / MobileMenu copies that add the Investors tab.
 import InvestorRequestForm from '../components/InvestorRequestForm'
+import RadioGroupPreview from './RadioGroupPreview'
 import SandboxNav from '../components/SandboxNav'
 import SandboxMobileMenu from '../components/SandboxMobileMenu'
 // Studio-bio collector cards: three CSS-drawn frames over one shared
@@ -72,6 +73,7 @@ const renderers = {
   ),
   'our-story-timeline':   () => <OurStoryTimeline />,
   'investor-request-form': () => <InvestorRequestForm source="sandbox" />,
+  'radio-group':          () => <RadioGroupPreview />,
   'sandbox-nav':          () => <SandboxNav />,
   'sandbox-mobile-menu':  () => <SandboxMobileMenu open onClose={() => {}} />,
   'bio-cards':            () => {
