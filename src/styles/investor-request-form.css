@@ -18,39 +18,3 @@
 .investor-request-form .button:active {
   box-shadow: 0 0 0 2px var(--text-primary) inset;
 }
-
-/*
- * Investor / publisher radio group. The shared stylesheet covers
- * checkboxes but not a fieldset, so strip the browser's fieldset chrome,
- * lay the two options out in a row, and give the radios the same pink
- * accent as the shared checkbox.
- */
-.investor-request-form__type {
-  border: 0;
-  margin: 0;
-  padding: 0;
-  min-width: 0;
-}
-
-.investor-request-form__type legend {
-  padding: 0;
-}
-
-.investor-request-form__options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-}
-
-.investor-request-form__options input[type="radio"] {
-  flex-shrink: 0;
-  width: 1.1rem;
-  height: 1.1rem;
-  margin: 0.15rem 0 0;
-  accent-color: var(--squid-pink);
-}
-
-.investor-request-form__type:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}

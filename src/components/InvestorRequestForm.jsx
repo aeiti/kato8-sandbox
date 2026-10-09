@@ -1,5 +1,11 @@
 import { useState } from 'react'
+import RadioGroup from './RadioGroup'
 import '../styles/investor-request-form.css'
+
+const TYPE_OPTIONS = [
+  { value: 'investor', label: 'Investor' },
+  { value: 'publisher', label: 'Publisher' },
+]
 
 /**
  * Investor / publisher contact form for the sandbox investor page.
@@ -188,34 +194,15 @@ export default function InvestorRequestForm({
           />
         </label>
 
-        <fieldset className="signup-form__field investor-request-form__type" disabled={status === 'submitting'}>
-          <legend className="signup-form__label">
-            I’m reaching out as<span className="signup-form__required" aria-hidden="true">*</span>
-          </legend>
-          <div className="investor-request-form__options">
-            <label className="signup-form__checkbox">
-              <input
-                type="radio"
-                name="type"
-                value="investor"
-                required
-                checked={type === 'investor'}
-                onChange={(event) => setType(event.target.value)}
-              />
-              Investor
-            </label>
-            <label className="signup-form__checkbox">
-              <input
-                type="radio"
-                name="type"
-                value="publisher"
-                checked={type === 'publisher'}
-                onChange={(event) => setType(event.target.value)}
-              />
-              Publisher
-            </label>
-          </div>
-        </fieldset>
+        <RadioGroup
+          name="type"
+          legend="I’m reaching out as"
+          options={TYPE_OPTIONS}
+          value={type}
+          onChange={setType}
+          required
+          disabled={status === 'submitting'}
+        />
 
         <label className="signup-form__field">
           <span className="signup-form__label">
