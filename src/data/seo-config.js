@@ -133,9 +133,9 @@ export const componentRoutes = Object.fromEntries(
 const CROWDFUNDING_SLUGS = [
   'dead-hour',
   'hollowbrook-apothecary',
+  'hotdog-hustler',
   'boardwalk',
   'blind-slight',
-  'game-five',
   'game-six',
 ]
 

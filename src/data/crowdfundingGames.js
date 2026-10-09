@@ -59,7 +59,7 @@ export const crowdfundingGames = [
       'Cozy',
       'Simulation',
     ],
-    comingSoon: true,
+    comingSoon: false,
     image: '/assets/sandbox/2-garden-afternoon.png',
     coverImage: {
       src: '/assets/sandbox/cover-1.png',
@@ -70,6 +70,21 @@ export const crowdfundingGames = [
       'Your grandmother left you a cabin, a cauldron, and a recipe book with only three pages written. The rest is up to you. Combine ingredients, adjust the heat, stir, and watch what happens. Every brew is built from six essences (Ember, Tide, Root, Gale, Lumen, and Umbra), and every failure tells you something: too heavy on Ember, or it refuses to bind. Recipes you work out yourself brew better than any you can buy.',
       'Between brews, tend your ingredient beds, forage rare plants in Whisper Wood, and make the rounds of the village market, library, and deed office. Fill orders from the bulletin board, then grow the business with a glasshouse, a meadow, and the Brewworks.',
       'Ten potions across three tiers, with the top tier calling for finished potions as ingredients. Your journal remembers every combination you have tried, progressive hints and a Guided mode are there when you want them, and there are no fail states, so there is no wrong way to play.',
+    ],
+  },
+  {
+    slug: 'hotdog-hustler',
+    title: 'Hotdog Hustler',
+    categories: [
+      'Simulation',
+      'Casual',
+    ],
+    comingSoon: false,
+    description: 'Toast the buns, grill the dogs, and pile on exactly what each customer asked for before their patience runs out. A fast-paced hot dog cart sim on a cherry-blossom street.',
+    body: [
+      'Customers line up at your cart, place their orders, and start losing patience. Toast the bun before it burns, pull the sausage off the grill inside the safe window, add exactly the toppings they asked for, and hand it over before they walk off. Get a topping wrong and you lose half the order. Leave one off and you only lose what that topping is worth.',
+      'Play in two modes, each with its own art style and controls. In side view you control a chef on foot, walking between the bun bag, toaster, cooler, grill, and plate, then carrying each finished dog to the pick-up ledge. Cook’s view puts you behind the cart at night under neon, where you click to start the grill, drag food onto the plate, and swipe toppings across the dog.',
+      'Your earnings go back into the business. Unlock better toppings from 24 across three quality tiers to raise your prices, buy five equipment upgrades, and save toward a food truck. Every shift ends with a receipt showing your star rating, order log, mistakes, and tip. Your progress saves automatically in the browser.',
     ],
   },
   {
@@ -90,21 +105,6 @@ export const crowdfundingGames = [
   {
     slug: 'blind-slight',
     title: 'Blind Slight',
-    categories: [
-      'Category',
-      'Category',
-    ],
-    comingSoon: true,
-    description: 'Short game description here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt.',
-    body: [
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-      'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-      'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
-    ],
-  },
-  {
-    slug: 'game-five',
-    title: 'Game Name',
     categories: [
       'Category',
       'Category',
