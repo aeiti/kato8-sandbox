@@ -159,7 +159,7 @@ export const previewEntries = [
     category: 'Forms',
     source: 'src/components/InvestorRequestForm.jsx',
     styles: 'src/styles/investor-request-form.css',
-    description: 'Investor-relations request form (name, email, company, investment range, message). Reuses the shared signup-form styling; no network call when VITE_INVESTOR_ENDPOINT is unset. New in the sandbox, not yet on main.',
+    description: 'Investor / publisher contact form (name, email, optional phone, investor-or-publisher type, company / firm, details). Reuses the shared signup-form styling; no network call when VITE_INVESTOR_ENDPOINT is unset. New in the sandbox, not yet on main.',
   },
   {
     name: 'sandbox-nav',
