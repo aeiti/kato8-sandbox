@@ -169,6 +169,21 @@ The deploy is driven by `.github/workflows/deploy.yml`, which checks out both th
 
 For work-in-progress that isn't ready to share yet, push to a branch instead of `main` — the workflow only fires on `main`. Screenshot or screen-record if you need to share before merging.
 
+### Link previews (Discord / Slack / X)
+
+Every route in `src/data/seo-config.js` gets a prerendered HTML file with its own title, description, and preview image. The image is a 1200×630 screenshot of the page itself, from `public/assets/og/`:
+
+```bash
+npm run og:capture                                   # every route
+npm run og:capture -- /investors /components/nav     # just these
+```
+
+The script (`scripts/capture-og.mjs`) runs its own dev server and drives your installed Google Chrome. Pages are shot without the sandbox chrome (`?bare=1`). Component previews are cropped to the component and centered. It rewrites `src/data/og-images.js`; commit that file along with the images. The deploy doesn't capture anything, so **rerun it for any page whose look you changed**, and for new pages. A route with no screenshot falls back to the small square studio logo.
+
+To use a specific image instead (e.g. key art), set `ogImage: '/assets/…'` on the route's entry in `seo-config.js`. That takes priority over the screenshot, and it's the same field external-site uses, so it carries over when the page graduates.
+
+Discord and Slack cache previews per URL, so a link shared before an update can keep showing the old preview for a while.
+
 ## 5. Graduating an experiment to production
 
 When a design is approved and ready to ship:

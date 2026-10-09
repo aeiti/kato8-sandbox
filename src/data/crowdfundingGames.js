@@ -62,7 +62,7 @@ export const crowdfundingGames = [
       'Cozy',
       'Simulation',
     ],
-    comingSoon: true,
+    comingSoon: false,
     image: '/assets/sandbox/2-garden-afternoon.png',
     coverImage: {
       src: '/assets/sandbox/cover-1.png',
@@ -80,21 +80,21 @@ export const crowdfundingGames = [
     slug: 'hotdog-hustler',
     title: 'Hotdog Hustler',
     categories: [
-      'Casual',
       'Simulation',
+      'Casual',
     ],
-    comingSoon: true,
+    comingSoon: false,
     itchUrl: 'https://terrytkato8.itch.io/hotdog-hustler',
-    description: 'Run a hot dog cart on a cherry-blossom street. Toast, grill, top, and serve before your customers run out of patience, then save up for a food truck.',
+    description: 'Toast the buns, grill the dogs, and pile on exactly what each customer asked for before their patience runs out. A fast-paced hot dog cart sim on a cherry-blossom street.',
     body: [
-      'You run a hot dog cart on a cherry-blossom street, and the line never stops. Toast the bun, pull the sausage off the grill at just the right moment, add the toppings each customer asked for, and get it into their hands before they give up and walk away. Leave something on the grill too long and it burns.',
-      'Every customer is watching two clocks: how long they have stood in line, and how long they have waited since ordering. The hand-drawn regulars wear their moods on their faces as the wait drags on. Play in side view, walking the chef around the cart, or switch to the cook\'s view and work the grill with mouse or touch.',
-      'Earnings go back into the business: 24 toppings across three quality tiers, five equipment upgrades, and a food truck to save up for. Each day ends with a receipt showing your star rating, orders, mistakes, and tip, and your progress saves automatically in the browser.',
+      'Customers line up at your cart, place their orders, and start losing patience. Toast the bun before it burns, pull the sausage off the grill inside the safe window, add exactly the toppings they asked for, and hand it over before they walk off. Get a topping wrong and you lose half the order. Leave one off and you only lose what that topping is worth.',
+      'Play in two modes, each with its own art style and controls. In side view you control a chef on foot, walking between the bun bag, toaster, cooler, grill, and plate, then carrying each finished dog to the pick-up ledge. Cook’s view puts you behind the cart at night under neon, where you click to start the grill, drag food onto the plate, and swipe toppings across the dog.',
+      'Your earnings go back into the business. Unlock better toppings from 24 across three quality tiers to raise your prices, buy five equipment upgrades, and save toward a food truck. Every shift ends with a receipt showing your star rating, order log, mistakes, and tip. Your progress saves automatically in the browser.',
     ],
   },
   {
-    slug: 'blind-slight',
-    title: 'Blind Slight',
+    slug: 'boardwalk',
+    title: 'Boardwalk',
     categories: [
       'Category',
       'Category',
@@ -108,8 +108,8 @@ export const crowdfundingGames = [
     ],
   },
   {
-    slug: 'game-five',
-    title: 'Game Name',
+    slug: 'blind-slight',
+    title: 'Blind Slight',
     categories: [
       'Category',
       'Category',

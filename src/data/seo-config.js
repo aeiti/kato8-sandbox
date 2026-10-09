@@ -11,16 +11,39 @@
  * mental model transfers between the two repos.
  *
  * SITE.url should include the Pages subpath — canonical URLs are built
- * by concatenating `${SITE.url}${pathname}`.
+ * by `canonicalUrl()`, which appends the pathname with a trailing slash
+ * (GitHub Pages 301-redirects `/route` to `/route/`).
+ *
+ * Preview images: `scripts/capture-og.mjs` (`npm run og:capture`)
+ * screenshots every prerendered route at 1200×630 into
+ * `public/assets/og/` and records them in `og-images.js`. `ogImageFor()`
+ * picks a route's screenshot up from there; a route with no screenshot
+ * yet falls back to `SITE.defaultImage` with a small `summary` card.
  */
 
 import { previewEntries } from '../previews/entries.js'
+import { crowdfundingGames } from './crowdfundingGames.js'
+import { ogImages } from './og-images.js'
 
 export const SITE = {
   url: 'https://aeiti.github.io/kato8-sandbox',
   name: 'Kato.8 Sandbox',
   defaultImage: '/assets/img/kato-webclip.png',
   twitterCard: 'summary_large_image',
+  // Size of the captured screenshots (scripts/capture-og.mjs).
+  ogImageWidth: 1200,
+  ogImageHeight: 630,
+}
+
+export function canonicalUrl(pathname) {
+  const p = pathname.endsWith('/') ? pathname : `${pathname}/`
+  return `${SITE.url}${p}`
+}
+
+// The route's captured screenshot, or null when it hasn't been captured.
+export function ogImageFor(pathname) {
+  const key = pathname !== '/' ? pathname.replace(/\/$/, '') : pathname
+  return ogImages[key] || null
 }
 
 const HOME_TITLE = 'Kato.8 Sandbox'
@@ -77,10 +100,10 @@ export const staticRoutes = {
   '/investors': {
     title: 'Investors | Kato.8 Sandbox',
     description:
-      'Prototype investor page for Kato.8 — an investor-relations hero plus a request form for investor materials. Adds an "Investors" nav tab. WIP preview.',
+      'Prototype investor / publisher page for Kato.8 — a partnership hero plus a contact form for investors and publishers. Adds an "Investors" nav tab. WIP preview.',
     ogTitle: 'Investors — page prototype',
     ogDescription:
-      'Prototype investor page: investor-relations hero + request form, with a new Investors nav tab.',
+      'Prototype investor / publisher page: partnership hero + contact form, with a new Investors nav tab.',
   },
   '/crowdfunding-games': {
     title: 'Crowdfunding Games | Kato.8 Sandbox',
@@ -125,32 +148,38 @@ export const componentRoutes = Object.fromEntries(
 )
 
 // Per-game meta for the crowdfunding demo detail pages
-// (`/crowdfunding-games/:slug`). Slugs mirror the vendored
-// `src/data/crowdfundingGames.js`; kept as a literal (not imported) so this
-// file stays import-light and Node-loadable by the prerender script. The dev
-// admin panel (/__admin → Crowdfunding) rewrites this array whenever it saves
-// the games, so added/renamed/deleted games keep their prerendered OG pages.
+// (`/crowdfunding-games/:slug`). The dev admin panel (/__admin →
+// Crowdfunding) rewrites this slug list whenever it saves the games, so
+// added/renamed/deleted games keep their prerendered OG pages. Title and
+// description come from the game's own entry in crowdfundingGames.js
+// (import-free, so still Node-loadable by the prerender script), falling
+// back to generic copy for a slug with no matching game.
 const CROWDFUNDING_SLUGS = [
   'dead-hour',
   'hollowbrook-apothecary',
+  'hotdog-hustler',
   'boardwalk',
   'blind-slight',
-  'game-five',
   'game-six',
 ]
 
 export const crowdfundingGameRoutes = Object.fromEntries(
-  CROWDFUNDING_SLUGS.map((slug) => [
-    slug,
-    {
-      title: 'Crowdfunding Game | Kato.8 Sandbox',
-      description:
-        'Preview of a crowdfunding demo game detail page — cover, title, tags, and description. Placeholder content.',
-      ogTitle: 'Crowdfunding Game — page preview',
-      ogDescription:
-        'Preview of a crowdfunding demo game detail page. Placeholder content.',
-    },
-  ]),
+  CROWDFUNDING_SLUGS.map((slug) => {
+    const game = crowdfundingGames.find((g) => g.slug === slug)
+    const name = game?.title || 'Crowdfunding Game'
+    const description =
+      game?.description ||
+      'Preview of a crowdfunding demo game detail page — cover, title, tags, and description. Placeholder content.'
+    return [
+      slug,
+      {
+        title: `${name} | Kato.8 Sandbox`,
+        description,
+        ogTitle: `${name} — crowdfunding game preview`,
+        ogDescription: description,
+      },
+    ]
+  }),
 )
 
 export const NOT_FOUND_META = {

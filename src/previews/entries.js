@@ -159,7 +159,16 @@ export const previewEntries = [
     category: 'Forms',
     source: 'src/components/InvestorRequestForm.jsx',
     styles: 'src/styles/investor-request-form.css',
-    description: 'Investor-relations request form (name, email, company, investment range, message). Reuses the shared signup-form styling; no network call when VITE_INVESTOR_ENDPOINT is unset. New in the sandbox, not yet on main.',
+    description: 'Investor / publisher contact form (name, email, optional phone, investor-or-publisher type, company / firm, details). Reuses the shared signup-form styling; no network call when VITE_INVESTOR_ENDPOINT is unset. New in the sandbox, not yet on main.',
+  },
+  {
+    name: 'radio-group',
+    label: 'RadioGroup',
+    status: 'vendored',
+    category: 'Forms',
+    source: 'src/components/RadioGroup.jsx',
+    styles: 'src/styles/radio-group.css',
+    description: 'Single-choice group of short options (fieldset + legend, radios centered on one-line labels). Separate from the consent checkbox. Used by InvestorRequestForm for investor / publisher. New in the sandbox, not yet on main.',
   },
   {
     name: 'sandbox-nav',

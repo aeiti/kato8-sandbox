@@ -1,8 +1,14 @@
 import { useState } from 'react'
+import RadioGroup from './RadioGroup'
 import '../styles/investor-request-form.css'
 
+const TYPE_OPTIONS = [
+  { value: 'investor', label: 'Investor' },
+  { value: 'publisher', label: 'Publisher' },
+]
+
 /**
- * Investor-relations request form for the sandbox investor page.
+ * Investor / publisher contact form for the sandbox investor page.
  *
  * Self-contained: validation, submission, idle / submitting / success /
  * error states, honeypot for basic bot filtering. Modeled on the main
@@ -15,11 +21,13 @@ import '../styles/investor-request-form.css'
  * PROCESS.md §1b). Graduate it by copying this component + wiring a real
  * endpoint into external-site.
  *
- * Posts `{ name, email, company, investmentRange, message, source }` to
+ * Posts `{ name, email, phone, type, company, details, source }` to
  * `VITE_INVESTOR_ENDPOINT` (typically a Formspree URL). If that env var
  * is unset the submit resolves successfully with no network call, so the
  * form is usable in the sandbox before a backend exists — same
- * convention as `NewsletterSignup` / `PlaytestSignupForm`.
+ * convention as `NewsletterSignup` / `PlaytestSignupForm`. `type` is
+ * `'investor'` or `'publisher'`; `phone` is the only optional field and
+ * is sent as an empty string when left blank.
  *
  * Props:
  *   - source?: string — identifier for where the form lives, sent with
@@ -29,14 +37,15 @@ import '../styles/investor-request-form.css'
  */
 export default function InvestorRequestForm({
   source = 'investors-page',
-  heading = 'Request investor information',
-  description = 'Tell us a little about yourself and we’ll follow up with our investor materials.',
+  heading = 'Get in touch',
+  description = 'Investors and publishers — tell us a little about yourself and we’ll follow up.',
 }) {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [type, setType] = useState('') // investor | publisher
   const [company, setCompany] = useState('')
-  const [investmentRange, setInvestmentRange] = useState('')
-  const [message, setMessage] = useState('')
+  const [details, setDetails] = useState('')
   const [website, setWebsite] = useState('') // honeypot
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
   const [errorMessage, setErrorMessage] = useState('')
@@ -60,9 +69,19 @@ export default function InvestorRequestForm({
       setErrorMessage('Please enter a valid email address.')
       return
     }
-    if (!message.trim()) {
+    if (type !== 'investor' && type !== 'publisher') {
       setStatus('error')
-      setErrorMessage('Please add a short message.')
+      setErrorMessage('Please choose investor or publisher.')
+      return
+    }
+    if (!company.trim()) {
+      setStatus('error')
+      setErrorMessage('Please enter your company or firm.')
+      return
+    }
+    if (!details.trim()) {
+      setStatus('error')
+      setErrorMessage('Please add some details.')
       return
     }
 
@@ -81,9 +100,10 @@ export default function InvestorRequestForm({
           body: JSON.stringify({
             name: name.trim(),
             email: trimmedEmail,
+            phone: phone.trim(),
+            type,
             company: company.trim(),
-            investmentRange,
-            message: message.trim(),
+            details: details.trim(),
             source,
           }),
         })
@@ -94,9 +114,10 @@ export default function InvestorRequestForm({
       setStatus('success')
       setName('')
       setEmail('')
+      setPhone('')
+      setType('')
       setCompany('')
-      setInvestmentRange('')
-      setMessage('')
+      setDetails('')
     } catch (error) {
       setStatus('error')
       setErrorMessage('Something went wrong. Please try again.')
@@ -107,7 +128,7 @@ export default function InvestorRequestForm({
     return (
       <section className="signup-form signup-form--success investor-request-form" aria-live="polite">
         <p className="signup-form__success">
-          Thanks for reaching out — we’ll be in touch with our investor materials.
+          Thanks for reaching out — we’ll be in touch soon.
         </p>
       </section>
     )
@@ -162,10 +183,35 @@ export default function InvestorRequestForm({
         </label>
 
         <label className="signup-form__field">
-          <span className="signup-form__label">Company / fund</span>
+          <span className="signup-form__label">Phone (optional)</span>
+          <input
+            type="tel"
+            name="phone"
+            autoComplete="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            disabled={status === 'submitting'}
+          />
+        </label>
+
+        <RadioGroup
+          name="type"
+          legend="I’m reaching out as"
+          options={TYPE_OPTIONS}
+          value={type}
+          onChange={setType}
+          required
+          disabled={status === 'submitting'}
+        />
+
+        <label className="signup-form__field">
+          <span className="signup-form__label">
+            Company / firm<span className="signup-form__required" aria-hidden="true">*</span>
+          </span>
           <input
             type="text"
             name="company"
+            required
             autoComplete="organization"
             value={company}
             onChange={(event) => setCompany(event.target.value)}
@@ -174,37 +220,21 @@ export default function InvestorRequestForm({
         </label>
 
         <label className="signup-form__field">
-          <span className="signup-form__label">Investment range</span>
-          <select
-            name="investmentRange"
-            value={investmentRange}
-            onChange={(event) => setInvestmentRange(event.target.value)}
-            disabled={status === 'submitting'}
-          >
-            <option value="">Prefer not to say</option>
-            <option value="under-10k">Under $10k</option>
-            <option value="10k-50k">$10k – $50k</option>
-            <option value="50k-250k">$50k – $250k</option>
-            <option value="250k-plus">$250k+</option>
-          </select>
-        </label>
-
-        <label className="signup-form__field">
           <span className="signup-form__label">
-            Message<span className="signup-form__required" aria-hidden="true">*</span>
+            Details / comments<span className="signup-form__required" aria-hidden="true">*</span>
           </span>
           <textarea
-            name="message"
+            name="details"
             required
-            placeholder="Tell us about your interest in Kato.8."
-            value={message}
-            onChange={(event) => setMessage(event.target.value)}
+            placeholder="Tell us what you’d like to discuss."
+            value={details}
+            onChange={(event) => setDetails(event.target.value)}
             disabled={status === 'submitting'}
           />
         </label>
 
         <button type="submit" className="button" disabled={status === 'submitting'}>
-          {status === 'submitting' ? 'Sending…' : 'Send request'}
+          {status === 'submitting' ? 'Sending…' : 'Send message'}
         </button>
 
         <p className="signup-form__status" role="status" aria-live="polite">
