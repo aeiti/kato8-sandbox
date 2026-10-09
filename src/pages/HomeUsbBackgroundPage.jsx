@@ -1,4 +1,5 @@
 import Seo from '../components/Seo'
+import { staticRoutes } from '../data/seo-config'
 import { asset } from '../utils/asset'
 import '../styles/home-usb-background.css'
 
@@ -56,11 +57,7 @@ export default function HomeUsbBackgroundPage() {
 
   return (
     <section className="home-main has-fixed-bg" style={{ backgroundImage }}>
-      <Seo
-        path="/home-usb-background"
-        title="Home — USB Background"
-        description="Archived home-page look: hero over a fixed USB cover-art parallax backdrop with cleaned-up game cards."
-      />
+      <Seo path="/home-usb-background" {...staticRoutes['/home-usb-background']} />
 
       <section className="home-hero-intro">
         <div className="hero-logo-wrapper">
