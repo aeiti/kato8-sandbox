@@ -14,8 +14,10 @@ import { fileURLToPath } from 'node:url'
 
 import {
   SITE,
+  canonicalUrl,
   getRouteMeta,
   listPrerenderRoutes,
+  ogImageFor,
 } from '../src/data/seo-config.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -43,8 +45,12 @@ function absoluteUrl(p) {
 }
 
 function buildSeoBlock(pathname, meta) {
-  const url = `${SITE.url}${pathname}`
-  const image = absoluteUrl(meta.ogImage || SITE.defaultImage)
+  const url = canonicalUrl(pathname)
+  // Mirrors Seo.jsx: captured screenshot → large card; default logo → summary.
+  const captured = !meta.ogImage && ogImageFor(pathname)
+  const largeImage = meta.ogImage || captured
+  const image = absoluteUrl(largeImage || SITE.defaultImage)
+  const twitterCard = largeImage ? SITE.twitterCard : 'summary'
   const ogTitle = meta.ogTitle || meta.title
   const ogDescription = meta.ogDescription || meta.description
 
@@ -60,7 +66,9 @@ function buildSeoBlock(pathname, meta) {
     `    <meta data-prerender property="og:title" content="${escapeAttr(ogTitle)}" />`,
     `    <meta data-prerender property="og:description" content="${escapeAttr(ogDescription)}" />`,
     image && `    <meta data-prerender property="og:image" content="${escapeAttr(image)}" />`,
-    `    <meta data-prerender name="twitter:card" content="${escapeAttr(SITE.twitterCard)}" />`,
+    captured && `    <meta data-prerender property="og:image:width" content="${SITE.ogImageWidth}" />`,
+    captured && `    <meta data-prerender property="og:image:height" content="${SITE.ogImageHeight}" />`,
+    `    <meta data-prerender name="twitter:card" content="${escapeAttr(twitterCard)}" />`,
     `    <meta data-prerender name="twitter:title" content="${escapeAttr(ogTitle)}" />`,
     `    <meta data-prerender name="twitter:description" content="${escapeAttr(ogDescription)}" />`,
     image && `    <meta data-prerender name="twitter:image" content="${escapeAttr(image)}" />`,

@@ -11,7 +11,7 @@
  * when moving between repos.
  */
 import { Helmet } from 'react-helmet-async'
-import { SITE } from '../data/seo-config'
+import { SITE, canonicalUrl, ogImageFor } from '../data/seo-config'
 
 function absoluteUrl(p) {
   if (!p) return null
@@ -28,8 +28,12 @@ export default function Seo({
   ogImage,
   noindex,
 }) {
-  const url = `${SITE.url}${path}`
-  const image = absoluteUrl(ogImage || SITE.defaultImage)
+  const url = canonicalUrl(path)
+  // A captured screenshot (or explicit ogImage) is a 1200×630 large card;
+  // the square default logo only works as a small `summary` card.
+  const largeImage = ogImage || ogImageFor(path)
+  const image = absoluteUrl(largeImage || SITE.defaultImage)
+  const twitterCard = largeImage ? SITE.twitterCard : 'summary'
   const finalOgTitle = ogTitle || title
   const finalOgDescription = ogDescription || description
 
@@ -46,8 +50,10 @@ export default function Seo({
       <meta property="og:title" content={finalOgTitle} />
       <meta property="og:description" content={finalOgDescription} />
       {image && <meta property="og:image" content={image} />}
+      {largeImage && !ogImage && <meta property="og:image:width" content={String(SITE.ogImageWidth)} />}
+      {largeImage && !ogImage && <meta property="og:image:height" content={String(SITE.ogImageHeight)} />}
 
-      <meta name="twitter:card" content={SITE.twitterCard} />
+      <meta name="twitter:card" content={twitterCard} />
       <meta name="twitter:title" content={finalOgTitle} />
       <meta name="twitter:description" content={finalOgDescription} />
       {image && <meta name="twitter:image" content={image} />}
