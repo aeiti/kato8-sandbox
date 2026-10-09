@@ -84,6 +84,19 @@ export default function CrowdfundingGamePage() {
                 <p key={i}>{paragraph}</p>
               ))}
             </div>
+
+            {game.itchUrl && (
+              <div className="simple-game-actions">
+                <a
+                  href={game.itchUrl}
+                  className="button"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Play on itch.io
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -386,6 +386,15 @@ function normalizeGame(g, index) {
   const cover = g.coverImage && typeof g.coverImage === 'object' ? g.coverImage : null
   const coverSrc = str(cover && cover.src)
   if (coverSrc) out.coverImage = { src: coverSrc, alt: str(cover.alt) || title }
+  const itchUrl = str(g.itchUrl)
+  if (itchUrl) {
+    if (!/^https?:\/\/\S+$/.test(itchUrl)) {
+      throw new Error(
+        `game #${index + 1}${title ? ` ("${title}")` : ''} has an invalid itch.io URL — must start with http:// or https:// — got ${JSON.stringify(itchUrl)}`
+      )
+    }
+    out.itchUrl = itchUrl
+  }
   out.description = str(g.description)
   out.body = (Array.isArray(g.body) ? g.body : []).map(str).filter(Boolean)
   return out

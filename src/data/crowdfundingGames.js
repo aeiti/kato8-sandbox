@@ -27,6 +27,8 @@
  *                 falls back to a plain placeholder block when absent.
  *   coverImage  — { src, alt } (optional). Portrait cover on the detail hero;
  *                 falls back to a plain placeholder block when absent.
+ *   itchUrl     — absolute http(s) URL of the game's itch.io page (optional).
+ *                 Renders a "Play on itch.io" button on the detail page.
  *   Image paths are stored base-less (`/assets/sandbox/foo.png`); the card
  *   and detail page pipe them through `asset()` so they resolve on Pages.
  */
@@ -45,6 +47,7 @@ export const crowdfundingGames = [
       src: '/assets/sandbox/deadhour-cover-630x500.png',
       alt: 'Dead Hour',
     },
+    itchUrl: 'https://terrytkato8.itch.io/dead-hour',
     description: 'Twelve nights. Twenty survivors. One helicopter. A top-down zombie roguelite where your guns fire themselves and your only job is to stay alive until extraction.',
     body: [
       'Your weapons fire on their own. Everything else is on you: where to move, what to upgrade, and how to hold out until the helicopter touches down. Each of the twelve nights brings a different mission. Survive the evac window, defend a repaired bus, escort survivors, scavenge supplies, or bring relays online while the horde closes in.',
@@ -63,8 +66,9 @@ export const crowdfundingGames = [
     image: '/assets/sandbox/2-garden-afternoon.png',
     coverImage: {
       src: '/assets/sandbox/cover-1.png',
-      alt: 'Dead Hour',
+      alt: 'Hollowbrook Apothecary',
     },
+    itchUrl: 'https://terrytkato8.itch.io/hollowbrook-apothecary',
     description: 'Inherit your grandmother\'s cabin, her cauldron, and three recipes, then fill in the blank pages yourself. A cozy, hand-drawn potion-brewing sim about discovery, not instructions.',
     body: [
       'Your grandmother left you a cabin, a cauldron, and a recipe book with only three pages written. The rest is up to you. Combine ingredients, adjust the heat, stir, and watch what happens. Every brew is built from six essences (Ember, Tide, Root, Gale, Lumen, and Umbra), and every failure tells you something: too heavy on Ember, or it refuses to bind. Recipes you work out yourself brew better than any you can buy.',
@@ -80,6 +84,7 @@ export const crowdfundingGames = [
       'Casual',
     ],
     comingSoon: false,
+    itchUrl: 'https://terrytkato8.itch.io/hotdog-hustler',
     description: 'Toast the buns, grill the dogs, and pile on exactly what each customer asked for before their patience runs out. A fast-paced hot dog cart sim on a cherry-blossom street.',
     body: [
       'Customers line up at your cart, place their orders, and start losing patience. Toast the bun before it burns, pull the sausage off the grill inside the safe window, add exactly the toppings they asked for, and hand it over before they walk off. Get a topping wrong and you lose half the order. Leave one off and you only lose what that topping is worth.',
