@@ -129,6 +129,14 @@ export const staticRoutes = {
     ogDescription:
       'Archived home page snapshot with the parallax USB cover-art background and cleaned-up game cards.',
   },
+  '/investors-color': {
+    title: 'Investors (color) | Kato.8 Sandbox',
+    description:
+      'Color variant of the investor / publisher page for comparison with /investors — a dark-cobalt hero band with the nav’s pink→peach wave, plus a strip of the studio’s three games above the contact form. WIP preview.',
+    ogTitle: 'Investors — color variant',
+    ogDescription:
+      'Investor page variant: cobalt hero band with the pink→peach wave, plus a games strip. Compare with /investors.',
+  },
   // ADMIN:SEO-ROUTES — pages created from the dev admin panel insert their
   // entry above this line. Keep it as the last line of staticRoutes.
 }

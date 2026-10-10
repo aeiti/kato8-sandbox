@@ -35,6 +35,7 @@ export const ogImages = {
   "/crowdfunding-games/hotdog-hustler": "/assets/og/crowdfunding-games--hotdog-hustler.jpg",
   "/home-usb-background": "/assets/og/home-usb-background.jpg",
   "/investors": "/assets/og/investors.jpg",
+  "/investors-color": "/assets/og/investors-color.jpg",
   "/kickstarter-button-v2": "/assets/og/kickstarter-button-v2.jpg",
   "/kickstarter-buttons": "/assets/og/kickstarter-buttons.jpg",
   "/newsletter-on-about": "/assets/og/newsletter-on-about.jpg",

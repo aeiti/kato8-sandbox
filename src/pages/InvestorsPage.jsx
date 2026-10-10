@@ -13,7 +13,9 @@ import '../styles/investors.css'
  * body. Graduate by moving the page + form into external-site and
  * wiring a real form endpoint (VITE_INVESTOR_ENDPOINT).
  */
-const HIGHLIGHTS = [
+// Shared with the color variant (InvestorsColorPage) so the two stay
+// comparable on copy and differ only in treatment.
+export const HIGHLIGHTS = [
   {
     title: 'Original games',
     body: 'A slate of in-house titles in active development, built to grow a catalog rather than chase a single hit.',

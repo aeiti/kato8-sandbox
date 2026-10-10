@@ -54,7 +54,13 @@ export const experiments = [
     path: '/investors',
     title: 'Investors page',
     active: true,
-    description: 'Prototype investor page — an investor-relations hero plus a request form for investor materials, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
+    description: 'Prototype investor / publisher page — a partnership hero plus a contact form for investors and publishers, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
+  },
+  {
+    path: '/investors-color',
+    title: 'Investors page (color variant)',
+    active: true,
+    description: 'Same investor page with more color, for comparison: a dark-cobalt hero band carrying the nav’s pink→peach wave, plus a strip of the three studio games above the contact form.',
   },
   {
     path: '/kickstarter-button-v2',
