@@ -1,0 +1,158 @@
+/*
+ * Color variant of the investor page (InvestorsColorPage). Builds on
+ * investors.css — highlights and type are shared — and adds the cobalt
+ * hero band and the games strip. Colors come from the main site: the
+ * nav wave's cobalt (#424065 → --dark-cobalt) and its pink→peach ribbon
+ * (#e6738a → #fecb86).
+ */
+
+.investors-color {
+  font-family: 'Reem Kufi', sans-serif;
+}
+
+/* ---- Hero band ---- */
+
+/* Pulled up under the nav's transparent lower edge (its 48px bottom
+   padding) so the cobalt runs straight on from the nav's pink ribbon
+   instead of leaving a strip of pearl between them. The nav is
+   position: relative + z-index: 99, so its ribbon stays on top. */
+.investors-color_hero {
+  position: relative;
+  margin-top: -48px;
+  color: var(--light-pearl, #f5efef);
+  text-align: center;
+}
+
+/* The gradient lives on the text block (not the whole header) so it ends
+   exactly where the wave SVG starts, on the same color as the SVG's band. */
+.investors-color_hero-inner {
+  padding: calc(48px + var(--space-3, 2.5rem)) 1rem 1rem;
+  background: linear-gradient(180deg, #424065 0%, var(--dark-cobalt, #1b1b26) 100%);
+}
+
+.investors-color_hero-content {
+  max-width: 46rem;
+  margin-inline: auto;
+}
+
+.investors-color_eyebrow {
+  color: #fecb86;
+}
+
+.investors-color_title {
+  color: var(--light-pearl, #f5efef);
+}
+
+.investors-color_lead {
+  color: var(--light-pearl, #f5efef);
+  opacity: 0.9;
+}
+
+/* The SVG continues the band (cobalt top) into a pink→peach ribbon; below
+   the ribbon it's transparent, so the page background shows through.
+   Pulled up 1px so no seam shows against the gradient. */
+.investors-color_wave {
+  display: block;
+  width: 100%;
+  height: clamp(64px, 10vw, 150px);
+  margin-top: -1px;
+}
+
+.investors-color_wave-band {
+  fill: var(--dark-cobalt, #1b1b26); /* = the band gradient's last stop */
+}
+
+.investors-color_body {
+  padding-top: var(--space-3, 2.5rem);
+}
+
+/* ---- Games strip ---- */
+
+.investors-color_games {
+  margin-bottom: var(--space-3, 2.5rem);
+}
+
+.investors-color_games-heading {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.investors-color_games-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.investors-color_game {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  aspect-ratio: 4 / 5;
+  padding: 1rem;
+  overflow: hidden;
+  border-radius: var(--card-radius, 0.75rem);
+  background-size: cover;
+  background-position: center;
+  color: var(--light-pearl, #f5efef);
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Darken the lower half so the logo and tagline stay legible on any art. */
+.investors-color_game::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 35%, rgba(27, 27, 38, 0.85) 100%);
+}
+
+.investors-color_game:hover,
+.investors-color_game:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(27, 27, 38, 0.25);
+}
+
+.investors-color_game:focus-visible {
+  outline: 3px solid var(--squid-pink, #e5718a);
+  outline-offset: 3px;
+}
+
+.investors-color_game-logo {
+  max-width: 85%;
+  max-height: 4rem;
+  object-fit: contain;
+  object-position: left bottom;
+}
+
+.investors-color_game-title {
+  font-family: 'RocknRoll One', sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.15;
+}
+
+.investors-color_game-tagline {
+  font-size: 0.9375rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .investors-color_games-list {
+    grid-template-columns: 1fr;
+  }
+
+  .investors-color_game {
+    aspect-ratio: 16 / 9;
+  }
+}
