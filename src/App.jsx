@@ -4,6 +4,10 @@ import { Routes, Route, useLocation, Link } from 'react-router-dom'
 // imported `kato8studios-site/src/components/Nav` when the tab graduates.
 import Nav from './components/SandboxNav'
 import Footer from 'kato8studios-site/src/components/Footer'
+// Resets scroll to the top on route change. Without it, a client-side
+// navigation keeps the previous page's scroll offset, so clicking a link
+// far down the home list opened the next page partway down.
+import ScrollToTop from 'kato8studios-site/src/components/ScrollToTop'
 import HomePage from './pages/HomePage'
 import KickstarterButtonsPage from './pages/KickstarterButtonsPage'
 import KickstarterButtonV2Page from './pages/KickstarterButtonV2Page'
@@ -57,11 +61,17 @@ export default function App() {
   // page fills the pane. PreviewPage also drops its own preview bar in this mode.
   const isBare = new URLSearchParams(location.search).get('bare') === '1'
   if (isBare) {
-    return <div className={`${bodyClass} body--bare`}>{routes}</div>
+    return (
+      <div className={`${bodyClass} body--bare`}>
+        <ScrollToTop />
+        {routes}
+      </div>
+    )
   }
 
   return (
     <div className={bodyClass}>
+      <ScrollToTop />
       {/* Standard sandbox chrome, shared by every page: a thin "← Sandbox"
           back bar (everywhere but the home index) above the main-site Nav,
           with the main-site Footer below. Kept here in App so all pages get
