@@ -18,6 +18,7 @@ import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
 import InvestorsPage from './pages/InvestorsPage'
 import InvestorsColorPage from './pages/InvestorsColorPage'
 import StudioBiosPage from './pages/StudioBiosPage'
+import StudioBiosFramesPage from './pages/StudioBiosFramesPage'
 import PreviewPage from './previews/PreviewPage'
 // Pages scaffolded from the dev admin panel (scripts/dev-admin) auto-insert
 // their `import` line directly below the next marker. Keep the marker line
@@ -49,6 +50,7 @@ export default function App() {
       <Route path="/investors" element={<InvestorsPage />} />
       <Route path="/investors-color" element={<InvestorsColorPage />} />
       <Route path="/studio-bios" element={<StudioBiosPage />} />
+      <Route path="/studio-bios-frames" element={<StudioBiosFramesPage />} />
       {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}
       <Route path="/home-usb-background" element={<HomeUsbBackgroundPage />} />
       <Route path="/components" element={<PreviewPage />} />

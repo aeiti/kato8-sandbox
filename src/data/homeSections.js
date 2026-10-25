@@ -51,6 +51,12 @@ export const experiments = [
     description: 'Meet-the-team page prototype — each studio member’s bio dealt out as a collector’s card in their own Pokémon, Magic, or Yu-Gi-Oh! frame, grouped by team: Studio, USB, Last Light, and BBCU.',
   },
   {
+    path: '/studio-bios-frames',
+    title: 'Studio Bios — card artwork',
+    active: true,
+    description: 'Same team page built from the studio’s finished trading-card frame images instead of CSS-drawn frames. Each member’s photo sits in their frame’s art window, and cards flip on click to show the frame’s back. The frames still carry the designer’s sample text.',
+  },
+  {
     path: '/investors',
     title: 'Investors page',
     active: true,

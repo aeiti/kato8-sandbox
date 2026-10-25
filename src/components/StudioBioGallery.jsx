@@ -8,7 +8,8 @@ import YugiohBioCard from './YugiohBioCard'
  * responsive grid of collector cards. Every person is dealt in their own
  * frame — `person.style` picks Pokémon, Magic, or Yu-Gi-Oh! — so the
  * `studioBios` records stay the single source of truth for both the
- * grouping and the look.
+ * grouping and the look. Pass `card` to deal every person into one card
+ * component instead (e.g. `FrameBioCard` on /studio-bios-frames).
  */
 const FRAMES = {
   pokemon: PokemonBioCard,
@@ -16,7 +17,7 @@ const FRAMES = {
   yugioh: YugiohBioCard,
 }
 
-export default function StudioBioGallery() {
+export default function StudioBioGallery({ card }) {
   return getStudioBiosByTeam().map((team) => (
     <section className="sb-team" key={team.slug} aria-labelledby={`sb-team-${team.slug}`}>
       <h2 className="sb-team__title" id={`sb-team-${team.slug}`}>
@@ -25,7 +26,7 @@ export default function StudioBioGallery() {
       </h2>
       <div className="sb-grid">
         {team.people.map((person) => {
-          const Card = FRAMES[person.style] || PokemonBioCard
+          const Card = card || FRAMES[person.style] || PokemonBioCard
           return <Card key={person.slug} person={person} />
         })}
       </div>

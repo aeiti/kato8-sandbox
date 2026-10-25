@@ -652,13 +652,108 @@
   border-top: 0;
 }
 
+/* ---------- Card-artwork frames (FrameBioCard) ---------- */
+
+/* The studio's finished card images, with the photo laid over the art
+   window and a 3D flip to the back. Faces share one grid cell. */
+.sbf {
+  margin: 0;
+  width: 300px;
+  text-align: center;
+}
+
+.sbf-card {
+  display: block;
+  width: 100%;
+  aspect-ratio: 750 / 1050;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1400px;
+  border-radius: 18px;
+  transition: transform 0.22s ease;
+}
+
+.sbf-card:hover {
+  transform: translateY(-8px) rotate(-0.6deg);
+}
+
+.sbf-card:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.sbf-card__inner {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.sbf-card[aria-pressed="true"] .sbf-card__inner {
+  transform: rotateY(180deg);
+}
+
+.sbf-face {
+  grid-area: 1 / 1;
+  position: relative;
+  backface-visibility: hidden;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.5));
+}
+
+.sbf-face--back {
+  transform: rotateY(180deg);
+}
+
+.sbf-face__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sbf-art {
+  position: absolute;
+}
+
+.sbf-art__window {
+  width: 100%;
+  height: 100%;
+}
+
+.sbf-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 14px;
+}
+
+.sbf-caption__name {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sbf-caption__role {
+  color: #b9bece;
+  font-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sbf-card__inner {
+    transition: none;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
   .sb-grid {
     gap: 24px;
   }
-  .sb-card {
+  .sb-card,
+  .sbf {
     width: min(300px, 86vw);
   }
 }
