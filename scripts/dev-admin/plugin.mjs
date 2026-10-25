@@ -316,8 +316,7 @@ function scaffoldPage({ component, routePath, title, description }) {
   const d = JSON.stringify(
     description || 'New page scaffolded from the admin panel — edit me.'
   )
-  return `import Seo from '../components/Seo'
-import { asset } from '../utils/asset'
+  return `import { asset } from '../utils/asset'
 
 /**
  * ${(title || component).replace(/\*\//g, '* /')} — scaffolded from the dev admin
@@ -326,11 +325,13 @@ import { asset } from '../utils/asset'
  * To drop in an image uploaded from the panel:
  *   <img src={asset('/assets/sandbox/your-image.png')} alt="…" />
  * (\`asset\` is imported above; remove the import if you don't use it.)
+ *
+ * Title and meta tags come from this route's entry in src/data/seo-config.js
+ * (App.jsx renders <Seo> from it), not from this file.
  */
 export default function ${component}() {
   return (
     <main className="container" style={{ padding: '48px 0' }}>
-      <Seo path=${JSON.stringify(routePath)} title=${t} description=${d} />
       <h1>{${t}}</h1>
       <p>{${d}}</p>
     </main>

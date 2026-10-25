@@ -1,7 +1,8 @@
 /**
  * Single source of truth for per-route SEO metadata in the sandbox.
  * Consumed by:
- *   - the `<Seo>` component at runtime (each page passes its own entry).
+ *   - App.jsx at runtime, which renders one `<Seo>` from `getRouteMeta()`
+ *     for the current route (pages don't render their own).
  *   - `scripts/prerender.mjs` at build time, which iterates
  *     `listPrerenderRoutes()` and bakes the right meta tags into each
  *     route's static HTML file so crawlers (Discord, Slack, X) see them

@@ -1,6 +1,4 @@
 import OurStoryTimeline from '../components/OurStoryTimeline'
-import Seo from '../components/Seo'
-import { staticRoutes } from '../data/seo-config'
 import '../styles/experiment-intro.css'
 
 /**
@@ -15,7 +13,6 @@ import '../styles/experiment-intro.css'
 export default function OurStoryTimelinePage() {
   return (
     <main>
-      <Seo path="/our-story-timeline" {...staticRoutes['/our-story-timeline']} />
       <div className="experiment-intro container">
         <h1 className="experiment-intro_title">Our Story timeline</h1>
         <p className="experiment-intro_subtitle">

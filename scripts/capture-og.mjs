@@ -6,7 +6,7 @@
 //   npm run og:capture                      # every route
 //   npm run og:capture -- /investors /      # just these routes
 //
-// Pages load with `?bare=1` (App.jsx drops the back bar, Nav, and Footer;
+// Pages load with `?bare=1` (App.jsx drops the sandbox frame, Nav, and Footer;
 // PreviewPage drops its preview bar), so the shared chrome doesn't fill
 // the top third of every image and make every preview look alike.
 //
