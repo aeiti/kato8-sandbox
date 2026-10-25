@@ -105,6 +105,18 @@ separated by a blank line). **Save** rewrites the games array *and* the
 `CROWDFUNDING_SLUGS` list in `src/data/seo-config.js`, so every game keeps
 a prerendered OG page. Renaming a slug moves the detail page to a new URL.
 
+The **Studio Bios** panel (`/__bios`, its own page rather than a tab)
+edits the team in `src/data/studioBios.js`, which feeds both
+`/studio-bios` (CSS-drawn cards) and `/studio-bios-frames` (the
+designer's card images). Each person has a **team** (one of `TEAMS`),
+a card **style** (Pokémon / Magic / Yu-Gi-Oh!) and a **color** (one of
+`CARD_COLORS`); the pages render one section per team, in `TEAMS`
+order. `TEAMS` is an array on purpose: the serializer sorts object keys
+alphabetically, so any list whose order matters must be an array. Team
+names are edited in the data file, not the panel. Frame images live in
+`public/assets/sandbox/frames/` as `<style>-<color>.png` and
+`back-<style>.png`; replacing a file with the same name is all it takes.
+
 Pages whose content has its own editor (the Crowdfunding tab, the
 `/__bios` panel) get an **Edit content →** link on their listing row. A
 new tab declared with a `viewUrl` is linked automatically; a separate
@@ -177,6 +189,8 @@ Every route in `src/data/seo-config.js` gets a prerendered HTML file with its ow
 npm run og:capture                                   # every route
 npm run og:capture -- /investors /components/nav     # just these
 ```
+
+In a fresh worktree, run `npm install` first: the script needs `playwright-core`, and it fails with `ERR_MODULE_NOT_FOUND` until that's installed. Prefer naming the routes you changed — a full run re-shoots every page, and pages you didn't touch can come back with small pixel differences that don't belong in your commit.
 
 The script (`scripts/capture-og.mjs`) runs its own dev server and drives your installed Google Chrome. Pages are shot without the sandbox chrome (`?bare=1`). Component previews are cropped to the component and centered. It rewrites `src/data/og-images.js`; commit that file along with the images. The deploy doesn't capture anything, so **rerun it for any page whose look you changed**, and for new pages. A route with no screenshot falls back to the small square studio logo.
 
