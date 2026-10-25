@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Link } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 // Sandbox nav is a vendored copy of the main-site Nav with an added
 // "Investors" tab (not yet upstream — PROCESS.md §1b). Swap back to the
 // imported `kato8studios-site/src/components/Nav` when the tab graduates.
@@ -8,6 +8,7 @@ import Footer from 'kato8studios-site/src/components/Footer'
 // navigation keeps the previous page's scroll offset, so clicking a link
 // far down the home list opened the next page partway down.
 import ScrollToTop from 'kato8studios-site/src/components/ScrollToTop'
+import SandboxFrame, { isInFrame, useReportFrameRoute } from './components/SandboxFrame'
 import HomePage from './pages/HomePage'
 import KickstarterButtonsPage from './pages/KickstarterButtonsPage'
 import KickstarterButtonV2Page from './pages/KickstarterButtonV2Page'
@@ -28,6 +29,7 @@ import HomeUsbBackgroundPage from './pages/HomeUsbBackgroundPage'
 
 export default function App() {
   const location = useLocation()
+  useReportFrameRoute()
   const isHome = location.pathname === '/'
   // Full-bleed layout for the crowdfunding demo detail pages, matching the
   // main site's `body-2` treatment for `/games/:slug`. Everything else uses
@@ -59,7 +61,7 @@ export default function App() {
   )
 
   // `?bare=1` (used by the dev admin panel's live-preview iframe) renders the
-  // routed page alone — no back bar, Nav, or Footer — so a single component or
+  // routed page alone — no sandbox frame, Nav, or Footer — so a single component or
   // page fills the pane. PreviewPage also drops its own preview bar in this mode.
   const isBare = new URLSearchParams(location.search).get('bare') === '1'
   if (isBare) {
@@ -71,21 +73,37 @@ export default function App() {
     )
   }
 
-  return (
-    <div className={bodyClass}>
-      <ScrollToTop />
-      {/* Standard sandbox chrome, shared by every page: a thin "← Sandbox"
-          back bar (everywhere but the home index) above the main-site Nav,
-          with the main-site Footer below. Kept here in App so all pages get
-          one consistent nav + footer instead of rolling their own. */}
-      {!isHome && (
-        <div className="sandbox-backbar">
-          <Link to="/" className="sandbox-backbar_link">← Sandbox</Link>
-        </div>
-      )}
-      <Nav />
-      {routes}
-      <Footer />
-    </div>
-  )
+  // Every page but the home index is shown inside the sandbox frame: a dark
+  // toolbar with the back link, over the page loaded in an iframe (see
+  // SandboxFrame). The iframe — or `?frame=0`, for viewing a page full-window —
+  // renders the page as prod does: main-site Nav, the route, main-site Footer.
+  const isUnframed = new URLSearchParams(location.search).get('frame') === '0'
+  if (isInFrame || isUnframed) {
+    return (
+      <div className={bodyClass}>
+        <ScrollToTop />
+        <Nav />
+        {routes}
+        <Footer />
+      </div>
+    )
+  }
+
+  // The home index isn't a Kato.8 page, so it gets the sandbox toolbar alone,
+  // without the main-site Nav and Footer.
+  if (isHome) {
+    return (
+      <div className="body">
+        <header className="sandbox-toolbar sandbox-toolbar--home">
+          <span className="sandbox-toolbar_dots" aria-hidden="true">
+            <span /><span /><span />
+          </span>
+          <span className="sandbox-toolbar_title">Kato.8 Sandbox</span>
+        </header>
+        {routes}
+      </div>
+    )
+  }
+
+  return <SandboxFrame />
 }
