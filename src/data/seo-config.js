@@ -121,6 +121,14 @@ export const staticRoutes = {
     ogDescription:
       'The Kato.8 team as collector cards — Studio, USB, Last Light, and BBCU, each member in their own Pokémon, Magic, or Yu-Gi-Oh! frame.',
   },
+  '/studio-bios-frames': {
+    title: 'Studio Bios (Card Art) | Kato.8 Sandbox',
+    description:
+      'Meet-the-team page prototype using the studio’s finished trading-card artwork: each member’s photo in their Pokémon, Magic, or Yu-Gi-Oh! frame, grouped by team, with cards that flip to show their backs.',
+    ogTitle: 'Studio Bios — card artwork',
+    ogDescription:
+      'The Kato.8 team on the studio’s own trading-card frames — Studio, USB, Last Light, and BBCU. Click a card to flip it.',
+  },
   '/home-usb-background': {
     title: 'Home — USB Background | Kato.8 Sandbox',
     description:

@@ -41,4 +41,5 @@ export const ogImages = {
   "/newsletter-on-about": "/assets/og/newsletter-on-about.jpg",
   "/our-story-timeline": "/assets/og/our-story-timeline.jpg",
   "/studio-bios": "/assets/og/studio-bios.jpg",
+  "/studio-bios-frames": "/assets/og/studio-bios-frames.jpg",
 }
