@@ -1,7 +1,5 @@
 import InvestorRequestForm from '../components/InvestorRequestForm'
-import Seo from '../components/Seo'
 import { games } from 'kato8studios-site/src/data/games'
-import { staticRoutes } from '../data/seo-config'
 import { HIGHLIGHTS } from './InvestorsPage'
 import '../styles/investors.css'
 import '../styles/investors-color.css'
@@ -25,7 +23,6 @@ const SITE_URL = 'https://kato8studios.com'
 export default function InvestorsColorPage() {
   return (
     <main className="investors-color">
-      <Seo path="/investors-color" {...staticRoutes['/investors-color']} />
 
       <header className="investors-color_hero">
         <div className="investors-color_hero-inner">

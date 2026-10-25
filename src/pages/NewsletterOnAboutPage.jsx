@@ -1,7 +1,5 @@
 import GoFundMeWidget from 'kato8studios-site/src/components/GoFundMeWidget'
 import NewsletterSignup from 'kato8studios-site/src/components/NewsletterSignup'
-import Seo from '../components/Seo'
-import { staticRoutes } from '../data/seo-config'
 import '../styles/newsletter-on-about.css'
 
 /**
@@ -25,7 +23,6 @@ import '../styles/newsletter-on-about.css'
 export default function NewsletterOnAboutPage() {
   return (
     <main className="newsletter-on-about">
-      <Seo path="/newsletter-on-about" {...staticRoutes['/newsletter-on-about']} />
 
       <div className="support-kato8-section">
         <div className="frame-122">

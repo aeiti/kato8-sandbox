@@ -1,7 +1,5 @@
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { previews, previewByName } from './registry'
-import Seo from '../components/Seo'
-import { staticRoutes, componentRoutes, NOT_FOUND_META } from '../data/seo-config'
 import '../styles/previews.css'
 
 export default function PreviewPage() {
@@ -74,7 +72,6 @@ function Gallery() {
   const sections = groupByCategory(previews)
   return (
     <main className="previews-gallery">
-      <Seo path="/components" {...staticRoutes['/components']} />
       <div className="container">
         <header className="previews-gallery_header">
           <h1 className="previews-gallery_title">Components</h1>
@@ -113,7 +110,6 @@ function Gallery() {
 }
 
 function SinglePreview({ entry, bare }) {
-  const meta = componentRoutes[entry.name]
   if (bare) {
     return (
       <div className={`preview-frame preview-frame--bare preview-frame--${entry.background}`}>
@@ -125,7 +121,6 @@ function SinglePreview({ entry, bare }) {
   }
   return (
     <div className={`preview-frame preview-frame--${entry.background}`}>
-      {meta && <Seo path={`/components/${entry.name}`} {...meta} />}
       <div className="preview-frame_bar">
         <div className="container preview-frame_bar-inner">
           <Link to="/components" className="preview-frame_back">← Components</Link>
@@ -156,7 +151,6 @@ function StatusBadge({ status }) {
 function NotFound({ name }) {
   return (
     <main className="previews-notfound">
-      <Seo path={`/components/${name}`} {...NOT_FOUND_META} />
       <div className="container">
         <h1>No preview named "{name}"</h1>
         <p>

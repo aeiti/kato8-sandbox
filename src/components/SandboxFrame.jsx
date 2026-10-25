@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { getRouteMeta } from '../data/seo-config'
 
-// Sandbox chrome for every page but the home index: a dark toolbar with the
+// Sandbox chrome for every page but the home index: a grey toolbar with the
 // "← Sandbox" link, and the page itself loaded in a same-origin iframe styled
 // as a browser window. The iframe (rather than a styled wrapper div) keeps
 // pages pixel-identical to prod — `position: fixed` backdrops, `100vw` bands,
 // and media queries all resolve against the window, not the whole viewport.
 //
 // Inside the iframe App renders the page as prod does (Nav + page + Footer)
-// and posts its route and title here (see useReportFrameRoute), so the outer
-// URL and toolbar follow client-side navigation within the frame.
+// and posts its route here (see useReportFrameRoute), so the outer URL —
+// and with it the toolbar title and App's <Seo> — follow client-side
+// navigation within the frame.
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '')
 const TITLE_SUFFIX = / \| Kato\.8 Sandbox$/
@@ -25,14 +27,15 @@ export default function SandboxFrame() {
   // frame updates the outer URL to match without reloading the iframe.
   const [src, setSrc] = useState(path)
   const framePath = useRef(path)
-  const [title, setTitle] = useState('')
+  const title = (getRouteMeta(location.pathname.replace(/(.)\/$/, '$1'))?.title || '').replace(
+    TITLE_SUFFIX,
+    '',
+  )
 
   useEffect(() => {
     function onMessage(e) {
       if (e.origin !== window.location.origin || e.data?.type !== 'sandbox:route') return
       framePath.current = e.data.path
-      setTitle(e.data.title.replace(TITLE_SUFFIX, ''))
-      document.title = e.data.title
       if (e.data.path === '/') navigate('/')
       else navigate(e.data.path, { replace: true })
     }
@@ -73,22 +76,12 @@ export default function SandboxFrame() {
   )
 }
 
-// Runs inside the iframe: report the current route and document title to the
-// parent frame. Helmet sets the title asynchronously, so a MutationObserver
-// on <head> catches it whenever it lands.
+// Runs inside the iframe: report the current route to the parent frame.
 export function useReportFrameRoute() {
   const location = useLocation()
   const path = location.pathname + location.search
   useEffect(() => {
-    if (!isInFrame) return undefined
-    const post = () =>
-      window.parent.postMessage(
-        { type: 'sandbox:route', path, title: document.title },
-        window.location.origin,
-      )
-    post()
-    const observer = new MutationObserver(post)
-    observer.observe(document.head, { childList: true, subtree: true, characterData: true })
-    return () => observer.disconnect()
+    if (!isInFrame) return
+    window.parent.postMessage({ type: 'sandbox:route', path }, window.location.origin)
   }, [path])
 }

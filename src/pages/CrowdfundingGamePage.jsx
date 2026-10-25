@@ -1,7 +1,5 @@
 import { useParams } from 'react-router-dom'
-import Seo from '../components/Seo'
 import { getCrowdfundingGameBySlug } from '../data/crowdfundingGames'
-import { crowdfundingGameRoutes } from '../data/seo-config'
 import { asset } from '../utils/asset'
 import '../styles/simple-game.css'
 
@@ -14,7 +12,7 @@ import '../styles/simple-game.css'
  * title + tags + description. No concept-art gallery, no playtest/Discord
  * forms, no Kickstarter button — these are placeholder demo games.
  *
- * The shared main-site `Nav` + `Footer` (and the "← Sandbox" back bar)
+ * The shared main-site `Nav` + `Footer` (and the sandbox frame)
  * are provided globally by `App.jsx`. Data + styles are vendored under
  * `src/` (not yet on external-site `main`; see PROCESS.md → "Pages").
  * Unlike the main site there's no `NotFoundPage` in the sandbox, so an
@@ -37,12 +35,10 @@ export default function CrowdfundingGamePage() {
     )
   }
 
-  const seo = crowdfundingGameRoutes[slug]
   const categories = game.categories ?? []
 
   return (
     <>
-      {seo && <Seo path={`/crowdfunding-games/${slug}`} {...seo} />}
       <section className="simple-game-page">
         <div className="simple-game-hero">
           <div className="simple-game-cover">

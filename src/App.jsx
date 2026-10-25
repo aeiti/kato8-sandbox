@@ -9,6 +9,8 @@ import Footer from 'kato8studios-site/src/components/Footer'
 // far down the home list opened the next page partway down.
 import ScrollToTop from 'kato8studios-site/src/components/ScrollToTop'
 import SandboxFrame, { isInFrame, useReportFrameRoute } from './components/SandboxFrame'
+import Seo from './components/Seo'
+import { getRouteMeta, NOT_FOUND_META } from './data/seo-config'
 import HomePage from './pages/HomePage'
 import KickstarterButtonsPage from './pages/KickstarterButtonsPage'
 import KickstarterButtonV2Page from './pages/KickstarterButtonV2Page'
@@ -36,6 +38,14 @@ export default function App() {
   // the normal `body` layout.
   const isFullWidthPage = /^\/crowdfunding-games\/[^/]+/.test(location.pathname)
   const bodyClass = isFullWidthPage ? 'body-2' : 'body'
+
+  // One <Seo> for the whole app, looked up from seo-config.js by route, so
+  // pages don't each carry their own. It renders in every mode: in the
+  // sandbox frame's outer document (which owns the address bar, so crawlers
+  // that run JS see the page's meta there) and inside the framed page.
+  // GitHub Pages serves routes with a trailing slash; the config keys don't.
+  const seoPath = location.pathname.replace(/(.)\/$/, '$1')
+  const seo = <Seo path={seoPath} {...(getRouteMeta(seoPath) || NOT_FOUND_META)} />
 
   // The route table, shared by the normal and bare renders so a page added
   // from the admin panel shows up in both. New page routes auto-insert below
@@ -67,6 +77,7 @@ export default function App() {
   if (isBare) {
     return (
       <div className={`${bodyClass} body--bare`}>
+        {seo}
         <ScrollToTop />
         {routes}
       </div>
@@ -81,6 +92,7 @@ export default function App() {
   if (isInFrame || isUnframed) {
     return (
       <div className={bodyClass}>
+        {seo}
         <ScrollToTop />
         <Nav />
         {routes}
@@ -94,6 +106,7 @@ export default function App() {
   if (isHome) {
     return (
       <div className="body">
+        {seo}
         <header className="sandbox-toolbar sandbox-toolbar--home">
           <span className="sandbox-toolbar_dots" aria-hidden="true">
             <span /><span /><span />
@@ -105,5 +118,10 @@ export default function App() {
     )
   }
 
-  return <SandboxFrame />
+  return (
+    <>
+      {seo}
+      <SandboxFrame />
+    </>
+  )
 }

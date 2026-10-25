@@ -1,6 +1,4 @@
 import InvestorRequestForm from '../components/InvestorRequestForm'
-import Seo from '../components/Seo'
-import { staticRoutes } from '../data/seo-config'
 import '../styles/investors.css'
 
 /**
@@ -33,7 +31,6 @@ export const HIGHLIGHTS = [
 export default function InvestorsPage() {
   return (
     <main className="investors-page">
-      <Seo path="/investors" {...staticRoutes['/investors']} />
 
       <header className="investors-hero">
         <p className="investors-hero_eyebrow">Investors &amp; Publishers</p>

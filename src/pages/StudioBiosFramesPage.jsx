@@ -1,7 +1,5 @@
 import StudioBioGallery from '../components/StudioBioGallery'
 import FrameBioCard from '../components/FrameBioCard'
-import Seo from '../components/Seo'
-import { staticRoutes } from '../data/seo-config'
 import '../styles/studio-bios.css'
 
 /**
@@ -13,7 +11,6 @@ import '../styles/studio-bios.css'
 export default function StudioBiosFramesPage() {
   return (
     <section className="sb-page">
-      <Seo path="/studio-bios-frames" {...staticRoutes['/studio-bios-frames']} />
       <div className="sb-heading">
         <h1 className="sb-heading__title">Meet the Studio</h1>
         <p className="sb-heading__description">

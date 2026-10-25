@@ -1,6 +1,4 @@
 import KickstarterButton from '../components/KickstarterButton'
-import Seo from '../components/Seo'
-import { staticRoutes } from '../data/seo-config'
 import { asset } from '../utils/asset'
 import '../styles/kickstarter-button.css'
 import '../styles/kickstarter-button-v2.css'
@@ -31,7 +29,6 @@ function KickstarterButtonV2({ href, label = 'Back on Kickstarter' }) {
 export default function KickstarterButtonV2Page() {
   return (
     <main className="kickstarter-buttons-page">
-      <Seo path="/kickstarter-button-v2" {...staticRoutes['/kickstarter-button-v2']} />
       <header className="kickstarter-buttons-page_header">
         <h1 className="kickstarter-buttons-page_title">Kickstarter Button v2</h1>
         <p className="kickstarter-buttons-page_subtitle">
