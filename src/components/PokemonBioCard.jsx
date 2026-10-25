@@ -1,5 +1,6 @@
 import BioCard from './BioCard'
 import BioCardArt from './BioCardArt'
+import { getTeamLabel } from '../data/studioBios'
 
 /**
  * Pokémon-style collector card for one studio member. Reads name/role as
@@ -17,7 +18,7 @@ export default function PokemonBioCard({ person }) {
         <div className="sb-poke__inner">
           <div className="sb-poke__head">
             <div>
-              <div className="sb-poke__stage">Studio Member</div>
+              <div className="sb-poke__stage">{getTeamLabel(person.team) || 'Studio Member'}</div>
               <div className="sb-poke__name">{person.name}</div>
             </div>
             <span className="sb-poke__hp">
@@ -28,7 +29,7 @@ export default function PokemonBioCard({ person }) {
 
           <BioCardArt person={person} className="sb-poke__art" />
 
-          <div className="sb-poke__role">{person.role}</div>
+          {person.role && <div className="sb-poke__role">{person.role}</div>}
 
           <div className="sb-poke__attacks">
             {(person.specialties || []).map((s) => (
@@ -40,6 +41,7 @@ export default function PokemonBioCard({ person }) {
                 <p className="sb-poke__attack-text">{s.text}</p>
               </div>
             ))}
+            {person.bio && <p className="sb-poke__bio">{person.bio}</p>}
           </div>
 
           <div className="sb-poke__footer">

@@ -116,10 +116,10 @@ export const staticRoutes = {
   '/studio-bios': {
     title: 'Studio Bios | Kato.8 Sandbox',
     description:
-      'Meet-the-team page prototype: each studio member’s bio rendered as a collector’s card, with a switcher for Pokémon, Magic, and Yu-Gi-Oh! frames. Placeholder people.',
+      'Meet-the-team page prototype: each studio member’s bio rendered as a collector’s card, each in their own Pokémon, Magic, or Yu-Gi-Oh! frame, grouped by team.',
     ogTitle: 'Studio Bios — collector cards',
     ogDescription:
-      'The studio team as collector cards — Pokémon, Magic, and Yu-Gi-Oh! frames over one shared bio data source. Placeholder content.',
+      'The Kato.8 team as collector cards — Studio, USB, Last Light, and BBCU, each member in their own Pokémon, Magic, or Yu-Gi-Oh! frame.',
   },
   '/home-usb-background': {
     title: 'Home — USB Background | Kato.8 Sandbox',

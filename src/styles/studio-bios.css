@@ -44,41 +44,37 @@
   line-height: 1.6;
 }
 
-/* ---------- Style switcher ---------- */
+/* ---------- Team sections ---------- */
 
-.sb-switcher {
+.sb-team {
+  margin-top: 56px;
+}
+
+.sb-team__title {
   display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin: 28px auto 40px;
-  padding: 6px;
-  width: fit-content;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 999px;
-}
-
-.sb-switcher__btn {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: #c7ccdb;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  padding: 9px 20px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: background 0.18s ease, color 0.18s ease;
-}
-
-.sb-switcher__btn:hover {
+  align-items: center;
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto 28px;
+  padding-inline: 24px;
   color: #fff;
+  font-family: "RocknRoll One", sans-serif;
+  font-size: clamp(22px, 3.4vw, 30px);
+  font-weight: 400;
+  letter-spacing: 0.5px;
 }
 
-.sb-switcher__btn[aria-pressed="true"] {
-  background: #fff;
-  color: #14161f;
+.sb-team__title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.sb-team__count {
+  color: #8d93a6;
+  font-family: inherit;
+  font-size: 0.6em;
 }
 
 /* ---------- Gallery grid ---------- */
@@ -620,6 +616,41 @@
 .sb-tpl--ygo .sb-tpl__role { top: 61.8%; left: 6.5%; right: 6.5%; text-align: left; font-size: 8px; font-weight: 800; text-transform: none; }
 .sb-tpl--ygo .sb-tpl__body { top: 67.2%; left: 7%; right: 7%; bottom: 9%; }
 .sb-tpl--ygo .sb-tpl__stats { bottom: 2.2%; left: 7%; right: 7%; justify-content: flex-end; gap: 14px; font-family: "Georgia", serif; font-size: 11px; }
+
+/* ---------- Bio text ---------- */
+
+/* Real bios run from one line to a full paragraph. Text boxes keep the
+   card's fixed proportions and scroll when a bio outgrows them; line
+   breaks in the data are kept. */
+.sb-poke__attacks,
+.sb-mtg__text,
+.sb-ygo__text {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sb-poke__bio,
+.sb-mtg__flavor,
+.sb-ygo__effect {
+  white-space: pre-line;
+}
+
+.sb-poke__bio {
+  margin: 0;
+  padding-top: 4px;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  font-size: 9.5px;
+  line-height: 1.4;
+  color: #3a3a30;
+}
+
+.sb-poke__bio:first-child,
+.sb-mtg__flavor:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
 
 /* ---------- Responsive ---------- */
 

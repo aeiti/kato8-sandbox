@@ -1,46 +1,34 @@
-import { useState } from 'react'
-import { studioBios } from '../data/studioBios'
+import { getStudioBiosByTeam } from '../data/studioBios'
 import PokemonBioCard from './PokemonBioCard'
 import MagicBioCard from './MagicBioCard'
 import YugiohBioCard from './YugiohBioCard'
 
 /**
- * The studio-bios gallery: a responsive grid of collector cards plus a
- * style switcher that flips every card between the Pokémon, Magic, and
- * Yu-Gi-Oh! frames. All three read the same `studioBios` records, so the
- * data source is the single source of truth regardless of frame.
+ * The studio-bios gallery: one section per team (in `TEAMS` order), each a
+ * responsive grid of collector cards. Every person is dealt in their own
+ * frame — `person.style` picks Pokémon, Magic, or Yu-Gi-Oh! — so the
+ * `studioBios` records stay the single source of truth for both the
+ * grouping and the look.
  */
 const FRAMES = {
-  pokemon: { label: 'Pokémon', Card: PokemonBioCard },
-  magic: { label: 'Magic', Card: MagicBioCard },
-  yugioh: { label: 'Yu-Gi-Oh!', Card: YugiohBioCard },
+  pokemon: PokemonBioCard,
+  magic: MagicBioCard,
+  yugioh: YugiohBioCard,
 }
 
 export default function StudioBioGallery() {
-  const [frame, setFrame] = useState('pokemon')
-  const Card = FRAMES[frame].Card
-
-  return (
-    <>
-      <div className="sb-switcher" role="group" aria-label="Card style">
-        {Object.entries(FRAMES).map(([key, { label }]) => (
-          <button
-            key={key}
-            type="button"
-            className="sb-switcher__btn"
-            aria-pressed={frame === key}
-            onClick={() => setFrame(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
-
+  return getStudioBiosByTeam().map((team) => (
+    <section className="sb-team" key={team.slug} aria-labelledby={`sb-team-${team.slug}`}>
+      <h2 className="sb-team__title" id={`sb-team-${team.slug}`}>
+        {team.label}
+        <span className="sb-team__count">{team.people.length}</span>
+      </h2>
       <div className="sb-grid">
-        {studioBios.map((person) => (
-          <Card key={person.slug} person={person} />
-        ))}
+        {team.people.map((person) => {
+          const Card = FRAMES[person.style] || PokemonBioCard
+          return <Card key={person.slug} person={person} />
+        })}
       </div>
-    </>
-  )
+    </section>
+  ))
 }

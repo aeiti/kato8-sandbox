@@ -1,4 +1,5 @@
 import { getCardTheme } from '../data/studioBios'
+import { asset } from '../utils/asset'
 import '../styles/studio-bios.css'
 
 /**
@@ -27,7 +28,7 @@ export default function BioCard({ person, frameClass = '', children }) {
   if (person.cardImage) {
     return (
       <article className="sb-card sb-card--image">
-        <img className="sb-card__image" src={person.cardImage} alt={person.name} />
+        <img className="sb-card__image" src={asset(person.cardImage)} alt={person.name} />
       </article>
     )
   }

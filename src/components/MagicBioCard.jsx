@@ -1,5 +1,6 @@
 import BioCard from './BioCard'
 import BioCardArt from './BioCardArt'
+import { getTeamLabel } from '../data/studioBios'
 
 /**
  * Magic: The Gathering-style collector card for one studio member. Name +
@@ -23,7 +24,7 @@ export default function MagicBioCard({ person }) {
           <BioCardArt person={person} className="sb-mtg__art" />
 
           <div className="sb-mtg__type">
-            <span>Legendary Creature — {person.role}</span>
+            <span>Legendary Creature{person.role ? ` — ${person.role}` : ''}</span>
             <span className="sb-mtg__set">★</span>
           </div>
 
@@ -33,12 +34,12 @@ export default function MagicBioCard({ person }) {
                 <b>{s.name}.</b> {s.text}
               </p>
             ))}
-            <p className="sb-mtg__flavor">“{person.bio}”</p>
+            {person.bio && <p className="sb-mtg__flavor">{person.bio}</p>}
           </div>
 
           <div className="sb-mtg__footer">
             <span className="sb-mtg__meta">
-              {m.rarity || 'Rare'} · {theme.magicColor} · Kato.8 Studios
+              {m.rarity || 'Rare'} · {theme.magicColor} · {getTeamLabel(person.team) || 'Kato.8 Studios'}
             </span>
             <span className="sb-mtg__pt">
               {m.power ?? 2}/{m.toughness ?? 2}
