@@ -1,9 +1,8 @@
 /**
  * Single source of truth for the studio's personal bios, rendered as
- * collector's cards on `/studio-bios` (see `StudioBiosPage`). The same
- * records feed three different card frames — Pokémon, Magic: The
- * Gathering, and Yu-Gi-Oh! — so the data is deliberately richer than any
- * one frame needs; each frame reads the fields it cares about.
+ * collector's cards on `/studio-bios` (see `StudioBiosPage`). Each person
+ * is dealt in their own card frame — Pokémon, Magic: The Gathering, or
+ * Yu-Gi-Oh! — in their own color, and the page groups them by team.
  *
  * Why data-driven instead of flat images: even if a person eventually
  * ships a single pre-rendered card PNG, keeping the structured record
@@ -11,17 +10,20 @@
  * swap frames. The `cardImage` field is the escape hatch — when set,
  * a card component renders that image in place of the generated layout.
  *
- * These are intentionally PLACEHOLDERS — invented names, roles, and
- * bios so the page can be built and reviewed before real bios land.
- * Mirrors the placeholder approach in `src/data/crowdfundingGames.js`.
+ * Source: the team's "Website_ProfilePic" sheet (Name, Style, Color, Team,
+ * Title, Bio) plus the profile pictures that came with it. Blank titles
+ * and bios are left empty on purpose — the frames skip empty fields.
  *
  * Record shape (all optional unless noted):
  *   slug       — REQUIRED. React key + stable id.
  *   name       — REQUIRED. Person's display name (card title).
- *   role       — REQUIRED. Studio role (subtitle / type line).
- *   bio        — REQUIRED. Personal bio; shown as the card's flavor text.
- *   type       — one of the keys in `CARD_TYPES` below. Drives color
+ *   team       — REQUIRED. A team `slug` from `TEAMS` below; the page
+ *                renders one section per team, in `TEAMS` order.
+ *   style      — REQUIRED. Card frame: 'pokemon' | 'magic' | 'yugioh'.
+ *   color      — one of the keys in `CARD_COLORS` below. Drives color
  *                theming and the per-frame type/attribute/color labels.
+ *   role       — Title (subtitle / type line). May be empty.
+ *   bio        — Personal bio; shown as the card's flavor text. May be empty.
  *   monogram   — 1–2 letters shown in the art window placeholder.
  *   avatar     — optional `/assets/...` portrait for the art window.
  *                Falls back to the themed monogram block when absent.
@@ -34,50 +36,56 @@
  *   magic      — { cost, rarity, power, toughness }. `cost` is a short
  *                mana string like '2UU' shown top-right.
  *   yugioh     — { level, attribute, monsterType, atk, def }.
- *
- * `type` semantics are studio-flavored (Vision, Systems, Craft, …), each
- * mapped once in `CARD_TYPES` to a base color plus the label each TCG
- * uses, so the records stay short and the mapping stays in one place.
  */
 
-// Studio "types" — one per broad discipline. Each carries the accent
-// color used across all three frames plus the per-frame label.
-export const CARD_TYPES = {
-  vision: {
-    accent: '#e8b23a',
-    pokemonType: 'Lightning',
-    magicColor: 'Gold',
-    yugiohAttribute: 'LIGHT',
+// Teams, in the order the page lists them. An array (not an object) so
+// the order survives the /__bios serializer, which sorts object keys.
+// `slug` is what a person's `team` field holds; `label` is the heading.
+export const TEAMS = [
+  {
+    label: 'Studio',
+    slug: 'studio',
   },
-  systems: {
-    accent: '#4c8bf5',
-    pokemonType: 'Water',
+  {
+    label: 'USB',
+    slug: 'usb',
+  },
+  {
+    label: 'Last Light',
+    slug: 'last-light',
+  },
+  {
+    label: 'BBCU',
+    slug: 'bbcu',
+  },
+]
+
+// Card colors from the studio's card templates. Each carries the accent
+// color used across all three frames plus the per-frame label.
+export const CARD_COLORS = {
+  'dark-blue': {
+    accent: '#43527c',
     magicColor: 'Blue',
+    pokemonType: 'Water',
     yugiohAttribute: 'WATER',
   },
-  craft: {
-    accent: '#e5533c',
-    pokemonType: 'Fire',
+  'dark-pink': {
+    accent: '#df7a93',
     magicColor: 'Red',
+    pokemonType: 'Psychic',
     yugiohAttribute: 'FIRE',
   },
-  growth: {
-    accent: '#4caf72',
-    pokemonType: 'Grass',
-    magicColor: 'Green',
-    yugiohAttribute: 'EARTH',
-  },
-  sound: {
-    accent: '#9b6cd8',
-    pokemonType: 'Psychic',
-    magicColor: 'Black',
-    yugiohAttribute: 'DARK',
-  },
-  ops: {
-    accent: '#6b7787',
-    pokemonType: 'Metal',
-    magicColor: 'White',
+  'light-blue': {
+    accent: '#707aa5',
+    magicColor: 'Blue',
+    pokemonType: 'Water',
     yugiohAttribute: 'WIND',
+  },
+  'light-pink': {
+    accent: '#f08fb2',
+    magicColor: 'White',
+    pokemonType: 'Fairy',
+    yugiohAttribute: 'LIGHT',
   },
 }
 
@@ -85,218 +93,225 @@ export const studioBios = [
   {
     name: 'Terry Teng',
     slug: 'terry-teng',
-    role: 'Founder & Creative Director',
-    type: 'vision',
+    role: 'Founder & CEO',
+    team: 'studio',
+    style: 'magic',
+    color: 'dark-blue',
     monogram: 'TT',
-    bio: 'Started the studio out of a two-bedroom apartment with a whiteboard and too much coffee. Sets the north star for every project and still sketches level ideas on napkins.',
-    specialties: [
-      {
-        name: 'North Star',
-        text: 'Turns a vague vibe into a shippable pitch overnight.',
-      },
-      {
-        name: 'Napkin Design',
-        text: 'Any flat surface becomes a design document.',
-      },
-    ],
-    pokemon: {
-      hp: 120,
-      resistance: 'Doubt',
-      retreat: 2,
-      weakness: 'Deadlines',
-    },
-    magic: {
-      cost: '3WW',
-      power: 5,
-      rarity: 'Mythic',
-      toughness: 5,
-    },
-    yugioh: {
-      atk: 2800,
-      def: 2400,
-      level: 8,
-      monsterType: 'Visionary / Effect',
-    },
+    avatar: '/assets/sandbox/team/terry-teng.jpg',
+    bio: 'With over 13 years in tech and gaming, Terry has made it his mission to change the culture and landscape of the current video game industry. Previous work experience at Google, Meta/Facebook, Riot Games, Xsolla, etc.',
+    specialties: [],
   },
   {
-    name: 'Marcus Obi',
-    slug: 'marcus-obi',
-    role: 'Lead Engineer',
-    type: 'systems',
-    monogram: 'MO',
-    bio: 'Keeps the whole thing running. Believes every bug has a story and every crash has a lesson. Has never met a build pipeline he could not shave three minutes off.',
-    specialties: [
-      {
-        name: 'Hotfix',
-        text: 'Ships a fix before the bug report finishes loading.',
-      },
-      {
-        name: 'Refactor',
-        text: 'Deletes more lines than he writes and the game runs faster.',
-      },
-    ],
-    pokemon: {
-      hp: 100,
-      resistance: 'Merge Conflicts',
-      retreat: 1,
-      weakness: 'Legacy Code',
-    },
-    magic: {
-      cost: '2UU',
-      power: 3,
-      rarity: 'Rare',
-      toughness: 6,
-    },
-    yugioh: {
-      atk: 2100,
-      def: 2600,
-      level: 7,
-      monsterType: 'Machine / Effect',
-    },
+    name: 'Ana Helena Vieira (Intern)',
+    slug: 'ana-helena-vieira',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'light-pink',
+    monogram: 'AV',
+    avatar: '/assets/sandbox/team/ana-helena-vieira.jpg',
+    bio: 'Someone that fixes bugs',
+    specialties: [],
   },
   {
-    name: 'Priya Rao',
-    slug: 'priya-rao',
-    role: 'Art Director',
-    type: 'craft',
-    monogram: 'PR',
-    bio: 'Owns the look of everything. Fills sketchbooks faster than the shelf can hold them and can tell you why a single pixel feels wrong from across the room.',
-    specialties: [
-      {
-        name: 'Style Pass',
-        text: 'One review turns programmer-art into a mood board come to life.',
-      },
-      {
-        name: 'Color Sense',
-        text: 'Sees the off-hue nobody else can and fixes it in one nudge.',
-      },
-    ],
-    pokemon: {
-      hp: 90,
-      resistance: 'Client Feedback',
-      retreat: 1,
-      weakness: 'Blank Canvas',
-    },
-    magic: {
-      cost: '1RR',
-      power: 4,
-      rarity: 'Mythic',
-      toughness: 3,
-    },
-    yugioh: {
-      atk: 2400,
-      def: 1800,
-      level: 7,
-      monsterType: 'Artist / Effect',
-    },
+    name: 'George Wang',
+    slug: 'george-wang',
+    role: '',
+    team: 'bbcu',
+    style: 'magic',
+    color: 'dark-blue',
+    monogram: 'GW',
+    avatar: '/assets/sandbox/team/george-wang.jpg',
+    bio: '',
+    specialties: [],
   },
   {
-    name: 'Lena Fischer',
-    slug: 'lena-fischer',
+    name: 'Sophia Jones',
+    slug: 'sophia-jones',
+    role: '',
+    team: 'bbcu',
+    style: 'magic',
+    color: 'light-blue',
+    monogram: 'SJ',
+    avatar: '/assets/sandbox/team/sophia-jones.jpg',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Keolani',
+    slug: 'keolani',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-pink',
+    monogram: 'K',
+    avatar: '/assets/sandbox/team/keolani.jpg',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Pride',
+    slug: 'pride',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-blue',
+    monogram: 'P',
+    avatar: '/assets/sandbox/team/pride.jpg',
+    bio: 'Long time game designer, both tabletop and digital. Loves classic games and old-school vibes.',
+    specialties: [],
+  },
+  {
+    name: 'Justin N',
+    slug: 'justin-n',
+    role: 'Art Lead / 3D Lead',
+    team: 'bbcu',
+    style: 'magic',
+    color: 'dark-blue',
+    monogram: 'JN',
+    avatar: '/assets/sandbox/team/justin-n.jpg',
+    bio: '3D Artist with over 10 years of experience in the games and film industry with a focus on building fascinating and unique environments.',
+    specialties: [],
+  },
+  {
+    name: 'Hailey H',
+    slug: 'hailey-h',
+    role: 'Art director / Lead concept artist',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-blue',
+    monogram: 'HH',
+    avatar: '/assets/sandbox/team/hailey-h.jpg',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Ian R',
+    slug: 'ian-r',
+    role: 'Audio Designer',
+    team: 'bbcu',
+    style: 'pokemon',
+    color: 'dark-blue',
+    monogram: 'IR',
+    avatar: '/assets/sandbox/team/ian-r.jpg',
+    bio: 'Music and audio professional based in San Francisco, California whose compositions and arrangements for film, installation, and stage have been performed throughout the United States and Europe. As an emerging game audio professional, Ian\'s music and audio design have also been featured on several new indie projects. Ian holds a Master of Music in Technology and Applied Composition from the San Francisco Conservatory of Music and enjoys singing dumb songs to his cat.',
+    specialties: [],
+  },
+  {
+    name: 'Katie L',
+    slug: 'katie-l',
+    role: '',
+    team: 'studio',
+    style: 'pokemon',
+    color: 'light-blue',
+    monogram: 'KL',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Lindsay W',
+    slug: 'lindsay-w',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'light-blue',
+    monogram: 'LW',
+    avatar: '/assets/sandbox/team/lindsay-w.jpg',
+    bio: '2D animator and artist.',
+    specialties: [],
+  },
+  {
+    name: 'Rhianna',
+    slug: 'rhianna',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-pink',
+    monogram: 'R',
+    avatar: '/assets/sandbox/team/rhianna.jpg',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Liz Polilli',
+    slug: 'liz-polilli',
+    role: '',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-pink',
+    monogram: 'LP',
+    bio: '',
+    specialties: [],
+  },
+  {
+    name: 'Ryan Folk',
+    slug: 'ryan-folk',
+    role: 'Level Designer',
+    team: 'usb',
+    style: 'yugioh',
+    color: 'dark-blue',
+    monogram: 'RF',
+    bio: '[Level/Design] All Digital Assets on the field can be manipulated and placed by this card. Using this effect in the Opponent\'s Standby Phase adds 1500 ATK and DEF Points to every monster on the player\'s side of the field.',
+    specialties: [],
+  },
+  {
+    name: 'Marcus Gordon',
+    slug: 'marcus-gordon',
+    role: 'General Artist',
+    team: 'last-light',
+    style: 'pokemon',
+    color: 'dark-blue',
+    monogram: 'MG',
+    avatar: '/assets/sandbox/team/marcus-gordon.jpg',
+    bio: 'Graduate from the University of Southern California (USC) Computer Science Games Major; a world-leading joint program between the Viterbi School of Engineering and the School of Cinematic Arts. Over 12 years of experience in a variety of fields of game design including 3D artist, programmer, and musical composer. Achieved rare honor of supporting two Senior Capstone Game Design projects as a Freshman. Competitively selected for both USC\'s National Honors Society and the initial student group for a new joint Microsoft Games and USC Computer Science Games development program.',
+    specialties: [],
+  },
+  {
+    name: 'Matthew Pablo',
+    slug: 'matthew-pablo',
+    role: 'Audio Designer',
+    team: 'usb',
+    style: 'pokemon',
+    color: 'dark-blue',
+    monogram: 'MP',
+    avatar: '/assets/sandbox/team/matthew-pablo.jpg',
+    bio: 'An industry audio leader with over 14 years of experience in games, music, and entertainment, Matthew has led audio alongside legendary game designer Warren Spector and created music and sound for Disney, Pokémon, Marvel, AMC, and collaborated with artists such as deadmau5. A Berklee College of Music graduate, his work spans audio direction, sound design, composition, technical audio, music supervision, and music production.',
+    specialties: [],
+  },
+  {
+    name: 'Desiree Ott (Intern)',
+    slug: 'desiree-ott',
+    role: 'Game Design Intern',
+    team: 'studio',
+    style: 'magic',
+    color: 'light-blue',
+    monogram: 'DO',
+    avatar: '/assets/sandbox/team/desiree-ott.jpg',
+    bio: 'Game Design student, former competitive esports player, and current Game Design Intern.\n\nRemove three Iteration counters: Untap all Designers you control. They gain “The players will figure it out” until end of turn.',
+    specialties: [],
+  },
+  {
+    name: 'Ryan Kenfield',
+    slug: 'ryan-kenfield',
     role: 'Game Designer',
-    type: 'growth',
-    monogram: 'LF',
-    bio: 'Lives in spreadsheets and playtests. Can balance an economy in her sleep and will happily argue about jump arcs for an hour — then prove her point with a prototype.',
-    specialties: [
-      {
-        name: 'Balance Pass',
-        text: 'Every number nudged until the whole system just clicks.',
-      },
-      {
-        name: 'Fast Prototype',
-        text: 'A rough playable by lunch to settle any design debate.',
-      },
-    ],
-    pokemon: {
-      hp: 95,
-      resistance: 'Analysis Paralysis',
-      retreat: 2,
-      weakness: 'Scope Creep',
-    },
-    magic: {
-      cost: '2GG',
-      power: 3,
-      rarity: 'Rare',
-      toughness: 4,
-    },
-    yugioh: {
-      atk: 2000,
-      def: 2200,
-      level: 6,
-      monsterType: 'Strategist / Effect',
-    },
+    team: 'last-light',
+    style: 'magic',
+    color: 'dark-blue',
+    monogram: 'RK',
+    bio: 'Technical Designer with 5+ years in game development. Ryan has worked with companies like Disney Imagineering and Formula 1 creating games and interactives for their parks. Has created shows for Adult Swim Smalls and is always working on his own animated sitcom. Fun fact Ryan also is a Cannes award winning actor.',
+    specialties: [],
   },
   {
-    name: 'Theo Marlowe',
-    slug: 'theo-marlowe',
-    role: 'Audio Director',
-    type: 'sound',
-    monogram: 'TM',
-    bio: 'Makes the world feel alive. Records everything from thunderstorms to cereal boxes and turns it into a soundtrack you hum for weeks. Owns an alarming number of microphones.',
-    specialties: [
-      {
-        name: 'Foley Magic',
-        text: 'Turns kitchen junk into the perfect in-game sound.',
-      },
-      {
-        name: 'Leitmotif',
-        text: 'One theme you will be humming long after you quit.',
-      },
-    ],
-    pokemon: {
-      hp: 85,
-      resistance: 'Feedback Loops',
-      retreat: 1,
-      weakness: 'Silence',
-    },
-    magic: {
-      cost: '1BB',
-      power: 2,
-      rarity: 'Rare',
-      toughness: 4,
-    },
-    yugioh: {
-      atk: 1900,
-      def: 2000,
-      level: 6,
-      monsterType: 'Composer / Effect',
-    },
-  },
-  {
-    name: 'Sam Delacroix',
-    slug: 'sam-delacroix',
-    role: 'Community & Operations',
-    type: 'ops',
-    monogram: 'SD',
-    bio: 'The glue. Runs the Discord, the schedule, and the snack budget with equal care. If the studio feels calm on a launch day, it is because Sam absorbed the chaos first.',
-    specialties: [
-      {
-        name: 'Firewall',
-        text: 'Absorbs launch-day chaos so the team never feels it.',
-      },
-      {
-        name: 'Rally',
-        text: 'A three-line post that gets the whole community showing up.',
-      },
-    ],
-    pokemon: {
-      hp: 110,
-      resistance: 'Bad Reviews',
-      retreat: 3,
-      weakness: 'Burnout',
-    },
-    magic: {
-      cost: '2WW',
-      power: 2,
-      rarity: 'Rare',
-      toughness: 6,
-    },
-    yugioh: {
-      atk: 1800,
-      def: 2800,
-      level: 7,
-      monsterType: 'Guardian / Effect',
-    },
+    name: 'Kit Hannay',
+    slug: 'kit-hannay',
+    role: '2D Artist',
+    team: 'last-light',
+    style: 'pokemon',
+    color: 'light-pink',
+    monogram: 'KH',
+    bio: 'Kit is a comic artist, illustrator, and solo game developer from upstate NY. When she\'s not doodling, she can be found in a dark corner curled up with a book.',
+    specialties: [],
   },
 ]
 
@@ -304,8 +319,21 @@ export function getStudioBioBySlug(slug) {
   return studioBios.find((person) => person.slug === slug) || null
 }
 
-// Convenience: resolve a person's theme block from their `type` key,
-// falling back to a neutral theme if a record uses an unknown type.
+// Convenience: resolve a person's theme block from their `color` key,
+// falling back to dark blue if a record uses an unknown color.
 export function getCardTheme(person) {
-  return CARD_TYPES[person?.type] || CARD_TYPES.ops
+  return CARD_COLORS[person?.color] || CARD_COLORS['dark-blue']
+}
+
+// A team's display label from its slug (falls back to the raw slug).
+export function getTeamLabel(slug) {
+  return TEAMS.find((team) => team.slug === slug)?.label || slug
+}
+
+// People grouped into `TEAMS` order: [{ slug, label, people }], skipping
+// teams with nobody in them. Unknown team slugs are dropped.
+export function getStudioBiosByTeam(people = studioBios) {
+  return TEAMS
+    .map((team) => ({ ...team, people: people.filter((p) => p.team === team.slug) }))
+    .filter((group) => group.people.length)
 }

@@ -133,9 +133,9 @@
 
       <div class="card">
         <div class="card__head">
-          <h2>Card types &amp; themes</h2>
+          <h2>Card colors &amp; themes</h2>
           <span class="spacer"></span>
-          <button class="btn btn--sm" id="save-types" disabled>Save types</button>
+          <button class="btn btn--sm" id="save-types" disabled>Save colors</button>
         </div>
         <div class="card__body" id="types"></div>
       </div>
@@ -152,7 +152,7 @@
           </div>
           <div class="card__body">
             <iframe class="preview-iframe" id="preview" src="/studio-bios?bare=1"></iframe>
-            <p class="preview-note">Use the Pokémon / Magic / Yu-Gi-Oh! switcher inside the preview. Saving reloads it.</p>
+            <p class="preview-note">Each card uses the person’s own frame and color, grouped by team. Saving reloads it.</p>
           </div>
         </div>
       </div>
@@ -162,7 +162,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const state = { people: [], types: {}, selected: -1, dirty: false, typesDirty: false }
+    const state = { people: [], types: {}, teams: [], selected: -1, dirty: false, typesDirty: false }
+    const STYLES = { pokemon: 'Pokémon', magic: 'Magic', yugioh: 'Yu-Gi-Oh!' }
     const $ = (id) => document.getElementById(id)
 
     function toast(msg, isErr) {
@@ -179,14 +180,25 @@
       $('dirty').style.display = ''
     }
 
-    function typeOptions(selected) {
-      return Object.keys(state.types)
-        .map((k) => `<option value="${k}"${k === selected ? ' selected' : ''}>${k}</option>`)
+    // Options for a select from a { value: label } map (or a key list).
+    function options(map, selected) {
+      const entries = Array.isArray(map) ? map.map((k) => [k, k]) : Object.entries(map)
+      return entries
+        .map(([k, label]) => `<option value="${k}"${k === selected ? ' selected' : ''}>${escapeHtml(label)}</option>`)
         .join('')
     }
 
+    // TEAMS is an ordered [{ label, slug }] list in the data file.
+    function teamMap() {
+      return Object.fromEntries(state.teams.map((t) => [t.slug, t.label]))
+    }
+    function teamLabel(slug) {
+      const t = state.teams.find((x) => x.slug === slug)
+      return t ? t.label : slug
+    }
+
     function accentFor(person) {
-      const t = state.types[person && person.type] || state.types.ops || {}
+      const t = state.types[person && person.color] || state.types['dark-blue'] || {}
       return t.accent || '#6b7787'
     }
 
@@ -204,7 +216,7 @@
         row.innerHTML =
           `<span class="swatch" style="background:${accentFor(p)}"></span>` +
           `<div class="pr-main"><div class="pr-name">${escapeHtml(p.name || '(unnamed)')}</div>` +
-          `<div class="pr-role">${escapeHtml(p.role || '')}</div></div>`
+          `<div class="pr-role">${escapeHtml([teamLabel(p.team), p.role].filter(Boolean).join(' · '))}</div></div>`
         const btns = document.createElement('div')
         btns.className = 'rowbtns'
         btns.appendChild(iconBtn('↑', () => move(i, -1), i === 0))
@@ -237,7 +249,8 @@
 
     function blankPerson() {
       return {
-        slug: '', name: '', role: '', type: Object.keys(state.types)[0] || 'ops',
+        slug: '', name: '', role: '', team: (state.teams[0] && state.teams[0].slug) || '',
+        style: 'pokemon', color: Object.keys(state.types)[0] || 'dark-blue',
         monogram: '', bio: '', specialties: [],
         pokemon: { hp: 100, weakness: '', resistance: '', retreat: 1 },
         magic: { cost: '', rarity: 'Rare', power: 2, toughness: 2 },
@@ -286,7 +299,11 @@
       form.appendChild(textField('Name', p.name, (v) => { p.name = v; $('editor-title').textContent = v || 'Edit person'; syncRow() }))
       form.appendChild(row2(
         textField('Slug (auto from name if blank)', p.slug, (v) => { p.slug = v }),
-        selectField('Type', typeOptions(p.type), (v) => { p.type = v; syncRow() })
+        selectField('Team', options(teamMap(), p.team), (v) => { p.team = v; syncRow() })
+      ))
+      form.appendChild(row2(
+        selectField('Card style', options(STYLES, p.style), (v) => { p.style = v }),
+        selectField('Color', options(Object.keys(state.types), p.color), (v) => { p.color = v; syncRow() })
       ))
       form.appendChild(row2(
         textField('Role', p.role, (v) => { p.role = v; syncRow() }),
@@ -346,7 +363,7 @@
       if (!row) return
       const p = state.people[state.selected]
       row.querySelector('.pr-name').textContent = p.name || '(unnamed)'
-      row.querySelector('.pr-role').textContent = p.role || ''
+      row.querySelector('.pr-role').textContent = [teamLabel(p.team), p.role].filter(Boolean).join(' · ')
       row.querySelector('.swatch').style.background = accentFor(p)
     }
 
@@ -494,7 +511,7 @@
         state.typesDirty = false
         $('save-types').disabled = true
         reloadPreview()
-        toast('Saved types')
+        toast('Saved colors')
       } catch (e) { toast(e.message, true) }
     }
 
@@ -528,6 +545,7 @@
       const j = await res.json()
       state.people = j.people || []
       state.types = j.types || {}
+      state.teams = j.teams || []
       renderList(); renderTypes()
     }
 

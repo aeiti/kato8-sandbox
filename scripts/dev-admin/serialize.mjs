@@ -23,7 +23,7 @@
 // order the UI sends keys in. Covers every editable literal:
 //   home listings  → { path, title, active, description }
 //   preview entries → { name, label, status, category, source, styles, description }
-//   studio bios    → { slug, name, role, type, monogram, …, specialties, pokemon, magic, yugioh }
+//   studio bios    → { slug, name, role, team, style, color, monogram, …, specialties, pokemon, magic, yugioh }
 //   crowdfunding   → { slug, title, categories, comingSoon, image, coverImage, itchUrl, description, body }
 // The blocks share this one list; each object only carries its own subset,
 // and the relative order of the home/component keys is preserved (they sit
@@ -34,6 +34,8 @@
 const KEY_ORDER = [
   // shared / home / component identity
   'name', 'label', 'slug', 'role', 'type',
+  // studio-bio grouping + frame
+  'team', 'style', 'color',
   'path', 'title', 'active', 'status', 'category', 'source', 'styles',
   // studio-bio content
   'monogram', 'avatar', 'cardImage', 'bio', 'text', 'specialties',

@@ -21,9 +21,9 @@
  * Endpoints (all under /__bios):
  *   GET  /__bios                    → the bios editor UI (bios-admin.html)
  *   GET  /__bios/api/info           → { branch, isMain }
- *   GET  /__bios/api/data           → { people, types }
+ *   GET  /__bios/api/data           → { people, types, teams }
  *   PUT  /__bios/api/people         → rewrite the `studioBios` array
- *   PUT  /__bios/api/types          → rewrite the `CARD_TYPES` object
+ *   PUT  /__bios/api/types          → rewrite the `CARD_COLORS` object
  *   POST /__bios/api/upload         → save an uploaded image (avatar / card art)
  *   POST /__bios/api/publish        → commit + push the bios feature files
  *
@@ -42,7 +42,9 @@ const UI_HTML = path.join(__dirname, 'bios-admin.html')
 
 const DATA_FILE = 'src/data/studioBios.js'
 const PEOPLE_ANCHOR = 'export const studioBios = '
-const TYPES_ANCHOR = 'export const CARD_TYPES = '
+const TYPES_ANCHOR = 'export const CARD_COLORS = '
+const TEAMS_ANCHOR = 'export const TEAMS = '
+const STYLES = ['pokemon', 'magic', 'yugioh']
 const ASSETS_DIR = 'public/assets/sandbox'
 
 // Files Push is allowed to commit — the whole studio-bios feature and
@@ -146,7 +148,15 @@ function normalizePerson(p, index) {
     throw new Error(`invalid slug for "${name}": ${JSON.stringify(slug)}`)
   }
 
-  const out = { slug, name, role: String(p.role || '').trim(), type: p.type || 'ops' }
+  const out = {
+    slug,
+    name,
+    role: String(p.role || '').trim(),
+    team: String(p.team || '').trim(),
+    style: STYLES.includes(p.style) ? p.style : 'pokemon',
+    color: p.color || 'dark-blue',
+  }
+  if (!out.team) throw new Error(`"${name}" needs a team`)
   if (p.monogram) out.monogram = String(p.monogram).trim().slice(0, 3)
   out.bio = String(p.bio || '').trim()
   if (p.avatar) out.avatar = String(p.avatar).trim()
@@ -209,13 +219,15 @@ export function devBiosAdmin() {
             return
           }
 
-          // GET /__bios/api/data — read the people array + the type themes
+          // GET /__bios/api/data — read the people array, the color themes,
+          // and the team list (read-only here; edit TEAMS in the data file)
           if (req.method === 'GET' && url === '/api/data') {
             const { readBlock } = await load()
             const src = fs.readFileSync(dataPath, 'utf8')
             sendJson(res, 200, {
               people: readBlock(src, PEOPLE_ANCHOR),
               types: readBlock(src, TYPES_ANCHOR),
+              teams: readBlock(src, TEAMS_ANCHOR),
             })
             return
           }
@@ -243,15 +255,15 @@ export function devBiosAdmin() {
             return
           }
 
-          // PUT /__bios/api/types — rewrite the CARD_TYPES object
+          // PUT /__bios/api/types — rewrite the CARD_COLORS object
           if (req.method === 'PUT' && url === '/api/types') {
             const value = await readJsonBody(req)
             if (!value || typeof value !== 'object' || Array.isArray(value)) {
-              return sendJson(res, 400, { error: 'expected a JSON object of types' })
+              return sendJson(res, 400, { error: 'expected a JSON object of colors' })
             }
             for (const key of Object.keys(value)) {
               if (!SLUG.test(key)) {
-                return sendJson(res, 400, { error: `invalid type key: ${key}` })
+                return sendJson(res, 400, { error: `invalid color key: ${key}` })
               }
             }
 

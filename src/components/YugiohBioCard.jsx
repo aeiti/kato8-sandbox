@@ -30,10 +30,10 @@ export default function YugiohBioCard({ person }) {
 
         <BioCardArt person={person} className="sb-ygo__art" />
 
-        <div className="sb-ygo__type">[ {y.monsterType || 'Effect'} ]</div>
+        <div className="sb-ygo__type">[ {y.monsterType || person.role || 'Effect'} ]</div>
 
         <div className="sb-ygo__text">
-          <p className="sb-ygo__effect">{person.bio}</p>
+          {person.bio && <p className="sb-ygo__effect">{person.bio}</p>}
           {(person.specialties || []).map((s) => (
             <p className="sb-ygo__effect" key={s.name}>
               <b>● {s.name}:</b> {s.text}
