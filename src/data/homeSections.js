@@ -54,7 +54,7 @@ export const experiments = [
     path: '/studio-bios-frames',
     title: 'Studio Bios — card artwork',
     active: true,
-    description: 'Same team page built from the studio’s finished trading-card frame images instead of CSS-drawn frames. Each member’s photo sits in their frame’s art window, and cards flip on click to show the frame’s back. The frames still carry the designer’s sample text.',
+    description: 'Same team page with each member’s finished trading card from the designer; cards flip on click to show their frame’s back.',
   },
   {
     path: '/investors',
