@@ -23,8 +23,7 @@ export const sections = [
   {
     path: '/components',
     title: 'Components',
-    description:
-      'Every component from the main site (Nav, Footer, Hero, GameCard, forms, etc.), rendered in isolation for review.',
+    description: 'Every component from the main site (Nav, Footer, Hero, GameCard, forms, and more), rendered in isolation for review.',
   },
 ]
 
