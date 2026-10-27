@@ -92,6 +92,20 @@ test('confirmation copy has no em dashes', () => {
   assert.ok(!CONFIRMATION.subject.includes('—'))
 })
 
+test('confirmation links the socials, not the website they came from', () => {
+  for (const url of [
+    'https://www.instagram.com/kato.8_studios/',
+    'https://www.tiktok.com/@kato.8_studios',
+    'https://x.com/Kato8_Studios',
+    'https://bsky.app/profile/kato-8.bsky.social',
+    'https://www.youtube.com/@Kato.8Studios',
+    'https://www.linkedin.com/company/kato-8-studios/',
+  ]) {
+    assert.ok(CONFIRMATION.text.includes(url), url)
+  }
+  assert.ok(!CONFIRMATION.text.includes('kato8studios.com'))
+})
+
 test('Formspree failure returns an error and sends no confirmation', async () => {
   responses[FORMSPREE] = () => new Response('nope', { status: 500 })
   const res = await worker.fetch(post(valid), baseEnv)

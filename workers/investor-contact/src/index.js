@@ -36,13 +36,22 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 const RESEND_URL = 'https://api.resend.com/emails'
 
+// Social links mirror the main site's footer / nav (external-site
+// src/components/SocialIcons.jsx). No website link: they just came from it.
 export const CONFIRMATION = {
   subject: 'Thanks for reaching out to Kato.8',
   text: `Hi there,
 
 Thanks for reaching out to Kato.8 Studios. We've got your message, and someone from the team will get back to you within 2 business days. If it's time-sensitive, just reply to this email.
 
-In the meantime, you can see what we're working on at kato8studios.com.
+In the meantime, you can follow along with what we're working on:
+
+Instagram: https://www.instagram.com/kato.8_studios/
+TikTok: https://www.tiktok.com/@kato.8_studios
+X: https://x.com/Kato8_Studios
+Bluesky: https://bsky.app/profile/kato-8.bsky.social
+YouTube: https://www.youtube.com/@Kato.8Studios
+LinkedIn: https://www.linkedin.com/company/kato-8-studios/
 
 The Kato.8 team
 `,
