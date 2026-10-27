@@ -3,6 +3,12 @@ name = "kato8-investor-contact"
 main = "src/index.js"
 compatibility_date = "2026-10-01"
 
+# Images used by the confirmation email (public/email/*.png), served at
+# <worker-url>/email/<file>. Requests that match no file (the form's POST
+# to /) run the Worker code.
+[assets]
+directory = "./public"
+
 [vars]
 # Sites allowed to post to this Worker (exact Origin header values).
 # Deliberately NOT the sandbox (aeiti.github.io): the form isn't meant to
@@ -15,6 +21,9 @@ FROM_ADDRESS = "partners@kato8studios.com"
 # Inbox that receives replies to the confirmation email.
 REPLY_TO = "REPLACE_WITH_TERRYS_EMAIL"
 DRY_RUN = "false"
+# Optional: host the email images elsewhere (e.g. https://kato8studios.com)
+# by putting public/email/ there and setting this. Default: this Worker.
+# EMAIL_ASSET_BASE = "https://kato8studios.com"
 
 # Secrets (never in this file). Set each with `npx wrangler secret put <NAME>`:
 #   TURNSTILE_SECRET    Cloudflare Turnstile secret key
