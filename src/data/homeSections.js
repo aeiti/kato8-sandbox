@@ -45,22 +45,10 @@ export const pages = [
 
 export const experiments = [
   {
-    path: '/studio-bios',
-    title: 'Studio Bios',
-    active: true,
-    description: 'Meet-the-team page prototype — each studio member’s bio dealt out as a collector’s card in their own Pokémon, Magic, or Yu-Gi-Oh! frame, grouped by team: Studio, USB, Last Light, and BBCU.',
-  },
-  {
     path: '/studio-bios-frames',
     title: 'Studio Bios — card artwork',
     active: true,
     description: 'Same team page with each member’s finished trading card from the designer; cards flip on click to show their frame’s back.',
-  },
-  {
-    path: '/investors',
-    title: 'Investors page',
-    active: true,
-    description: 'Prototype investor / publisher page — a partnership hero plus a contact form for investors and publishers, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
   },
   {
     path: '/investors-color',
@@ -69,22 +57,34 @@ export const experiments = [
     description: 'Same investor page with more color, for comparison: a dark-cobalt hero band carrying the nav’s pink→peach wave, plus a strip of the three studio games above the contact form.',
   },
   {
-    path: '/kickstarter-button-v2',
-    title: 'Kickstarter Button v2',
-    active: true,
-    description: 'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
-  },
-  {
     path: '/our-story-timeline',
     title: 'Our Story timeline',
     active: true,
     description: 'Milestone timeline proposed for the bottom of the About page — alternating cards zigzag around a centered line, collapsing to a left rail on mobile. WIP from external-site branch about-timeline-section; vendored here (not yet on main).',
   },
   {
+    path: '/kickstarter-button-v2',
+    title: 'Kickstarter Button v2',
+    active: true,
+    description: 'Flatter, "official-partner" take on the shipped Kickstarter CTA — response to v1 reading as designed-by-AI. Side-by-side with v1 for team review.',
+  },
+  {
     path: '/newsletter-on-about',
     title: 'Newsletter on About',
     active: true,
     description: 'NewsletterSignup mounted below the Support Kato.8 section on the About page, with the top spacing tightened so the form hugs the section above. WIP from external-site branch mount-newsletter-on-about.',
+  },
+  {
+    path: '/studio-bios',
+    title: 'Studio Bios',
+    active: false,
+    description: 'Meet-the-team page prototype — each studio member’s bio dealt out as a collector’s card in their own Pokémon, Magic, or Yu-Gi-Oh! frame, grouped by team: Studio, USB, Last Light, and BBCU.',
+  },
+  {
+    path: '/investors',
+    title: 'Investors page',
+    active: false,
+    description: 'Prototype investor / publisher page — a partnership hero plus a contact form for investors and publishers, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
   },
   {
     path: '/kickstarter-buttons',
