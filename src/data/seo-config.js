@@ -138,7 +138,7 @@ export const staticRoutes = {
     ogDescription:
       'Archived home page snapshot with the parallax USB cover-art background and cleaned-up game cards.',
   },
-  '/investors-color': {
+  '/investors-colour': {
     title: 'Investors (color) | Kato.8 Sandbox',
     description:
       'Color variant of the investor / publisher page for comparison with /investors — a dark-cobalt hero band with the nav’s pink→peach wave, plus a strip of the studio’s three games above the contact form. WIP preview.',
