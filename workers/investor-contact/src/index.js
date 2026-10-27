@@ -12,16 +12,21 @@
  *   6. Forwards the submission to Formspree, so the studio inbox still
  *      receives it. If that fails, the visitor gets an error and no
  *      confirmation is sent.
- *   7. Sends the confirmation email to the visitor through Resend. A
- *      failure here is logged but doesn't fail the request: the
- *      submission is already safely in Formspree.
+ *   7. Sends the confirmation email (src/email.js: HTML + plain text)
+ *      to the visitor through Resend. A failure here is logged but
+ *      doesn't fail the request: the submission is already safely in
+ *      Formspree.
+ *
+ * Also serves the email's images from public/email/ as static assets
+ * (wrangler.toml [assets]); POSTs to / fall through to this code.
  *
  * DRY_RUN=true skips both outbound sends (Formspree + Resend) and logs
  * what would have been sent, so the whole flow can be exercised locally
  * with `wrangler dev` before any accounts exist.
  *
  * Config (see wrangler.toml and .dev.vars.example):
- *   vars:    ALLOWED_ORIGINS, FROM_ADDRESS, REPLY_TO, DRY_RUN
+ *   vars:    ALLOWED_ORIGINS, FROM_ADDRESS, REPLY_TO, DRY_RUN,
+ *            EMAIL_ASSET_BASE (optional; defaults to this Worker's origin)
  *   secrets: TURNSTILE_SECRET, RESEND_API_KEY, FORMSPREE_ENDPOINT
  */
 
@@ -32,30 +37,10 @@ export const TYPES = ['investor', 'publisher']
 const LIMITS = { name: 200, email: 254, phone: 50, company: 200, details: 5000 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+import { SUBJECT, renderHtml, renderText } from './email.js'
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 const RESEND_URL = 'https://api.resend.com/emails'
-
-// Social links mirror the main site's footer / nav (external-site
-// src/components/SocialIcons.jsx). No website link: they just came from it.
-export const CONFIRMATION = {
-  subject: 'Thanks for reaching out to Kato.8',
-  text: `Hi there,
-
-Thanks for reaching out to Kato.8 Studios. We've got your message, and someone from the team will get back to you within 2 business days. If it's time-sensitive, just reply to this email.
-
-In the meantime, you can follow along with what we're working on:
-
-Instagram: https://www.instagram.com/kato.8_studios/
-TikTok: https://www.tiktok.com/@kato.8_studios
-X: https://x.com/Kato8_Studios
-Bluesky: https://bsky.app/profile/kato-8.bsky.social
-YouTube: https://www.youtube.com/@Kato.8Studios
-LinkedIn: https://www.linkedin.com/company/kato-8-studios/
-
-The Kato.8 team
-`,
-}
 
 export default {
   async fetch(request, env) {
@@ -111,7 +96,8 @@ export default {
       }
     }
 
-    const email = confirmationEmail(submission, env)
+    const assetBase = env.EMAIL_ASSET_BASE || new URL(request.url).origin
+    const email = confirmationEmail(submission, env, assetBase)
     if (dryRun) {
       console.log('[dry run] would send confirmation:', JSON.stringify(email))
     } else {
@@ -145,13 +131,14 @@ export function validate(body) {
   return { value }
 }
 
-export function confirmationEmail(submission, env) {
+export function confirmationEmail(submission, env, assetBase) {
   return {
     from: `Kato.8 Studios <${env.FROM_ADDRESS}>`,
     to: [submission.email],
     reply_to: env.REPLY_TO,
-    subject: CONFIRMATION.subject,
-    text: CONFIRMATION.text,
+    subject: SUBJECT,
+    html: renderHtml(assetBase),
+    text: renderText(),
   }
 }
 

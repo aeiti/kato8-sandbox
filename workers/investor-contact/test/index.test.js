@@ -4,7 +4,8 @@
 
 import { test, beforeEach, afterEach } from 'node:test'
 import assert from 'node:assert/strict'
-import worker, { CONFIRMATION } from '../src/index.js'
+import worker from '../src/index.js'
+import { SUBJECT, SOCIALS, renderHtml, renderText } from '../src/email.js'
 
 const ORIGIN = 'https://kato8studios.com'
 const TURNSTILE = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
@@ -81,29 +82,62 @@ test('valid submission is forwarded to Formspree, then confirmed via Resend', as
   assert.deepEqual(email.to, ['jane@example.com'])
   assert.equal(email.from, 'Kato.8 Studios <partners@kato8studios.com>')
   assert.equal(email.reply_to, 'terry@example.com')
-  assert.equal(email.subject, CONFIRMATION.subject)
-  assert.equal(email.text, CONFIRMATION.text)
+  assert.equal(email.subject, SUBJECT)
+  assert.equal(email.text, renderText())
+  // Images default to the Worker's own origin (its static assets).
+  assert.equal(email.html, renderHtml('https://worker.example'))
   assert.equal(calls[2].init.headers.Authorization, 'Bearer re_test')
   assert.equal(res.headers.get('Access-Control-Allow-Origin'), ORIGIN)
 })
 
+const SOCIAL_URLS = [
+  'https://www.instagram.com/kato.8_studios/',
+  'https://www.tiktok.com/@kato.8_studios',
+  'https://x.com/Kato8_Studios',
+  'https://bsky.app/profile/kato-8.bsky.social',
+  'https://www.youtube.com/@Kato.8Studios',
+  'https://www.linkedin.com/company/kato-8-studios/',
+]
+
 test('confirmation copy has no em dashes', () => {
-  assert.ok(!CONFIRMATION.text.includes('—'))
-  assert.ok(!CONFIRMATION.subject.includes('—'))
+  for (const part of [SUBJECT, renderText(), renderHtml('https://a.example')]) {
+    assert.ok(!part.includes('—'))
+  }
 })
 
-test('confirmation links the socials, not the website they came from', () => {
-  for (const url of [
-    'https://www.instagram.com/kato.8_studios/',
-    'https://www.tiktok.com/@kato.8_studios',
-    'https://x.com/Kato8_Studios',
-    'https://bsky.app/profile/kato-8.bsky.social',
-    'https://www.youtube.com/@Kato.8Studios',
-    'https://www.linkedin.com/company/kato-8-studios/',
-  ]) {
-    assert.ok(CONFIRMATION.text.includes(url), url)
+test('both versions link every social profile, and not the website', () => {
+  const html = renderHtml('https://a.example')
+  const text = renderText()
+  for (const url of SOCIAL_URLS) {
+    assert.ok(text.includes(url), `text: ${url}`)
+    assert.ok(html.includes(`href="${url}"`), `html: ${url}`)
   }
-  assert.ok(!CONFIRMATION.text.includes('kato8studios.com'))
+  for (const part of [text, html]) assert.ok(!part.includes('kato8studios.com'))
+})
+
+test('html: every icon is an absolute PNG under the asset base, labelled in text', () => {
+  const html = renderHtml('https://assets.example/')
+  for (const s of SOCIALS) {
+    assert.match(s.icon, /\.png$/, 'email clients do not render SVG')
+    assert.ok(html.includes(`src="https://assets.example/email/${s.icon}"`), s.icon)
+    assert.ok(html.includes(`${s.name}\n`), `${s.name} label shows when images are blocked`)
+  }
+  assert.ok(html.includes('src="https://assets.example/email/kato8-logo.png"'))
+  assert.ok(!/src="\//.test(html), 'no relative image URLs')
+})
+
+test('every image the email references exists in public/email', async () => {
+  const fs = await import('node:fs')
+  const html = renderHtml('https://a.example')
+  const files = [...html.matchAll(/src="https:\/\/a\.example\/email\/([^"]+)"/g)].map((m) => m[1])
+  assert.equal(files.length, SOCIALS.length + 1)
+  for (const f of files) assert.ok(fs.existsSync(new URL(`../public/email/${f}`, import.meta.url)), f)
+})
+
+test('EMAIL_ASSET_BASE overrides the image host', async () => {
+  await worker.fetch(post(valid), { ...baseEnv, EMAIL_ASSET_BASE: 'https://kato8studios.com' })
+  const email = JSON.parse(calls.find((c) => c.url === RESEND).init.body)
+  assert.equal(email.html, renderHtml('https://kato8studios.com'))
 })
 
 test('Formspree failure returns an error and sends no confirmation', async () => {

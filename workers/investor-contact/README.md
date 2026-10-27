@@ -70,7 +70,28 @@ before any local `npm run build`, since a build inlines its values.
 `VITE_INVESTOR_ENDPOINT` to the Worker URL and `VITE_TURNSTILE_SITE_KEY` to
 the Turnstile site key. Both are public values.
 
-## Changing the confirmation email
+## The confirmation email
 
-The subject and text are `CONFIRMATION` in `src/index.js`. `npm test` checks
-the copy has no em dashes. Redeploy after editing.
+`src/email.js` builds it as HTML (Kato.8 logo, the message, and a dark footer
+with clickable social icons and their names) plus a plain-text version for
+clients that don't show HTML. Edit the copy and links there and redeploy.
+`npm test` checks that the copy has no em dashes, both versions link every
+social profile and not the website, and every image the HTML uses exists.
+
+The images live in `public/email/` and are served by the Worker itself
+(`[assets]` in `wrangler.toml`), so the email points at
+`<worker-url>/email/<file>`. Set `EMAIL_ASSET_BASE` to host them somewhere
+else instead. They're PNG because Gmail and Outlook don't render SVG:
+
+- `kato8-logo.png` is the main site's `public/assets/img/anime-type.png`.
+- The social icons are the main site's `public/assets/img/social/*.svg`
+  rendered to 60×60 PNG (2× for sharp screens). If those SVGs change,
+  re-render them, e.g. by screenshotting each at 30×30 CSS pixels with a
+  device scale factor of 2 and a transparent background.
+
+To preview the HTML locally:
+
+```bash
+node -e "import('./src/email.js').then(m => require('fs').writeFileSync('preview.html', m.renderHtml('http://127.0.0.1:8787')))"
+npm run dev   # serves the images; then open preview.html in a browser
+```
