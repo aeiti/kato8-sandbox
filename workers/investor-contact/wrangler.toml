@@ -1,0 +1,28 @@
+# Investor / publisher contact Worker. See README.md.
+name = "kato8-investor-contact"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[vars]
+# Sites allowed to post to this Worker (exact Origin header values).
+# Deliberately NOT the sandbox (aeiti.github.io): the form isn't meant to
+# send real submissions until the investor page is on prod. Local dev
+# overrides this in .dev.vars.
+ALLOWED_ORIGINS = "https://kato8studios.com,https://www.kato8studios.com"
+# Sender for the confirmation email. Must be on the domain verified in
+# Resend. Doesn't need a real mailbox: replies go to REPLY_TO.
+FROM_ADDRESS = "partners@kato8studios.com"
+# Inbox that receives replies to the confirmation email.
+REPLY_TO = "REPLACE_WITH_TERRYS_EMAIL"
+DRY_RUN = "false"
+
+# Secrets (never in this file). Set each with `npx wrangler secret put <NAME>`:
+#   TURNSTILE_SECRET    Cloudflare Turnstile secret key
+#   RESEND_API_KEY      Resend API key (sending access only)
+#   FORMSPREE_ENDPOINT  https://formspree.io/f/<id>
+
+# Per-IP limit on top of Turnstile: 5 submissions a minute.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
