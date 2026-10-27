@@ -11,9 +11,10 @@ import '../styles/studio-bios.css'
  * with their photo set into the frame's art window; clicking flips it to
  * that style's back (back-<style>.png).
  *
- * The frame images still carry the designer's sample text (name, stats,
- * rules text), so only the photo is personalized; the real name and title
- * sit in a caption under the card.
+ * When the person has a finished card from the designer (`cardImage`),
+ * that image is the front as-is. Otherwise the blank frame still carries
+ * the designer's sample text, so only the photo is personalized. Either
+ * way the real name and title sit in a caption under the card.
  *
  * Art-window boxes are measured from the 750×1050 source images, as
  * percentages so they scale with the card.
@@ -42,16 +43,18 @@ export default function FrameBioCard({ person }) {
           <span className="sbf-face sbf-face--front">
             <img
               className="sbf-face__img"
-              src={asset(`/assets/sandbox/frames/${style}-${color}.png`)}
+              src={asset(person.cardImage || `/assets/sandbox/frames/${style}-${color}.png`)}
               alt=""
               loading="lazy"
             />
-            <span
-              className="sbf-art"
-              style={{ ...ART_WINDOWS[style], '--sb-accent': getCardTheme(person).accent }}
-            >
-              <BioCardArt person={person} className="sbf-art__window" />
-            </span>
+            {!person.cardImage && (
+              <span
+                className="sbf-art"
+                style={{ ...ART_WINDOWS[style], '--sb-accent': getCardTheme(person).accent }}
+              >
+                <BioCardArt person={person} className="sbf-art__window" />
+              </span>
+            )}
           </span>
           <span className="sbf-face sbf-face--back">
             <img

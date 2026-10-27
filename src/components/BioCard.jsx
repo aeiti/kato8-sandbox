@@ -28,7 +28,12 @@ export default function BioCard({ person, frameClass = '', children }) {
   if (person.cardImage) {
     return (
       <article className="sb-card sb-card--image">
-        <img className="sb-card__image" src={asset(person.cardImage)} alt={person.name} />
+        <img
+          className="sb-card__image"
+          src={asset(person.cardImage)}
+          alt={person.role ? `${person.name}, ${person.role}` : person.name}
+          loading="lazy"
+        />
       </article>
     )
   }
