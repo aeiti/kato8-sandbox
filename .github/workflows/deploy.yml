@@ -15,6 +15,12 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# external-site is pinned so a sandbox deploy is reproducible: bump this
+# SHA deliberately (keep check.yml in step) when the sandbox should pick up
+# newer main-site components.
+env:
+  EXTERNAL_SITE_REF: 5fafce6c1ec7575c68d3f6fcbf0432021111d4d2
+
 permissions:
   contents: read
   pages: write
@@ -37,11 +43,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: terrytkato8/external-site
+          ref: ${{ env.EXTERNAL_SITE_REF }}
           path: external-site
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: kato8-sandbox/.nvmrc
           cache: 'npm'
           cache-dependency-path: kato8-sandbox/package-lock.json
 
