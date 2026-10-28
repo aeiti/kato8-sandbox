@@ -19,7 +19,6 @@ import CrowdfundingGamePage from './pages/CrowdfundingGamePage'
 import OurStoryTimelinePage from './pages/OurStoryTimelinePage'
 import NewsletterOnAboutPage from './pages/NewsletterOnAboutPage'
 import InvestorsPage from './pages/InvestorsPage'
-import InvestorsColorPage from './pages/InvestorsColorPage'
 import StudioBiosPage from './pages/StudioBiosPage'
 import StudioBiosFramesPage from './pages/StudioBiosFramesPage'
 import PreviewPage from './previews/PreviewPage'
@@ -60,7 +59,6 @@ export default function App() {
       <Route path="/our-story-timeline" element={<OurStoryTimelinePage />} />
       <Route path="/newsletter-on-about" element={<NewsletterOnAboutPage />} />
       <Route path="/investors" element={<InvestorsPage />} />
-      <Route path="/investors-color" element={<InvestorsColorPage />} />
       <Route path="/studio-bios" element={<StudioBiosPage />} />
       <Route path="/studio-bios-frames" element={<StudioBiosFramesPage />} />
       {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}

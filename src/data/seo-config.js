@@ -101,10 +101,10 @@ export const staticRoutes = {
   '/investors': {
     title: 'Investors | Kato.8 Sandbox',
     description:
-      'Prototype investor / publisher page for Kato.8 — a partnership hero plus a contact form for investors and publishers. Adds an "Investors" nav tab. WIP preview.',
+      'Prototype investor / publisher page for Kato.8: a cobalt hero band with the nav’s pink→peach wave, highlight cards, a strip of the studio’s three games, and a contact form for investors and publishers. Adds an "Investors" nav tab. WIP preview.',
     ogTitle: 'Investors — page prototype',
     ogDescription:
-      'Prototype investor / publisher page: partnership hero + contact form, with a new Investors nav tab.',
+      'Prototype investor / publisher page: cobalt hero, games strip, and contact form, with a new Investors nav tab.',
   },
   '/crowdfunding-games': {
     title: 'Crowdfunding Games | Kato.8 Sandbox',
@@ -137,14 +137,6 @@ export const staticRoutes = {
     ogTitle: 'Home — USB Background — page preview',
     ogDescription:
       'Archived home page snapshot with the parallax USB cover-art background and cleaned-up game cards.',
-  },
-  '/investors-color': {
-    title: 'Investors (color) | Kato.8 Sandbox',
-    description:
-      'Color variant of the investor / publisher page for comparison with /investors — a dark-cobalt hero band with the nav’s pink→peach wave, plus a strip of the studio’s three games above the contact form. WIP preview.',
-    ogTitle: 'Investors — color variant',
-    ogDescription:
-      'Investor page variant: cobalt hero band with the pink→peach wave, plus a games strip. Compare with /investors.',
   },
   // ADMIN:SEO-ROUTES — pages created from the dev admin panel insert their
   // entry above this line. Keep it as the last line of staticRoutes.
