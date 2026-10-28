@@ -234,6 +234,13 @@ test('rate limiter blocks before anything is sent upstream', async () => {
   assert.deepEqual(urls(), [TURNSTILE], 'only the bot check ran')
 })
 
+test('missing REPLY_TO skips the confirmation but keeps the submission', async () => {
+  const { REPLY_TO, ...env } = baseEnv
+  const res = await worker.fetch(post(valid), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(urls(), [TURNSTILE, FORMSPREE], 'forwarded, but no unanswerable email sent')
+})
+
 test('DRY_RUN skips Formspree and Resend', async () => {
   const res = await worker.fetch(post(valid), { ...baseEnv, DRY_RUN: 'true' })
   assert.equal(res.status, 200)

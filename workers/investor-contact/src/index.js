@@ -25,9 +25,9 @@
  * with `wrangler dev` before any accounts exist.
  *
  * Config (see wrangler.toml and .dev.vars.example):
- *   vars:    ALLOWED_ORIGINS, FROM_ADDRESS, REPLY_TO, DRY_RUN,
+ *   vars:    ALLOWED_ORIGINS, FROM_ADDRESS, DRY_RUN,
  *            EMAIL_ASSET_BASE (optional; defaults to this Worker's origin)
- *   secrets: TURNSTILE_SECRET, RESEND_API_KEY, FORMSPREE_ENDPOINT
+ *   secrets: REPLY_TO, TURNSTILE_SECRET, RESEND_API_KEY, FORMSPREE_ENDPOINT
  */
 
 export const TYPES = ['investor', 'publisher']
@@ -174,6 +174,12 @@ async function forwardToFormspree(submission, env) {
 }
 
 async function sendConfirmation(email, env) {
+  // The email tells people to reply. Without a reply-to, replies would go to
+  // FROM_ADDRESS, which has no mailbox, so don't send one that can't be answered.
+  if (!email.reply_to) {
+    console.error('REPLY_TO is not set; skipping the confirmation email.')
+    return
+  }
   try {
     const res = await fetch(RESEND_URL, {
       method: 'POST',

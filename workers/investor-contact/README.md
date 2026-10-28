@@ -52,12 +52,12 @@ before any local `npm run build`, since a build inlines its values.
 
 **Config:**
 
-- `wrangler.toml`: set `REPLY_TO` to the inbox that should get replies, and
-  check `FROM_ADDRESS` and `ALLOWED_ORIGINS`.
+- `wrangler.toml`: check `FROM_ADDRESS` and `ALLOWED_ORIGINS`.
 - Secrets, entered at the prompt and never committed or pasted into chat:
 
   ```bash
   npx wrangler login
+  npx wrangler secret put REPLY_TO          # inbox that gets replies
   npx wrangler secret put TURNSTILE_SECRET
   npx wrangler secret put RESEND_API_KEY
   npx wrangler secret put FORMSPREE_ENDPOINT
