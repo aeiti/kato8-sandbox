@@ -26,6 +26,11 @@ export const sections = [
     description:
       'Every component from the main site (Nav, Footer, Hero, GameCard, forms, etc.), rendered in isolation for review.',
   },
+  {
+    path: '/archive',
+    title: 'Archive',
+    description: 'Earlier versions of sandbox pages, kept for reference after they were replaced (e.g. the original investor page).',
+  },
 ]
 
 export const pages = [

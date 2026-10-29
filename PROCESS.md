@@ -198,6 +198,23 @@ To use a specific image instead (e.g. key art), set `ogImage: '/assets/…'` on 
 
 Discord and Slack cache previews per URL, so a link shared before an update can keep showing the old preview for a while.
 
+## 4b. Retire a page to the archive
+
+When a design is replaced, move the old one to `/archive` instead of
+deleting it, so there's still a record of what it looked like:
+
+- Copy the page to `src/pages/Archive<Name>Page.jsx` and its CSS to
+  `src/styles/<name>.css`, renaming the class prefix (e.g. `investors-` →
+  `investors-v1-`). Every stylesheet is global in the built app, so a copy
+  that keeps the live page's class names would pick up the live page's rules.
+- Inline anything it imported from the live page (copy text, data), so later
+  edits to the live page don't change the archived one.
+- Render `<ArchiveNotice entry={...} />` at the top.
+- Route it at `/archive/<slug>` in `App.jsx`, add a `staticRoutes` entry in
+  `seo-config.js`, add an entry to `src/data/archive.js` (newest first), and
+  capture its OG image. Archived pages are listed on `/archive`, not in
+  `homeSections.js`.
+
 ## 5. Graduating an experiment to production
 
 When a design is approved and ready to ship:

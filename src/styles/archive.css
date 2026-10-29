@@ -1,0 +1,25 @@
+/*
+ * /archive index (reuses the home page's .sandbox-home_* list styles) and
+ * the notice bar shown at the top of every archived page.
+ */
+
+.archive-entry_meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  opacity: 0.65;
+}
+
+.archive-notice {
+  padding: 0.6rem 1rem;
+  background: color-mix(in srgb, var(--dark-cobalt, #1b1b26) 8%, transparent);
+  font-family: 'Reem Kufi', sans-serif;
+  font-size: 0.9375rem;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.archive-notice a {
+  color: inherit;
+  font-weight: 600;
+}

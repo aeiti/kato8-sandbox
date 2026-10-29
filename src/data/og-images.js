@@ -3,6 +3,8 @@
 // public/assets/og/. Read by ogImageFor() in seo-config.js.
 export const ogImages = {
   "/": "/assets/og/home.jpg",
+  "/archive": "/assets/og/archive.jpg",
+  "/archive/investors-v1": "/assets/og/archive--investors-v1.jpg",
   "/components": "/assets/og/components.jpg",
   "/components/bio-cards": "/assets/og/components--bio-cards.jpg",
   "/components/discord-signup-form": "/assets/og/components--discord-signup-form.jpg",

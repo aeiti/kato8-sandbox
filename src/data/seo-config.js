@@ -106,6 +106,21 @@ export const staticRoutes = {
     ogDescription:
       'Prototype investor / publisher page: cobalt hero, games strip, and contact form, with a new Investors nav tab.',
   },
+  '/archive': {
+    title: 'Archive | Kato.8 Sandbox',
+    description:
+      'Earlier versions of Kato.8 sandbox pages, kept for reference after they were replaced.',
+    ogTitle: 'Archive — Kato.8 Sandbox',
+    ogDescription: 'Retired sandbox pages, kept for reference.',
+  },
+  '/archive/investors-v1': {
+    title: 'Investors (original) | Kato.8 Sandbox',
+    description:
+      'Archived: the original Kato.8 investor / publisher page prototype, with a plain hero, highlight cards, and the contact form. Replaced by the color design on 2026-10-28.',
+    ogTitle: 'Investors page — original (archived)',
+    ogDescription:
+      'Archived first version of the investor / publisher page, replaced by the color design.',
+  },
   '/crowdfunding-games': {
     title: 'Crowdfunding Games | Kato.8 Sandbox',
     description:
