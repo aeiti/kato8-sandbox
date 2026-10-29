@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 // Sandbox nav is a vendored copy of the main-site Nav with an added
 // "Investors" tab (not yet upstream — PROCESS.md §1b). Swap back to the
 // imported `kato8studios-site/src/components/Nav` when the tab graduates.
@@ -23,12 +23,12 @@ import StudioBiosPage from './pages/StudioBiosPage'
 import StudioBiosFramesPage from './pages/StudioBiosFramesPage'
 import ArchivePage from './pages/ArchivePage'
 import ArchiveInvestorsV1Page from './pages/ArchiveInvestorsV1Page'
+import ArchiveHomeUsbBackgroundPage from './pages/ArchiveHomeUsbBackgroundPage'
 import PreviewPage from './previews/PreviewPage'
 // Pages scaffolded from the dev admin panel (scripts/dev-admin) auto-insert
 // their `import` line directly below the next marker. Keep the marker line
 // intact and on its own — the panel splices new imports right after it.
 // ADMIN:PAGE-IMPORTS
-import HomeUsbBackgroundPage from './pages/HomeUsbBackgroundPage'
 
 export default function App() {
   const location = useLocation()
@@ -65,8 +65,10 @@ export default function App() {
       <Route path="/studio-bios-frames" element={<StudioBiosFramesPage />} />
       <Route path="/archive" element={<ArchivePage />} />
       <Route path="/archive/investors-v1" element={<ArchiveInvestorsV1Page />} />
+      <Route path="/archive/home-usb-background" element={<ArchiveHomeUsbBackgroundPage />} />
+      {/* Old address from before the archive existed. */}
+      <Route path="/home-usb-background" element={<Navigate to="/archive/home-usb-background" replace />} />
       {/* ADMIN:PAGE-ROUTES — admin-scaffolded page routes insert below this line */}
-      <Route path="/home-usb-background" element={<HomeUsbBackgroundPage />} />
       <Route path="/components" element={<PreviewPage />} />
       <Route path="/components/:name" element={<PreviewPage />} />
     </Routes>

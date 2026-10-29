@@ -19,4 +19,12 @@ export const archived = [
     description:
       'The first investor / publisher page: a plain hero, three highlight cards, and the contact form, on the default page background. Replaced by the color design (cobalt hero band, games strip).',
   },
+  {
+    path: '/archive/home-usb-background',
+    title: 'Home — USB Background',
+    archived: '2026-08-21',
+    replacedBy: null,
+    description:
+      'Home page look from the 2026-08 UI/UX pass: the studio hero over a fixed/parallax Universal Serial Blade cover-art backdrop, with cleaned-up game cards (logo + description, no title/tags). Hero + cards only (no support section).',
+  },
 ]

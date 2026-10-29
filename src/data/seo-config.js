@@ -145,7 +145,7 @@ export const staticRoutes = {
     ogDescription:
       'The Kato.8 team on the studio’s own trading-card frames — Studio, USB, Last Light, and BBCU. Click a card to flip it.',
   },
-  '/home-usb-background': {
+  '/archive/home-usb-background': {
     title: 'Home — USB Background | Kato.8 Sandbox',
     description:
       'Archived home-page look: hero over a fixed USB cover-art parallax backdrop with cleaned-up game cards.',
