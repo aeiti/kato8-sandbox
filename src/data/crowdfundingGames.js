@@ -11,8 +11,8 @@
  * filled in later. Body copy is lorem ipsum.
  *
  * Editable from the dev admin panel (/__admin → Crowdfunding), which
- * rewrites the `crowdfundingGames` array below in place and keeps
- * `CROWDFUNDING_SLUGS` in `src/data/seo-config.js` in sync. Keep the array
+ * rewrites the `crowdfundingGames` array below in place;
+ * `src/data/seo-config.js` derives each game's SEO route from it. Keep the array
  * a plain literal (no shared constants or computed values) so the panel
  * can read and rewrite it; comments inside the array are dropped on save.
  *
