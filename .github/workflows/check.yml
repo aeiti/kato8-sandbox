@@ -1,0 +1,56 @@
+name: Check
+
+# Runs on every PR: install, build (incl. prerender), and verify the four
+# route lists agree (scripts/check-routes.mjs). Same side-by-side checkout
+# as deploy.yml so the `kato8studios-site` file: dep resolves.
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+# Keep in step with deploy.yml.
+env:
+  EXTERNAL_SITE_REF: 5fafce6c1ec7575c68d3f6fcbf0432021111d4d2
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out kato8-sandbox
+        uses: actions/checkout@v4
+        with:
+          path: kato8-sandbox
+
+      - name: 'Check out external-site (sibling for file: dep)'
+        uses: actions/checkout@v4
+        with:
+          repository: terrytkato8/external-site
+          ref: ${{ env.EXTERNAL_SITE_REF }}
+          path: external-site
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: kato8-sandbox/.nvmrc
+          cache: 'npm'
+          cache-dependency-path: kato8-sandbox/package-lock.json
+
+      - name: Install
+        working-directory: kato8-sandbox
+        run: npm ci
+
+      - name: Build
+        working-directory: kato8-sandbox
+        env:
+          VITE_DEPLOY_TARGET: pages
+        run: npm run build
+
+      - name: Check routes
+        working-directory: kato8-sandbox
+        run: node scripts/check-routes.mjs
