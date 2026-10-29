@@ -26,6 +26,11 @@ export const sections = [
     description:
       'Every component from the main site (Nav, Footer, Hero, GameCard, forms, etc.), rendered in isolation for review.',
   },
+  {
+    path: '/archive',
+    title: 'Archive',
+    description: 'Earlier versions of sandbox pages, kept for reference after they were replaced (e.g. the original investor page).',
+  },
 ]
 
 export const pages = [
@@ -34,12 +39,6 @@ export const pages = [
     title: 'Crowdfunding Games',
     source: 'src/pages/CrowdfundingGamesPage.jsx',
     description: 'Full-page preview of the crowdfunding games landing plus its six per-game detail pages (main-section layout, placeholder content). Live on staging; previewed here for review.',
-  },
-  {
-    path: '/home-usb-background',
-    title: 'Home — USB Background',
-    source: 'src/pages/HomeUsbBackgroundPage.jsx',
-    description: 'Archived snapshot of the home page with the fixed/parallax USB cover-art background and cleaned-up game cards (logo + description, no title/tags), from the 2026-08 UI/UX pass. Hero + cards only (no support section).',
   },
 ]
 
@@ -60,13 +59,7 @@ export const experiments = [
     path: '/investors',
     title: 'Investors page',
     active: true,
-    description: 'Prototype investor / publisher page — a partnership hero plus a contact form for investors and publishers, with a new "Investors" tab added to the top nav (vendored SandboxNav). Not yet on external-site main.',
-  },
-  {
-    path: '/investors-color',
-    title: 'Investors page (color variant)',
-    active: true,
-    description: 'Same investor page with more color, for comparison: a dark-cobalt hero band carrying the nav’s pink→peach wave, plus a strip of the three studio games above the contact form.',
+    description: 'Prototype investor / publisher page: a dark-cobalt hero carrying the nav’s pink→peach wave, highlight cards, a strip of the three studio games, and a contact form for investors and publishers. Adds an "Investors" tab to the top nav (vendored SandboxNav). Not yet on external-site main.',
   },
   {
     path: '/kickstarter-button-v2',

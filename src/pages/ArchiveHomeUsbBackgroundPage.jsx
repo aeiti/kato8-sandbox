@@ -1,8 +1,10 @@
 import { asset } from '../utils/asset'
+import ArchiveNotice from '../components/ArchiveNotice'
+import { archived } from '../data/archive'
 import '../styles/home-usb-background.css'
 
 /**
- * Home — USB Background (archived snapshot).
+ * Home — USB Background (archived snapshot, /archive/home-usb-background).
  *
  * Frozen copy of the home-page look from the 2026-08 UI/UX pass: the studio
  * hero over a fixed/parallax Universal Serial Blade cover-art backdrop, plus
@@ -16,6 +18,8 @@ import '../styles/home-usb-background.css'
  * card-logo deltas live in ../styles/home-usb-background.css. Cards are static
  * previews — the "Learn More" pill doesn't navigate (no game routes here).
  */
+
+const ENTRY = archived.find((entry) => entry.path === '/archive/home-usb-background')
 
 const SCRIM = 'rgba(255, 255, 255, 0.62)'
 const BACKGROUND = '/assets/img/universal-serial-blade-outside-city-concept.jpg'
@@ -50,55 +54,58 @@ const games = [
   },
 ]
 
-export default function HomeUsbBackgroundPage() {
+export default function ArchiveHomeUsbBackgroundPage() {
   const backgroundImage = `linear-gradient(${SCRIM}, ${SCRIM}), url('${asset(BACKGROUND)}')`
 
   return (
-    <section className="home-main has-fixed-bg" style={{ backgroundImage }}>
+    <>
+      <ArchiveNotice entry={ENTRY} />
+      <section className="home-main has-fixed-bg" style={{ backgroundImage }}>
 
-      <section className="home-hero-intro">
-        <div className="hero-logo-wrapper">
-          <img src={asset('/assets/img/anime-type.png')} loading="lazy" alt="Kato.8 Studios logo" className="hero-logo-image" />
-        </div>
-        <div className="hero-tagline-wrapper">
-          <p className="hero-intro-paragraph">{TAGLINE}</p>
-        </div>
-      </section>
+        <section className="home-hero-intro">
+          <div className="hero-logo-wrapper">
+            <img src={asset('/assets/img/anime-type.png')} loading="lazy" alt="Kato.8 Studios logo" className="hero-logo-image" />
+          </div>
+          <div className="hero-tagline-wrapper">
+            <p className="hero-intro-paragraph">{TAGLINE}</p>
+          </div>
+        </section>
 
-      <section className="games-cards-wrapper">
-        <section className="games-list-section">
-          <div className="games-card-list-wrapper w-dyn-list">
-            <div role="list" className="games-card-list w-dyn-items w-row">
-              {games.map((game) => (
-                <div
-                  key={game.slug}
-                  style={{ backgroundColor: game.bgColor, backgroundImage: `url('${asset(game.bgImage)}')` }}
-                  role="listitem"
-                  className="game-card w-dyn-item w-col w-col-4"
-                >
-                  <div className="game-card-overlay">
-                    <div className="game-card-content">
-                      {game.cardLogo && (
-                        <div className="game-card-logo-block">
-                          <img src={asset(game.cardLogo.src)} loading="lazy" alt={game.cardLogo.alt} className="game-card-logo" />
+        <section className="games-cards-wrapper">
+          <section className="games-list-section">
+            <div className="games-card-list-wrapper w-dyn-list">
+              <div role="list" className="games-card-list w-dyn-items w-row">
+                {games.map((game) => (
+                  <div
+                    key={game.slug}
+                    style={{ backgroundColor: game.bgColor, backgroundImage: `url('${asset(game.bgImage)}')` }}
+                    role="listitem"
+                    className="game-card w-dyn-item w-col w-col-4"
+                  >
+                    <div className="game-card-overlay">
+                      <div className="game-card-content">
+                        {game.cardLogo && (
+                          <div className="game-card-logo-block">
+                            <img src={asset(game.cardLogo.src)} loading="lazy" alt={game.cardLogo.alt} className="game-card-logo" />
+                          </div>
+                        )}
+                        <div className="game-card-description">
+                          <p>{game.tagline}</p>
                         </div>
-                      )}
-                      <div className="game-card-description">
-                        <p>{game.tagline}</p>
-                      </div>
-                      <div className="game-card-cta-link w-inline-block" aria-hidden="true">
-                        <div className="game-card-cta-pill">
-                          <div className="game-card-cta-label">Learn More</div>
+                        <div className="game-card-cta-link w-inline-block" aria-hidden="true">
+                          <div className="game-card-cta-pill">
+                            <div className="game-card-cta-label">Learn More</div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          </section>
         </section>
       </section>
-    </section>
+    </>
   )
 }

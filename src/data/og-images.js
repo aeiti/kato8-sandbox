@@ -3,6 +3,9 @@
 // public/assets/og/. Read by ogImageFor() in seo-config.js.
 export const ogImages = {
   "/": "/assets/og/home.jpg",
+  "/archive": "/assets/og/archive.jpg",
+  "/archive/home-usb-background": "/assets/og/archive--home-usb-background.jpg",
+  "/archive/investors-v1": "/assets/og/archive--investors-v1.jpg",
   "/components": "/assets/og/components.jpg",
   "/components/bio-cards": "/assets/og/components--bio-cards.jpg",
   "/components/discord-signup-form": "/assets/og/components--discord-signup-form.jpg",
@@ -33,9 +36,7 @@ export const ogImages = {
   "/crowdfunding-games/game-six": "/assets/og/crowdfunding-games--game-six.jpg",
   "/crowdfunding-games/hollowbrook-apothecary": "/assets/og/crowdfunding-games--hollowbrook-apothecary.jpg",
   "/crowdfunding-games/hotdog-hustler": "/assets/og/crowdfunding-games--hotdog-hustler.jpg",
-  "/home-usb-background": "/assets/og/home-usb-background.jpg",
   "/investors": "/assets/og/investors.jpg",
-  "/investors-color": "/assets/og/investors-color.jpg",
   "/kickstarter-button-v2": "/assets/og/kickstarter-button-v2.jpg",
   "/kickstarter-buttons": "/assets/og/kickstarter-buttons.jpg",
   "/newsletter-on-about": "/assets/og/newsletter-on-about.jpg",
