@@ -104,10 +104,6 @@ export default function SandboxNav() {
             </nav>
           </div>
 
-          <nav role="navigation" className="nav_menu w-nav-menu">
-            <ul role="list" className="nav_menu-list w-list-unstyled" />
-          </nav>
-
           <Link to="/about-us" className="nav-about-link">
             About
           </Link>
