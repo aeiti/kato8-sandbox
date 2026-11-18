@@ -7,9 +7,9 @@ import '../styles/studio-bios.css'
 /**
  * Collector card built from the studio's finished card artwork rather than
  * a CSS-drawn frame. The front is the frame image for the person's
- * `style` + `color` (public/assets/sandbox/frames/<style>-<color>.png)
+ * `style` + `color` (public/assets/sandbox/frames/<style>-<color>.webp)
  * with their photo set into the frame's art window; clicking flips it to
- * that style's back (back-<style>.png).
+ * that style's back (back-<style>.webp).
  *
  * When the person has a finished card from the designer (`cardImage`),
  * that image is the front as-is. Otherwise the blank frame still carries
@@ -43,7 +43,7 @@ export default function FrameBioCard({ person }) {
           <span className="sbf-face sbf-face--front">
             <img
               className="sbf-face__img"
-              src={asset(person.cardImage || `/assets/sandbox/frames/${style}-${color}.png`)}
+              src={asset(person.cardImage || `/assets/sandbox/frames/${style}-${color}.webp`)}
               alt=""
               loading="lazy"
             />
@@ -59,7 +59,7 @@ export default function FrameBioCard({ person }) {
           <span className="sbf-face sbf-face--back">
             <img
               className="sbf-face__img"
-              src={asset(`/assets/sandbox/frames/back-${style}.png`)}
+              src={asset(`/assets/sandbox/frames/back-${style}.webp`)}
               alt=""
               loading="lazy"
             />

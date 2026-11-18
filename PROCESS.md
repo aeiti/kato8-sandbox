@@ -114,8 +114,11 @@ a card **style** (Pokémon / Magic / Yu-Gi-Oh!) and a **color** (one of
 order. `TEAMS` is an array on purpose: the serializer sorts object keys
 alphabetically, so any list whose order matters must be an array. Team
 names are edited in the data file, not the panel. Frame images live in
-`public/assets/sandbox/frames/` as `<style>-<color>.png` and
-`back-<style>.png`; replacing a file with the same name is all it takes.
+`public/assets/sandbox/frames/` as `<style>-<color>.webp` and
+`back-<style>.webp`, and the designer's finished cards in
+`public/assets/sandbox/cards/<slug>.webp`. Convert a new PNG export with
+`node scripts/convert-to-webp.mjs <file or dir>` (it replaces the PNG with
+a ~10× smaller WebP), then point `cardImage` at the `.webp`.
 
 Pages whose content has its own editor (the Crowdfunding tab, the
 `/__bios` panel) get an **Edit content →** link on their listing row. A
