@@ -59,7 +59,7 @@ before any local `npm run build`, since a build inlines its values.
   npx wrangler login
   npx wrangler secret put REPLY_TO          # inbox that gets replies
   npx wrangler secret put TURNSTILE_SECRET
-  npx wrangler secret put RESEND_API_KEY
+  npx wrangler secret put RESEND_API_KEY    # optional: without it, no confirmation email
   npx wrangler secret put FORMSPREE_ENDPOINT
   ```
 
