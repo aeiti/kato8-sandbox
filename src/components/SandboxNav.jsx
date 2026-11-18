@@ -2,40 +2,27 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { games } from 'kato8studios-site/src/data/games'
 import { socialLinks, SocialIcon } from 'kato8studios-site/src/components/SocialIcons'
+import { asset } from '../utils/asset'
 import SandboxMobileMenu from './SandboxMobileMenu'
 
 /**
- * Sandbox copy of the main-site Nav, with one addition: an **Investors**
- * link (`/investors`) alongside the existing About link. Used as the
- * sandbox's global nav (see App.jsx) so the proposed "tab at the top"
- * is visible across the sandbox for review.
- *
- * Vendored rather than imported because the Investors tab isn't on
- * external-site `main` yet — there's nothing to import (PROCESS.md §1b
- * vendoring exception). `games` and `SocialIcons` ARE upstream, so they
- * stay imported from `kato8studios-site`; the mobile menu is vendored
- * too (SandboxMobileMenu) so the tab appears on mobile as well.
- *
- * Everything else mirrors external-site/src/components/Nav.jsx. When the
- * Investors tab graduates to the real nav, delete this file plus
- * SandboxMobileMenu and switch App.jsx back to the imported Nav.
+ * The "Games" dropdown — the toggle plus the list of every game in
+ * `src/data/games.js`. Closes on outside click, Escape, or picking a link.
+ * Owns its own open state so it can be dropped into both the main nav and the
+ * compact pinned bar without the two sharing (or fighting over) one state.
  */
-export default function SandboxNav() {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const dropdownRef = useRef(null)
+function GamesDropdown() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
 
   useEffect(() => {
-    if (!dropdownOpen) return
+    if (!open) return undefined
 
     function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false)
-      }
+      if (ref.current && !ref.current.contains(event.target)) setOpen(false)
     }
-
     function handleEscape(event) {
-      if (event.key === 'Escape') setDropdownOpen(false)
+      if (event.key === 'Escape') setOpen(false)
     }
 
     document.addEventListener('mousedown', handleClickOutside)
@@ -44,9 +31,86 @@ export default function SandboxNav() {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleEscape)
     }
-  }, [dropdownOpen])
+  }, [open])
 
-  const closeDropdown = () => setDropdownOpen(false)
+  return (
+    <div ref={ref} data-hover="false" data-delay="0" className={`w-dropdown${open ? ' w--open' : ''}`}>
+      <div
+        className={`w-dropdown-toggle${open ? ' w--open' : ''}`}
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            setOpen((o) => !o)
+          }
+        }}
+      >
+        <div className="nav-dropdown-caret w-icon-dropdown-toggle" />
+        <div className="nav-games-label">Games</div>
+      </div>
+      <nav className={`nav-games-dropdown w-dropdown-list${open ? ' w--open' : ''}`}>
+        <div className="nav-games-list-wrapper w-dyn-list">
+          <div role="list" className="nav-games-list w-dyn-items">
+            {games.map((game) => (
+              <div key={game.slug} role="listitem" className="nav-games-item w-dyn-item">
+                <Link to={`/games/${game.slug}`} className="link" onClick={() => setOpen(false)}>
+                  {game.title}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </nav>
+    </div>
+  )
+}
+
+/**
+ * Sandbox copy of the main-site Nav, with one addition: an **Investors**
+ * link (`/investors`) after About, in both the main header and the compact
+ * pinned bar. Used as the sandbox's global nav (see App.jsx) so the
+ * proposed tab is visible across the sandbox for review.
+ *
+ * Vendored rather than imported because the Investors tab isn't on
+ * external-site `main` yet (PROCESS.md §1b vendoring exception). `games`
+ * and `SocialIcons` ARE upstream, so they stay imported; the mobile menu
+ * is vendored too (SandboxMobileMenu).
+ *
+ * Everything else mirrors external-site/src/components/Nav.jsx (synced
+ * 2026-11-18). When the Investors tab graduates to the real nav, delete
+ * this file plus SandboxMobileMenu and switch App.jsx back to the
+ * imported Nav.
+ *
+ * Upstream notes:
+ *
+ * Two bars:
+ *   - The main tall wavy header (in-flow at the top): logo, Games dropdown,
+ *     About, socials on desktop; hamburger → MobileMenu on mobile.
+ *   - A compact pinned bar (`.nav-compact`) that slides down once the user
+ *     scrolls past the header, so navigation stays reachable — handy for a
+ *     phone visitor who scanned a convention QR. Same controls, slimmed down.
+ *
+ * Nav owns the mobile-menu open state (both hamburgers toggle it) and the
+ * `scrolled` flag that reveals the compact bar. Each `GamesDropdown` owns its
+ * own open state.
+ *
+ * No props.
+ */
+export default function SandboxNav() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    // Reveal the compact bar once past the tall header (~its own height).
+    const onScroll = () => setScrolled(window.scrollY > 160)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <div className="nav">
@@ -71,38 +135,7 @@ export default function SandboxNav() {
         </div>
 
         <div className="nav_right">
-          <div ref={dropdownRef} data-hover="false" data-delay="0" className={`w-dropdown${dropdownOpen ? ' w--open' : ''}`}>
-            <div
-              className={`w-dropdown-toggle${dropdownOpen ? ' w--open' : ''}`}
-              role="button"
-              tabIndex={0}
-              aria-haspopup="menu"
-              aria-expanded={dropdownOpen}
-              onClick={() => setDropdownOpen((open) => !open)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault()
-                  setDropdownOpen((open) => !open)
-                }
-              }}
-            >
-              <div className="nav-dropdown-caret w-icon-dropdown-toggle" />
-              <div className="nav-games-label">Games</div>
-            </div>
-            <nav className={`nav-games-dropdown w-dropdown-list${dropdownOpen ? ' w--open' : ''}`}>
-              <div className="nav-games-list-wrapper w-dyn-list">
-                <div role="list" className="nav-games-list w-dyn-items">
-                  {games.map((game) => (
-                    <div key={game.slug} role="listitem" className="nav-games-item w-dyn-item">
-                      <Link to={`/games/${game.slug}`} className="link" onClick={closeDropdown}>
-                        {game.title}
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </nav>
-          </div>
+          <GamesDropdown />
 
           <Link to="/about-us" className="nav-about-link">
             About
@@ -133,6 +166,45 @@ export default function SandboxNav() {
             <span />
           </span>
         </button>
+      </div>
+
+      {/* Compact pinned bar — appears on scroll. Reuses the main nav's controls. */}
+      <div className={`nav-compact${scrolled ? ' is-visible' : ''}`} aria-hidden={!scrolled}>
+        <div className="nav-compact-inner">
+          <Link to="/" className="nav-compact-logo w-inline-block" aria-label="Kato.8 Studios home">
+            <img src={asset('/assets/img/logo-no-mouth.png')} alt="" className="nav-compact-logo-img" />
+          </Link>
+
+          <div className="nav-compact-right">
+            <GamesDropdown />
+            <Link to="/about-us" className="nav-about-link">
+              About
+            </Link>
+            <Link to="/investors" className="nav-about-link">
+              Investors
+            </Link>
+            <div className="nav-social-icons">
+              {socialLinks.map((link) => (
+                <SocialIcon key={link.name} {...link} />
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className={`nav-hamburger${mobileOpen ? ' is-open' : ''}`}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-menu-panel"
+            onClick={() => setMobileOpen((open) => !open)}
+          >
+            <span className="nav-hamburger-bars" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
+        </div>
       </div>
 
       <SandboxMobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
