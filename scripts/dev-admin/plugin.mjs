@@ -27,23 +27,24 @@
  *   GET  /__admin/api/file?path=<p>   → read one src/pages/*.jsx page source
  *   PUT  /__admin/api/file            → write one src/pages/*.jsx page source
  *   POST /__admin/api/pages/create    → scaffold a page file + wire its route
- *   PUT  /__admin/api/crowdfunding    → rewrite crowdfundingGames (+ SEO slug list)
+ *   PUT  /__admin/api/crowdfunding    → rewrite crowdfundingGames
  *   GET  /__admin/api/routes          → App.jsx page routes + where each is listed / has SEO
  *   POST /__admin/api/upload          → save an uploaded image under public/assets/sandbox
- *   POST /__admin/api/publish         → commit + push the managed files
+ *   POST /__admin/api/publish         → open a PR with the managed files
  *
- * Push commits ONLY the files this panel manages (home listings, the
- * preview entries + registry, vendored component source, page source under
- * src/pages, the App.jsx route table, the crowdfunding games data + its SEO
- * slug list, and uploaded images under public/assets/sandbox) and pushes the current branch to origin. On `main`
- * (the normal case) that triggers the Pages deploy; on any other branch it
- * reports that you need to merge to main. It never force-pushes and never
- * touches unmanaged files.
+ * Push carries ONLY the files this panel manages (home listings, the
+ * preview entries + registry, the vendored component sources entries.js
+ * names, page source under src/pages, the App.jsx route table, the
+ * crowdfunding games data, seo-config.js, and uploaded images under
+ * public/assets/sandbox) onto a fresh `content/<yyyymmdd-hhmm>` branch
+ * from origin/main, builds it, and opens a pull request — see
+ * `publishPullRequest()` in common.mjs. Merging the PR deploys. It never
+ * commits in, or pushes, this checkout.
  */
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { execFileSync } from 'node:child_process'
+import { sendJson, readJsonBody, currentBranch, saveUpload, publishPullRequest } from './common.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const UI_HTML = path.join(__dirname, 'index.html')
@@ -57,11 +58,9 @@ const ASSETS_DIR = 'public/assets/sandbox'
 const ENTRIES_ANCHOR = 'export const previewEntries = '
 const GAMES_FILE = 'src/data/crowdfundingGames.js'
 const GAMES_ANCHOR = 'export const crowdfundingGames = '
-// seo-config.js keeps its own literal list of game slugs (so the prerender
-// script can load it without importing the data). Rewritten alongside the
-// games so every game keeps a prerendered OG page.
+// seo-config.js derives the game slugs from crowdfundingGames, so saving
+// the games is enough; the panel only edits it to add a scaffolded page.
 const SEO_FILE = 'src/data/seo-config.js'
-const SEO_SLUGS_ANCHOR = 'const CROWDFUNDING_SLUGS = '
 const PAGES_ANCHOR = 'export const pages = '
 
 // Insertion markers in App.jsx. A scaffolded page's `import` is spliced in
@@ -80,15 +79,15 @@ const LISTING_BLOCKS = {
   experiments: { file: HOME_FILE, anchor: 'export const experiments = ' },
 }
 
-// Files Push is allowed to commit — everything this panel can write, and
-// nothing else. `src/components`, `src/pages`, and `public/assets/sandbox`
-// are directories; the rest are single files.
+// Files Push is allowed to carry — everything this panel can write, and
+// nothing else. `src/pages` and `public/assets/sandbox` are directories;
+// the vendored component sources it edits are added per Push from
+// entries.js (see managedPaths() below), never all of src/components.
 const MANAGED_PATHS = [
   HOME_FILE,
   ENTRIES_FILE,
   REGISTRY_FILE,
   APP_FILE,
-  'src/components',
   PAGES_DIR,
   GAMES_FILE,
   SEO_FILE,
@@ -100,42 +99,6 @@ const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 // A page source path this panel is allowed to read/write: exactly one
 // PascalCase-ish file directly under src/pages/, no traversal.
 const PAGE_SOURCE = /^src\/pages\/[A-Za-z0-9_-]+\.jsx$/
-// Image types the uploader accepts, mapped to their canonical extension.
-const IMAGE_EXT = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/gif': 'gif',
-  'image/svg+xml': 'svg',
-  'image/webp': 'webp',
-}
-
-function sendJson(res, status, body) {
-  res.statusCode = status
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(body))
-}
-
-function readJsonBody(req, maxBytes = 2_000_000) {
-  return new Promise((resolve, reject) => {
-    let data = ''
-    req.on('data', (chunk) => {
-      data += chunk
-      if (data.length > maxBytes) reject(new Error('body too large'))
-    })
-    req.on('end', () => {
-      try {
-        resolve(data ? JSON.parse(data) : null)
-      } catch (err) {
-        reject(err)
-      }
-    })
-    req.on('error', reject)
-  })
-}
-
-function git(root, args) {
-  return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
-}
 
 /**
  * Resolve a component `source` (as stored in entries.js) to an absolute
@@ -401,17 +364,6 @@ function normalizeGame(g, index) {
   return out
 }
 
-/** Filesystem-safe image basename: lowercase, hyphen-separated. */
-function safeImageName(name, ext) {
-  const stem = String(name || '')
-    .replace(/\.[^.]*$/, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60)
-  return (stem || 'image') + '.' + ext
-}
-
 export function devAdmin() {
   return {
     name: 'kato8-dev-admin',
@@ -435,6 +387,15 @@ export function devAdmin() {
         return readBlock(src, anchor)
       }
 
+      // MANAGED_PATHS plus the vendored component sources (src/...) the
+      // Components tab can edit, read from entries.js at Push time.
+      const managedPaths = async () => {
+        const vendored = (await readEntries())
+          .map((e) => e.source)
+          .filter((s) => typeof s === 'string' && s.startsWith('src/components/'))
+        return [...new Set([...MANAGED_PATHS, ...vendored])]
+      }
+
       server.middlewares.use('/__admin', async (req, res, next) => {
         const [rawUrl, query = ''] = (req.url || '/').split('?')
         const url = rawUrl
@@ -449,12 +410,7 @@ export function devAdmin() {
 
           // GET /__admin/api/info — current git branch (for the UI header)
           if (req.method === 'GET' && url === '/api/info') {
-            let branch = null
-            try {
-              branch = git(root, ['rev-parse', '--abbrev-ref', 'HEAD'])
-            } catch {
-              /* not a git repo — leave null */
-            }
+            const branch = currentBranch(root)
             sendJson(res, 200, { branch, isMain: branch === 'main' })
             return
           }
@@ -787,19 +743,9 @@ export function devAdmin() {
               seen.add(g.slug)
             }
 
-            // Build both new sources before writing either, so a failed
-            // round-trip leaves both files untouched.
             const { writeBlock } = await load()
             const gamesPath = path.join(root, GAMES_FILE)
-            const seoPath = path.join(root, SEO_FILE)
-            const nextGames = writeBlock(fs.readFileSync(gamesPath, 'utf8'), GAMES_ANCHOR, games)
-            const nextSeo = writeBlock(
-              fs.readFileSync(seoPath, 'utf8'),
-              SEO_SLUGS_ANCHOR,
-              games.map((g) => g.slug)
-            )
-            fs.writeFileSync(gamesPath, nextGames)
-            fs.writeFileSync(seoPath, nextSeo)
+            fs.writeFileSync(gamesPath, writeBlock(fs.readFileSync(gamesPath, 'utf8'), GAMES_ANCHOR, games))
             sendJson(res, 200, { ok: true, count: games.length, games })
             return
           }
@@ -807,93 +753,24 @@ export function devAdmin() {
           // POST /__admin/api/upload — save an uploaded image under
           // public/assets/sandbox. Body: { filename, dataUrl }.
           if (req.method === 'POST' && url === '/api/upload') {
-            const body = await readJsonBody(req, 12_000_000)
-            const dataUrl = body && body.dataUrl
-            const m = typeof dataUrl === 'string'
-              ? dataUrl.match(/^data:([^;]+);base64,(.*)$/)
-              : null
-            if (!m) {
-              return sendJson(res, 400, { error: 'expected { filename, dataUrl } (base64 data URL)' })
-            }
-            const ext = IMAGE_EXT[m[1]]
-            if (!ext) {
-              return sendJson(res, 400, {
-                error: `unsupported image type: ${m[1]} (png, jpg, gif, svg, webp)`,
-              })
-            }
-            const buf = Buffer.from(m[2], 'base64')
-            if (buf.length > 8_000_000) {
-              return sendJson(res, 413, { error: 'image too large (8 MB max)' })
-            }
-
-            const dir = path.join(root, ASSETS_DIR)
-            fs.mkdirSync(dir, { recursive: true })
-            let file = safeImageName(body.filename, ext)
-            // Avoid clobbering an existing file: suffix -1, -2, …
-            if (fs.existsSync(path.join(dir, file))) {
-              const stem = file.replace(/\.[^.]*$/, '')
-              let n = 1
-              while (fs.existsSync(path.join(dir, `${stem}-${n}.${ext}`))) n++
-              file = `${stem}-${n}.${ext}`
-            }
-            fs.writeFileSync(path.join(dir, file), buf)
-            const publicPath = `/assets/sandbox/${file}`
-            sendJson(res, 200, {
-              ok: true,
-              file,
-              path: publicPath,
-              snippet: `asset('${publicPath}')`,
-              bytes: buf.length,
-            })
+            const [status, body] = saveUpload(root, ASSETS_DIR, await readJsonBody(req, 12_000_000))
+            if (body.ok) body.snippet = `asset('${body.path}')`
+            sendJson(res, status, body)
             return
           }
 
-          // POST /__admin/api/publish — commit + push the managed files
+          // POST /__admin/api/publish — open a PR with the managed files
+          // (common.mjs publishPullRequest: temp worktree from origin/main,
+          // build, push a content/* branch, gh pr create).
           if (req.method === 'POST' && url === '/api/publish') {
-            let branch
-            try {
-              branch = git(root, ['rev-parse', '--abbrev-ref', 'HEAD'])
-            } catch {
-              return sendJson(res, 500, { error: 'not a git repository' })
-            }
-
-            git(root, ['add', '--', ...MANAGED_PATHS])
-            const staged = git(root, [
-              'diff', '--cached', '--name-only', '--', ...MANAGED_PATHS,
-            ])
-            if (!staged) {
-              return sendJson(res, 200, {
-                published: false,
-                reason: 'No changes to push — save an edit first.',
-                branch,
-              })
-            }
-
-            git(root, ['commit', '-m', COMMIT_MESSAGE, '--', ...MANAGED_PATHS])
-            const sha = git(root, ['rev-parse', '--short', 'HEAD'])
-
-            try {
-              git(root, ['push', 'origin', 'HEAD'])
-            } catch (err) {
-              return sendJson(res, 500, {
-                error: 'commit succeeded but push failed: ' + (err.stderr || err.message),
-                branch,
-                sha,
-              })
-            }
-
-            const isMain = branch === 'main'
-            sendJson(res, 200, {
-              published: true,
-              branch,
-              sha,
-              isMain,
-              deploy: isMain,
-              files: staged.split('\n').filter(Boolean),
-              message: isMain
-                ? `Pushed ${sha} to main — the Pages deploy is starting.`
-                : `Pushed ${sha} to ${branch}. Merge it to main to deploy.`,
+            const result = await publishPullRequest({
+              root,
+              paths: await managedPaths(),
+              commitMessage: COMMIT_MESSAGE,
+              title: 'Sandbox content update (admin panel)',
+              panel: '/__admin',
             })
+            sendJson(res, 200, result)
             return
           }
 

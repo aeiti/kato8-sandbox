@@ -275,7 +275,9 @@
     .save-note { font-size: 0.8rem; color: var(--muted); }
 
     /* Toast / push feedback */
+    #prlink { color: inherit; }
     #toast {
+      white-space: pre-wrap;
       position: fixed;
       right: 20px; bottom: 20px;
       max-width: 380px;
@@ -333,12 +335,13 @@
     <div class="topbar">
       <div>
         <h1>Sandbox Admin Panel</h1>
-        <p class="sub">Pick a category, edit, then Push to deploy.</p>
+        <p class="sub">Pick a category, edit, then Push to open a PR (merging it deploys).</p>
       </div>
       <div class="spacer"></div>
       <a class="btn" href="/__bios" style="text-decoration:none">🃏 Studio Bios →</a>
       <span class="env" id="branch">branch …</span>
-      <button class="btn btn--push" id="publish">Push</button>
+      <a class="env" id="prlink" target="_blank" rel="noopener" hidden></a>
+      <button class="btn btn--push" id="publish" title="Opens a pull request against main from your saved changes">Push</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
   </header>
@@ -1563,33 +1566,45 @@
       if (dirtyKeys.length) {
         const ok = confirm(
           'You have unsaved changes in: ' + dirtyKeys.join(', ') +
-          '.\nOnly saved changes are pushed. Save them first?\n\n' +
+          '.\nOnly saved changes go into the PR. Save them first?\n\n' +
           'OK = save all, then push. Cancel = push only saved changes.'
         )
         if (ok) {
           for (const k of dirtyKeys) await saveByKey(k)
         }
       }
+      // Push builds in a temp worktree before opening the PR — ~30s+.
+      const btn = document.getElementById('publish')
+      btn.disabled = true
+      btn.textContent = 'Building + opening PR…'
       try {
         const res = await fetch('/__admin/api/publish', { method: 'POST' })
         const body = await res.json()
         if (!res.ok) throw new Error(body.error || 'push failed')
         if (body.published === false) { toast(body.reason, 'ok'); return }
-        toast(body.message, body.deploy ? 'ok' : '')
+        const link = document.getElementById('prlink')
+        link.href = body.prUrl
+        link.textContent = 'PR: ' + body.prUrl.replace(/^.*\/pull\//, '#') + ' ↗'
+        link.hidden = false
+        toast(body.message, 'ok')
       } catch (err) {
         toast('Push failed: ' + err.message, 'err')
+      } finally {
+        btn.disabled = false
+        btn.textContent = 'Push'
       }
     }
 
     document.getElementById('publish').onclick = publish
 
-    // Show the current branch so it's obvious where Push will land.
+    // Show the current branch. Push always opens a PR from origin/main,
+    // whatever is checked out here.
     fetch('/__admin/api/info')
       .then((r) => r.json())
       .then((info) => {
         const el = document.getElementById('branch')
         if (!info.branch) { el.textContent = 'not a git repo'; return }
-        el.textContent = 'branch: ' + info.branch + (info.isMain ? ' → deploys' : '')
+        el.textContent = 'branch: ' + info.branch + ' · Push → PR to main'
       })
       .catch(() => {})
     load()

@@ -6,7 +6,8 @@
  * Deliberately a SEPARATE panel from the main home/components manager
  * (`plugin.mjs`, mounted at /__admin) so bios editing can be developed
  * and used on its own. It is built to the same conventions — same
- * `serialize.mjs` round-trip, same `/api/...` shape, same publish flow —
+ * `serialize.mjs` round-trip, same `/api/...` shape, same publish flow
+ * (shared helpers in `common.mjs`) —
  * so folding it into the main panel later is mostly moving these
  * endpoints into plugin.mjs and this UI into a new tab. The two panels
  * cross-link in their headers.
@@ -25,17 +26,18 @@
  *   PUT  /__bios/api/people         → rewrite the `studioBios` array
  *   PUT  /__bios/api/types          → rewrite the `CARD_COLORS` object
  *   POST /__bios/api/upload         → save an uploaded image (avatar / card art)
- *   POST /__bios/api/publish        → commit + push the bios feature files
+ *   POST /__bios/api/publish        → open a PR with the bios feature files
  *
- * Push commits ONLY the studio-bios feature files (the data source, the
- * page, its stylesheet, the five card components, and uploaded images
- * under public/assets/sandbox) — an explicit allowlist, so it never grabs
- * unrelated WIP. It never force-pushes.
+ * Push carries ONLY the studio-bios feature files (the data source, both
+ * pages, their stylesheet, the card components, and uploaded images under
+ * public/assets/sandbox) — an explicit allowlist, so it never grabs
+ * unrelated WIP — onto a `content/*` branch from origin/main, builds it,
+ * and opens a PR (`publishPullRequest()` in common.mjs). Merging deploys.
  */
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { execFileSync } from 'node:child_process'
+import { sendJson, readJsonBody, currentBranch, saveUpload, publishPullRequest } from './common.mjs'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const UI_HTML = path.join(__dirname, 'bios-admin.html')
@@ -47,17 +49,24 @@ const TEAMS_ANCHOR = 'export const TEAMS = '
 const STYLES = ['pokemon', 'magic', 'yugioh']
 const ASSETS_DIR = 'public/assets/sandbox'
 
-// Files Push is allowed to commit — the whole studio-bios feature and
+// Files Push is allowed to carry — the whole studio-bios feature and
 // nothing else. Explicit list (not a directory) so a Push never sweeps in
 // unrelated components or pages.
 const MANAGED_PATHS = [
   DATA_FILE,
   'src/pages/StudioBiosPage.jsx',
+  'src/pages/StudioBiosFramesPage.jsx',
   'src/styles/studio-bios.css',
+  'src/components/BioCard.jsx',
   'src/components/BioCardArt.jsx',
+  'src/components/FrameBioCard.jsx',
+  'src/components/TemplateBioCard.jsx',
   'src/components/PokemonBioCard.jsx',
   'src/components/MagicBioCard.jsx',
   'src/components/YugiohBioCard.jsx',
+  'src/components/PokemonTemplateCard.jsx',
+  'src/components/MagicTemplateCard.jsx',
+  'src/components/YugiohTemplateCard.jsx',
   'src/components/StudioBioGallery.jsx',
   ASSETS_DIR,
 ]
@@ -71,42 +80,6 @@ const NUMERIC_TOP = []
 const NUMERIC_POKEMON = ['hp', 'retreat']
 const NUMERIC_MAGIC = ['power', 'toughness']
 const NUMERIC_YUGIOH = ['level', 'atk', 'def']
-
-const IMAGE_EXT = {
-  'image/png': 'png',
-  'image/jpeg': 'jpg',
-  'image/gif': 'gif',
-  'image/svg+xml': 'svg',
-  'image/webp': 'webp',
-}
-
-function sendJson(res, status, body) {
-  res.statusCode = status
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(body))
-}
-
-function readJsonBody(req, maxBytes = 12_000_000) {
-  return new Promise((resolve, reject) => {
-    let data = ''
-    req.on('data', (chunk) => {
-      data += chunk
-      if (data.length > maxBytes) reject(new Error('body too large'))
-    })
-    req.on('end', () => {
-      try {
-        resolve(data ? JSON.parse(data) : null)
-      } catch (err) {
-        reject(err)
-      }
-    })
-    req.on('error', reject)
-  })
-}
-
-function git(root, args) {
-  return execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim()
-}
 
 /** Coerce the known numeric fields of one nested block from strings to
  *  numbers (dropping blank/NaN values), leaving other fields untouched. */
@@ -175,17 +148,6 @@ function normalizePerson(p, index) {
   return coerceNumbers(out, NUMERIC_TOP)
 }
 
-/** Filesystem-safe image basename: lowercase, hyphen-separated. */
-function safeImageName(name, ext) {
-  const stem = String(name || '')
-    .replace(/\.[^.]*$/, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 60)
-  return (stem || 'image') + '.' + ext
-}
-
 export function devBiosAdmin() {
   return {
     name: 'kato8-dev-bios-admin',
@@ -209,12 +171,7 @@ export function devBiosAdmin() {
 
           // GET /__bios/api/info — current git branch (for the header)
           if (req.method === 'GET' && url === '/api/info') {
-            let branch = null
-            try {
-              branch = git(root, ['rev-parse', '--abbrev-ref', 'HEAD'])
-            } catch {
-              /* not a git repo — leave null */
-            }
+            const branch = currentBranch(root)
             sendJson(res, 200, { branch, isMain: branch === 'main' })
             return
           }
@@ -234,7 +191,7 @@ export function devBiosAdmin() {
 
           // PUT /__bios/api/people — rewrite the studioBios array
           if (req.method === 'PUT' && url === '/api/people') {
-            const value = await readJsonBody(req)
+            const value = await readJsonBody(req, 12_000_000)
             if (!Array.isArray(value)) {
               return sendJson(res, 400, { error: 'expected a JSON array of people' })
             }
@@ -277,86 +234,21 @@ export function devBiosAdmin() {
           // POST /__bios/api/upload — save an uploaded image under
           // public/assets/sandbox. Body: { filename, dataUrl }.
           if (req.method === 'POST' && url === '/api/upload') {
-            const body = await readJsonBody(req)
-            const dataUrl = body && body.dataUrl
-            const m = typeof dataUrl === 'string'
-              ? dataUrl.match(/^data:([^;]+);base64,(.*)$/)
-              : null
-            if (!m) {
-              return sendJson(res, 400, { error: 'expected { filename, dataUrl } (base64 data URL)' })
-            }
-            const ext = IMAGE_EXT[m[1]]
-            if (!ext) {
-              return sendJson(res, 400, {
-                error: `unsupported image type: ${m[1]} (png, jpg, gif, svg, webp)`,
-              })
-            }
-            const buf = Buffer.from(m[2], 'base64')
-            if (buf.length > 8_000_000) {
-              return sendJson(res, 413, { error: 'image too large (8 MB max)' })
-            }
-
-            const dir = path.join(root, ASSETS_DIR)
-            fs.mkdirSync(dir, { recursive: true })
-            let file = safeImageName(body.filename, ext)
-            if (fs.existsSync(path.join(dir, file))) {
-              const stem = file.replace(/\.[^.]*$/, '')
-              let n = 1
-              while (fs.existsSync(path.join(dir, `${stem}-${n}.${ext}`))) n++
-              file = `${stem}-${n}.${ext}`
-            }
-            fs.writeFileSync(path.join(dir, file), buf)
-            const publicPath = `/assets/sandbox/${file}`
-            sendJson(res, 200, { ok: true, file, path: publicPath, bytes: buf.length })
+            const [status, body] = saveUpload(root, ASSETS_DIR, await readJsonBody(req, 12_000_000))
+            sendJson(res, status, body)
             return
           }
 
-          // POST /__bios/api/publish — commit + push the bios feature files
+          // POST /__bios/api/publish — open a PR with the bios feature files
           if (req.method === 'POST' && url === '/api/publish') {
-            let branch
-            try {
-              branch = git(root, ['rev-parse', '--abbrev-ref', 'HEAD'])
-            } catch {
-              return sendJson(res, 500, { error: 'not a git repository' })
-            }
-
-            git(root, ['add', '--', ...MANAGED_PATHS])
-            const staged = git(root, [
-              'diff', '--cached', '--name-only', '--', ...MANAGED_PATHS,
-            ])
-            if (!staged) {
-              return sendJson(res, 200, {
-                published: false,
-                reason: 'No changes to push — save an edit first.',
-                branch,
-              })
-            }
-
-            git(root, ['commit', '-m', COMMIT_MESSAGE, '--', ...MANAGED_PATHS])
-            const sha = git(root, ['rev-parse', '--short', 'HEAD'])
-
-            try {
-              git(root, ['push', 'origin', 'HEAD'])
-            } catch (err) {
-              return sendJson(res, 500, {
-                error: 'commit succeeded but push failed: ' + (err.stderr || err.message),
-                branch,
-                sha,
-              })
-            }
-
-            const isMain = branch === 'main'
-            sendJson(res, 200, {
-              published: true,
-              branch,
-              sha,
-              isMain,
-              deploy: isMain,
-              files: staged.split('\n').filter(Boolean),
-              message: isMain
-                ? `Pushed ${sha} to main — the Pages deploy is starting.`
-                : `Pushed ${sha} to ${branch}. Merge it to main to deploy.`,
+            const result = await publishPullRequest({
+              root,
+              paths: MANAGED_PATHS,
+              commitMessage: COMMIT_MESSAGE,
+              title: 'Studio bios update (admin panel)',
+              panel: '/__bios',
             })
+            sendJson(res, 200, result)
             return
           }
 

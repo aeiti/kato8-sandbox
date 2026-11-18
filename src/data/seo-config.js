@@ -172,20 +172,11 @@ export const componentRoutes = Object.fromEntries(
 )
 
 // Per-game meta for the crowdfunding demo detail pages
-// (`/crowdfunding-games/:slug`). The dev admin panel (/__admin →
-// Crowdfunding) rewrites this slug list whenever it saves the games, so
-// added/renamed/deleted games keep their prerendered OG pages. Title and
-// description come from the game's own entry in crowdfundingGames.js
-// (import-free, so still Node-loadable by the prerender script), falling
-// back to generic copy for a slug with no matching game.
-const CROWDFUNDING_SLUGS = [
-  'dead-hour',
-  'hollowbrook-apothecary',
-  'hotdog-hustler',
-  'boardwalk',
-  'blind-slight',
-  'game-six',
-]
+// (`/crowdfunding-games/:slug`), one per game in crowdfundingGames.js, so
+// added/renamed/deleted games keep their prerendered OG pages with no
+// second list to sync. Title and description come from the game's own
+// entry (import-free, so still Node-loadable by the prerender script).
+const CROWDFUNDING_SLUGS = crowdfundingGames.map((g) => g.slug)
 
 export const crowdfundingGameRoutes = Object.fromEntries(
   CROWDFUNDING_SLUGS.map((slug) => {

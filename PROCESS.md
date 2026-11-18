@@ -86,10 +86,15 @@ browser instead of hand-editing the file:
   (Vite hot-reloads the running site). Only that one array is touched;
   everything else in the file is preserved. Comments *inside* the arrays
   are dropped on save, so keep prose in the file's top doc comment.
-- **Publish → deploy** commits `homeSections.js` and pushes the current
-  branch. Run it on `main` (the normal case) and that push triggers the
-  Pages deploy; on any other branch it just tells you to merge to main.
-  It only ever commits that one file and never force-pushes.
+- **Push** opens a pull request; it never commits in, or pushes, your
+  checkout. It fetches `origin/main`, creates a `content/<yyyymmdd-hhmm>`
+  branch from it in a temporary worktree, applies your edits to the
+  panel's managed files there (a conflict with newer `main` stops it),
+  runs `npm run build` + `scripts/check-routes.mjs`, pushes, and runs
+  `gh pr create`. The panel shows the PR link; **merging the PR deploys**.
+  Your edits stay uncommitted locally — after the merge, discard them and
+  pull `main`. Needs `gh` signed in. The `/__bios` panel's Push works
+  the same way (shared code in `scripts/dev-admin/common.mjs`).
 
 How it stays out of production: the manager is a Vite middleware plugin
 (`scripts/dev-admin/`) registered with `apply: 'serve'`, so it exists
@@ -101,8 +106,8 @@ The **Crowdfunding** tab edits the games on `/crowdfunding-games`
 (`src/data/crowdfundingGames.js`): add, delete, reorder, and edit each
 game's title, slug, categories, Coming Soon tag, card/cover images
 (upload or path), card description, and detail-page body (paragraphs
-separated by a blank line). **Save** rewrites the games array *and* the
-`CROWDFUNDING_SLUGS` list in `src/data/seo-config.js`, so every game keeps
+separated by a blank line). **Save** rewrites the games array;
+`src/data/seo-config.js` derives the game routes from it, so every game keeps
 a prerendered OG page. Renaming a slug moves the detail page to a new URL.
 
 The **Studio Bios** panel (`/__bios`, its own page rather than a tab)
