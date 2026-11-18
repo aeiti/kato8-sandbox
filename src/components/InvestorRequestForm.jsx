@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import RadioGroup from './RadioGroup'
+import Turnstile from './Turnstile'
 import '../styles/investor-request-form.css'
 
 const TYPE_OPTIONS = [
@@ -22,12 +23,18 @@ const TYPE_OPTIONS = [
  * endpoint into external-site.
  *
  * Posts `{ name, email, phone, type, company, details, source }` to
- * `VITE_INVESTOR_ENDPOINT` (typically a Formspree URL). If that env var
+ * `VITE_INVESTOR_ENDPOINT`: the investor-contact Worker
+ * (workers/investor-contact), which forwards to Formspree and emails the
+ * visitor a confirmation. A plain Formspree URL also works. If the env var
  * is unset the submit resolves successfully with no network call, so the
  * form is usable in the sandbox before a backend exists — same
  * convention as `NewsletterSignup` / `PlaytestSignupForm`. `type` is
  * `'investor'` or `'publisher'`; `phone` is the only optional field and
  * is sent as an empty string when left blank.
+ *
+ * When `VITE_TURNSTILE_SITE_KEY` is set, a Cloudflare Turnstile bot check
+ * renders above the submit button and its token is sent as
+ * `turnstileToken` (the Worker verifies it). Unset, no widget renders.
  *
  * Props:
  *   - source?: string — identifier for where the form lives, sent with
@@ -49,6 +56,9 @@ export default function InvestorRequestForm({
   const [website, setWebsite] = useState('') // honeypot
   const [status, setStatus] = useState('idle') // idle | submitting | success | error
   const [errorMessage, setErrorMessage] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState('')
+  const turnstileRef = useRef(null)
+  const turnstileSiteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -84,6 +94,11 @@ export default function InvestorRequestForm({
       setErrorMessage('Please add some details.')
       return
     }
+    if (turnstileSiteKey && !turnstileToken) {
+      setStatus('error')
+      setErrorMessage('Please complete the bot check.')
+      return
+    }
 
     setStatus('submitting')
     setErrorMessage('')
@@ -105,9 +120,14 @@ export default function InvestorRequestForm({
             company: company.trim(),
             details: details.trim(),
             source,
+            ...(turnstileSiteKey ? { turnstileToken } : {}),
           }),
         })
-        if (!response.ok) throw new Error(`Request failed (${response.status})`)
+        if (!response.ok) {
+          // The Worker returns a human-readable `error`; show it when present.
+          const data = await response.json().catch(() => null)
+          throw new Error(data?.error || `Request failed (${response.status})`, { cause: 'server' })
+        }
       } else {
         console.warn(`InvestorRequestForm: VITE_INVESTOR_ENDPOINT not set (source=${source}); skipping network call.`)
       }
@@ -120,7 +140,13 @@ export default function InvestorRequestForm({
       setDetails('')
     } catch (error) {
       setStatus('error')
-      setErrorMessage('Something went wrong. Please try again.')
+      setErrorMessage(
+        error.cause === 'server' && !/^Request failed/.test(error.message)
+          ? error.message
+          : 'Something went wrong. Please try again.',
+      )
+      // Turnstile tokens are single-use; get a fresh one for the retry.
+      turnstileRef.current?.reset()
     }
   }
 
@@ -232,6 +258,10 @@ export default function InvestorRequestForm({
             disabled={status === 'submitting'}
           />
         </label>
+
+        {turnstileSiteKey && (
+          <Turnstile ref={turnstileRef} siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+        )}
 
         <button type="submit" className="button" disabled={status === 'submitting'}>
           {status === 'submitting' ? 'Sending…' : 'Send message'}
