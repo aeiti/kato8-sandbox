@@ -28,6 +28,9 @@
  *   vars:    ALLOWED_ORIGINS, FROM_ADDRESS, DRY_RUN,
  *            EMAIL_ASSET_BASE (optional; defaults to this Worker's origin)
  *   secrets: REPLY_TO, TURNSTILE_SECRET, RESEND_API_KEY, FORMSPREE_ENDPOINT
+ *
+ * Without RESEND_API_KEY (or REPLY_TO), submissions still go to Formspree;
+ * only the confirmation email is skipped.
  */
 
 export const TYPES = ['investor', 'publisher']
@@ -178,6 +181,12 @@ async function sendConfirmation(email, env) {
   // FROM_ADDRESS, which has no mailbox, so don't send one that can't be answered.
   if (!email.reply_to) {
     console.error('REPLY_TO is not set; skipping the confirmation email.')
+    return
+  }
+  // No key yet (e.g. the sending domain isn't verified in Resend): the
+  // submission still reaches Formspree, just without a confirmation.
+  if (!env.RESEND_API_KEY) {
+    console.log('RESEND_API_KEY is not set; skipping the confirmation email.')
     return
   }
   try {

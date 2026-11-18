@@ -241,6 +241,14 @@ test('missing REPLY_TO skips the confirmation but keeps the submission', async (
   assert.deepEqual(urls(), [TURNSTILE, FORMSPREE], 'forwarded, but no unanswerable email sent')
 })
 
+test('missing RESEND_API_KEY skips the confirmation but keeps the submission', async () => {
+  const { RESEND_API_KEY, ...env } = baseEnv
+  const res = await worker.fetch(post(valid), env)
+  assert.equal(res.status, 200)
+  assert.deepEqual(await res.json(), { ok: true })
+  assert.deepEqual(urls(), [TURNSTILE, FORMSPREE], 'forwarded, with no keyless call to Resend')
+})
+
 test('DRY_RUN skips Formspree and Resend', async () => {
   const res = await worker.fetch(post(valid), { ...baseEnv, DRY_RUN: 'true' })
   assert.equal(res.status, 200)
