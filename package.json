@@ -3,11 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
     "preview": "vite preview",
-    "og:capture": "node scripts/capture-og.mjs"
+    "og:capture": "node scripts/capture-og.mjs",
+    "check:routes": "node scripts/check-routes.mjs"
   },
   "dependencies": {
     "kato8studios-site": "file:../external-site",
